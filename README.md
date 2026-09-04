@@ -1,43 +1,106 @@
+<div align="center">
+
+<img src="docs/images/icon-256.png" width="128" alt="Suffix">
+
 # Suffix
 
 **Convert files by renaming them.**
 
-Select a file in Finder, press Return, change `.png` to `.pdf`, and the file
-becomes a real PDF. No upload, no website, no app to open. It works in every
-folder on your Mac, and a banner confirms each conversion with an Undo
-button.
+Select a file in Finder. Press Return. Change `.png` to `.pdf`.
+The file becomes a real PDF.
+
+[**⬇ Download for macOS**](https://github.com/PewPewBiches/Suffix/releases/latest) · [How it works](#how-to-use-it) · [What it converts](#what-it-converts)
+
+macOS 14 or later · Free · Open source · No account, no upload, no network
+
+</div>
+
+---
+
+## The thing this removes
+
+You have a photo and you need a PDF. So you search "png to pdf", pick one of the
+identical sites, upload your file to a stranger's server, wait, close a popup,
+download the result, find it in Downloads, move it back where it belongs, and
+delete the original.
+
+That is nine steps and a stranger's server, to change a file format your Mac has
+been able to change on its own the entire time.
+
+Suffix makes it one step: **rename the file.**
+
+```
+invoice.png  →  invoice.pdf
+```
+
+Nothing is uploaded. Nothing leaves your Mac. There is no window to open, no
+file picker, no "drag your file here". You already know how to rename a file.
+
+---
+
+## How to use it
+
+<img src="docs/images/how-it-works.png" width="520" alt="Three keystrokes: select a file, press Return and edit the extension, and it converts in place">
+
+1. **Click a file** in Finder
+2. **Press Return** and edit the part after the dot
+3. **Press Return again**
+
+A second later a notice confirms it, with **Undo** if you didn't mean it.
+
+<img src="docs/images/notice-dark.png" width="420" alt="Converted: invoice.png to invoice.pdf, with Undo and Show buttons">
+
+That's the whole app. It lives in your menu bar and does nothing else.
+
+### Some things worth trying
+
+| Rename this | To this | And you get |
+|---|---|---|
+| `screenshot.png` | `screenshot.txt` | **The text in the image**, read out of it |
+| `scan.pdf` | `scan.txt` | The words from a scanned document |
+| `photo.heic` | `photo.jpg` | An iPhone photo anything can open |
+| `report.docx` | `report.pdf` | A PDF you can send |
+| `deck.pages` | `deck.pdf` | Exactly what Pages would export |
+| `clip.mov` | `clip.mp4` | The same video, in the container everything accepts |
+| `talk.mp4` | `talk.m4a` | Just the audio |
+| `brochure.pdf` | `brochure.jpg` | Every page as an image, in a `.zip` |
 
 ---
 
 ## Install
 
-Download `Suffix.dmg` from [Releases](../../releases), drag Suffix to your
-Applications folder, and open it.
+**[Download the latest release](https://github.com/PewPewBiches/Suffix/releases/latest)**, open the disk image, and drag Suffix to Applications.
 
-### The first time you open it
+### macOS will block it the first time
 
-Suffix isn't signed with a paid Apple Developer certificate, so macOS will
-refuse to open it and say it "cannot be verified". This is Gatekeeper reacting
-to the missing $99/year signature, not to anything the app does.
+Suffix isn't signed with a paid Apple Developer certificate ($99/year), so
+macOS will say it "cannot be verified". This is Gatekeeper reacting to the
+missing signature, not to anything the app does.
 
-To open it anyway:
+1. Open Suffix and let macOS block it
+2. Go to **System Settings → Privacy & Security**
+3. Scroll down to the line about Suffix and click **Open Anyway**
 
-1. Try to open Suffix. Let macOS block it.
-2. Go to **System Settings → Privacy & Security**.
-3. Scroll down. There's a line about Suffix being blocked — click **Open Anyway**.
+You do this once.
 
-You only do this once. If you'd rather not trust a stranger's build, the whole
-app is here — clone it and run `./Scripts/build-app.sh` to build your own.
+### Then let it reach your files
 
-### Give it access to your files
-
-macOS protects Desktop, Documents and Downloads. Without access Suffix keeps
-running but silently does nothing in exactly the folders you use most, so the
+macOS protects Desktop, Documents and Downloads. Without access, Suffix keeps
+running and silently does nothing in exactly the folders you use most — so the
 setup window asks for **Full Disk Access** and then offers a **Test it** button
 that converts a real file to prove the whole chain works.
 
-Don't skip the test. A silent, healthy-looking failure is this app's
+**Don't skip the test.** A silent, healthy-looking failure is this app's
 characteristic way of going wrong.
+
+### Don't trust a stranger's binary?
+
+Reasonable. Build your own — it takes about ten seconds:
+
+```bash
+git clone https://github.com/PewPewBiches/Suffix.git
+cd Suffix && ./Scripts/build-app.sh && open build
+```
 
 ---
 
@@ -45,139 +108,109 @@ characteristic way of going wrong.
 
 ### Images and PDFs
 
-|                                            | PNG | JPEG | TIFF | GIF | BMP | HEIC | PDF | TXT |
-|--------------------------------------------|:---:|:----:|:----:|:---:|:---:|:----:|:---:|:---:|
-| **from** PNG / JPEG / TIFF / GIF / BMP / HEIC | ●   | ●    | ●    | ●   | ●   | ●    | ●   | –   |
-| **from** WebP                               | ●   | ●    | ●    | ●   | ●   | ●    | ●   | –   |
-| **from** PDF                                | ●   | ●    | ●    | ●   | ●   | ●    | –   | ●   |
+|  | PNG | JPEG | TIFF | GIF | BMP | HEIC | PDF | TXT |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| **PNG · JPEG · TIFF · GIF · BMP · HEIC** | ● | ● | ● | ● | ● | ● | ● | ● |
+| **WebP** | ● | ● | ● | ● | ● | ● | ● | ● |
+| **PDF** | ● | ● | ● | ● | ● | ● | – | ● |
+
+Any image can become text — Suffix reads the words in it using the Vision
+framework built into macOS. A PDF becomes text the same way, falling back to
+reading the pages when the document is a scan with no text layer.
 
 A PDF of more than one page becomes a **`.zip` of numbered images**, because one
-image cannot hold 100 pages. Suffix asks first, and names the result
+image cannot hold a hundred pages. Suffix asks first, and names the result
 `document.zip` rather than the `document.jpg` you typed.
-
-`PDF → .txt` pulls out the text. A scanned PDF has none, and says so rather than
-writing an empty file.
 
 ### Video and audio
 
-|                | MOV | MP4 | M4V | M4A | WAV | AIFF | MP3 |
-|----------------|:---:|:---:|:---:|:---:|:---:|:----:|:---:|
-| **from** MOV / MP4 / M4V | ●   | ●   | ●   | ●   | ●   | ●    | ○   |
-| **from** M4A / WAV / AIFF / MP3 | –   | –   | –   | ●   | ●   | ●    | ○   |
+|  | MOV | MP4 | M4V | M4A | WAV | AIFF | MP3 |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| **MOV · MP4 · M4V** | ● | ● | ● | ● | ● | ● | ○ |
+| **M4A · WAV · AIFF · MP3** | – | – | – | ● | ● | ● | ○ |
 
-Video → video usually copies the existing streams rather than re-encoding, which
-is fast and lossless. Video → audio extracts the soundtrack. Audio cannot become
-video.
+Video to video normally copies the existing streams instead of re-encoding, so
+it is fast and loses nothing. Video to audio extracts the soundtrack.
 
-**○ MP3 needs a helper.** macOS ships an MP3 decoder but no encoder, so Suffix
-uses `ffmpeg` or `lame` if one is installed and otherwise says so:
+**○ MP3 needs a helper.** macOS ships an MP3 *decoder* but no encoder, so Suffix
+uses `ffmpeg` or `lame` if one is installed:
 
 ```bash
 brew install ffmpeg
 ```
 
-Rather than bundle an encoder, Suffix looks for one. Nothing to ship, nothing to
-license, and most people who want MP3 already have it. If you don't, `.m4a` is
-the native equivalent and needs nothing.
-
-### Text out of pictures
-
-Rename a screenshot to `.txt` and you get the words in it:
-
-```
-receipt.png  →  receipt.txt
-```
-
-This uses the Vision framework built into macOS — no service, no upload, no
-account. It also rescues **scanned PDFs**: `scan.pdf → scan.txt` reads the pages
-when there is no text layer to extract.
+Suffix looks for an encoder rather than bundling one — nothing to ship, nothing
+to license. If you'd rather not, `.m4a` is the native equivalent and needs
+nothing.
 
 ### Documents
 
 | From | To PDF |
 |---|---|
-| **Pages, Keynote, Numbers** | ● exact — but needs that Apple app installed |
-| **Word (.docx, .doc)**, **RTF**, **OpenDocument**, **HTML**, **plain text** | ● approximate |
+| **Pages · Keynote · Numbers** | ● exact — needs that Apple app installed |
+| **Word · RTF · OpenDocument · HTML · plain text** | ● approximate |
 
-An iWork document contains no PDF — only protobuf `.iwa` data and JPEG previews
-— so Suffix asks Pages, Keynote or Numbers to export it. If none is installed it
-says so rather than guessing.
-
-Those apps are addressed by **bundle identifier**, not by name. Apple ships them
-with display names that differ from the app ("Pages Creator Studio"), so
-matching on the visible name is unreliable. Both identifier forms are accepted:
-current versions use `com.apple.Pages`, older ones `com.apple.iWork.Pages`.
-
-Suffix quits an iWork app afterwards **only if it started it** — if Pages was
-already open, it is left exactly as it was.
-
-**Read this before converting a document you intend to send.** Everything except
-Pages is re-laid-out by macOS's own text engine, not by Word. Text and basic
-formatting survive; tables, columns, headers and footers, and exact pagination
-do not. Suffix says so on the notice, but check the result.
-
-Pages files are exact because a `.pages` file is a zip carrying a PDF that Pages
-generated. If the document was saved without a preview, Suffix explains how to
-turn that on rather than producing something wrong.
+**Read this before converting a document you plan to send.** Only iWork files
+convert exactly, because Suffix asks Pages (or Keynote, or Numbers) to export
+them. Everything else is re-laid-out by macOS's own text engine: text and basic
+formatting survive, but tables, columns, headers and footers, and exact
+pagination do not. Suffix says so on the notice — check the result.
 
 ### What it never touches
 
-Archives, code, spreadsheets, and anything whose contents aren't a format above.
-A `.zip` renamed to `.png` is left exactly as it is.
+Archives, code, spreadsheets, other apps' libraries, and anything whose contents
+aren't a format above. A `.zip` renamed to `.png` is left exactly as it is, and
+your Photos library is never opened.
 
 ---
 
-## Replace, or keep both
+## Is this safe?
 
-Set during setup, changeable any time in Settings:
+**Your files never leave your Mac.** Suffix has no network code in it at all.
+Conversion uses only what ships with macOS — ImageIO, PDFKit, AVFoundation,
+Vision.
+
+**Nothing is destroyed.** Before anything is overwritten, the original is copied
+to `~/Library/Application Support/Suffix/Originals` and kept for seven days.
+Every conversion can be undone from the menu bar, and stored originals are
+deleted automatically after a week.
+
+**You choose whether the original stays.** Set during setup, changeable any time:
 
 | | After renaming `photo.png` to `photo.pdf` |
 |---|---|
-| **Replace the file** | `photo.pdf` — one file, as renaming implies. Undo for 7 days. |
-| **Keep both** | `photo.pdf` and `photo.png`, side by side in the same folder. |
+| **Replace the file** | `photo.pdf` — one file, as renaming implies |
+| **Keep both** | `photo.pdf` and `photo.png`, side by side |
 
-Either way the original is copied aside before anything is overwritten, and any
-conversion can be undone from the menu bar for seven days.
+**It only acts on a deliberate rename.** Not on files you copy, download, or
+move — only when you change a file's extension yourself, to something Suffix can
+actually produce, and the contents don't already match.
 
 ---
 
-## Why the banner isn't a real notification
-
-Suffix draws its own banner instead of using Notification Center. Not by
-choice: an ad-hoc signature carries no Team Identifier, so macOS auto-denies
-notification authorization with *"Notifications are not allowed for this
-application"* and never even prompts. A stable identity costs $99/year.
-
-The banner is therefore built from system parts — materials, text styles, your
-accent colour — and to the system's own proportions.
-
 ## How it works
 
-Renaming a file in Finder only changes its name — the bytes are untouched. So
-Suffix watches for rename events through FSEvents, checks whether the file's
-real format still matches its new extension, and re-encodes it when it doesn't.
+Renaming a file in Finder only changes its name; the bytes are untouched. Suffix
+watches for rename events, checks whether the file's real format still matches
+its new extension, and re-encodes it when it doesn't.
 
 Everything is decided from the file's **contents**, never its name. A text file
-called `notes.jpg` is left alone; a PNG called `photo.jpg` is converted.
-
-Conversion uses only what ships with macOS — ImageIO, PDFKit, Core Graphics.
-No bundled binaries, no network access. Suffix never sends your files anywhere,
-because it has nowhere to send them.
+called `notes.jpg` is left alone. A PNG called `photo.jpg` is converted.
 
 ---
 
 ## Development
 
 ```bash
-swift test                                    # engine tests
-./Scripts/build-app.sh                        # assemble Suffix.app
+swift test                                     # engine tests
+./Scripts/build-app.sh                         # assemble Suffix.app
+./Scripts/make-dmg.sh 0.3.1                    # build a release disk image
 build/Suffix.app/Contents/MacOS/Suffix --render-previews /tmp/ui
 ```
 
-That last one renders screens to PNG in both light and dark. Note its limit:
+That last one renders the app's screens to PNG in both themes. Note its limit:
 `ImageRenderer` cannot rasterise AppKit-backed controls, so anything built from
-`Form`, `Picker` or `Toggle` comes out blank or as placeholder glyphs. It is
-useful for the notification banner and for layout, not for the settings window.
+`Form`, `Picker` or `Toggle` comes out blank or as placeholder glyphs.
 
 `suffixctl` drives the same engine from the command line:
 
@@ -188,9 +221,8 @@ useful for the notification banner and for layout, not for the settings window.
 .build/debug/suffixctl watch ~/Desktop      # react to renames in a folder
 ```
 
-`SUFFIX_DEBUG=1` prints raw filesystem events.
-
-### Layout
+`SUFFIX_DEBUG=1` prints raw filesystem events. The app logs to
+`~/Library/Logs/Suffix.log`.
 
 | Path | What's in it |
 |---|---|
@@ -200,16 +232,28 @@ useful for the notification banner and for layout, not for the settings window.
 
 ### Notes for anyone touching the watcher
 
-Three FSEvents behaviours cost real debugging time here:
+Four behaviours cost real debugging time here, and every one of them presents
+identically: a watcher that looks healthy and does nothing.
 
 - **`kFSEventStreamCreateFlagUseCFTypes` is mandatory.** Without it the callback
   receives a C `char**`, and reading it as a `CFArray` is silently wrong.
 - **`FSEventStreamSetExclusionPaths` returns `true` and then suppresses every
   event** on a file-level stream. Directory filtering is done in Swift instead.
-- **A rename can arrive as `Removed | Renamed` in one coalesced event.**
-  Filtering out `Removed` drops real renames. Existence on disk is the reliable
+- **A rename can arrive as `Removed | Renamed` coalesced into one event.**
+  Filtering out `Removed` drops real renames; existence on disk is the reliable
   test of which name survived.
+- **Reading a file can block on a permission decision.** Doing that on the main
+  thread freezes the whole app with no visible cause.
 
-All three present identically: a watcher that looks healthy and does nothing.
 Test watcher changes in a busy folder through Finder, not with `mv` in an empty
 directory — a quiet folder never reproduces the coalescing.
+
+One more, for media: **AVFoundation infers a file's type from its extension**,
+unlike ImageIO which reads the bytes. Since this app exists precisely because
+the extension is wrong, media files are staged under their true name first.
+
+---
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).

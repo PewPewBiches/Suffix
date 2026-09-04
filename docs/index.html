@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Suffix — convert files by renaming them</title>
+<meta name="description" content="A free macOS app that converts files when you rename their extension. Change .png to .pdf in Finder and the file becomes a real PDF. No upload, no website.">
+<link rel="icon" href="images/icon-256.png">
+<meta property="og:title" content="Suffix — convert files by renaming them">
+<meta property="og:description" content="Rename photo.png to photo.pdf and it becomes a real PDF. Nothing is uploaded. A free, open-source macOS menu-bar app.">
+<meta property="og:image" content="images/icon-256.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --ink:      #1A1A1C;
+    --paper:    #F6F5F2;
+    --surface:  #FFFFFF;
+    --muted:    #6B6862;
+    --faint:    #93908A;
+    --hair:     #E0DDD6;
+    --accent:   #A8551A;
+    --accent-soft: #F3E7DA;
+    --good:     #2F6B4F;
+
+    --display: "Schibsted Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --body: "Newsreader", Georgia, serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --measure: 64ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink:      #ECEAE5;
+      --paper:    #131314;
+      --surface:  #1B1B1D;
+      --muted:    #A09C95;
+      --faint:    #78746D;
+      --hair:     #2C2C2E;
+      --accent:   #E39B5E;
+      --accent-soft: #2A1F14;
+      --good:     #6DBF95;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 0 24px 80px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 18px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: var(--measure); margin: 0 auto; }
+  .wide { max-width: 940px; margin: 0 auto; }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+  /* ---------- hero ---------- */
+  header.hero {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 72px 0 56px;
+    text-align: center;
+  }
+  header.hero img.icon {
+    width: 104px; height: 104px;
+    border-radius: 23px;
+    margin-bottom: 26px;
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(44px, 8vw, 76px);
+    letter-spacing: -.035em;
+    line-height: 1;
+    margin: 0 0 18px;
+  }
+  .tagline {
+    font-size: clamp(20px, 3vw, 25px);
+    line-height: 1.4;
+    color: var(--muted);
+    margin: 0 auto 30px;
+    max-width: 22ch;
+  }
+
+  /* The gesture itself, as the hero image. */
+  .gesture {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: clamp(15px, 2.6vw, 21px);
+    background: var(--surface);
+    border: 1px solid var(--hair);
+    border-radius: 12px;
+    padding: 16px 22px;
+    margin-bottom: 34px;
+  }
+  .gesture .from { color: var(--muted); }
+  .gesture .arrow { color: var(--faint); }
+  .gesture .to { color: var(--accent); font-weight: 500; }
+
+  .cta {
+    display: inline-block;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: -.01em;
+    color: var(--paper);
+    background: var(--ink);
+    padding: 15px 32px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: transform .12s ease, opacity .12s ease;
+  }
+  .cta:hover { transform: translateY(-1px); opacity: .9; }
+  .cta:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+  .requirements {
+    font-family: var(--display);
+    font-size: 13.5px;
+    color: var(--faint);
+    margin-top: 16px;
+  }
+  .requirements a { color: var(--faint); }
+
+  /* ---------- sections ---------- */
+  section { padding-top: 58px; }
+  h2 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(27px, 4vw, 34px);
+    letter-spacing: -.025em;
+    line-height: 1.15;
+    margin: 0 0 18px;
+    text-wrap: balance;
+  }
+  h3 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: -.012em;
+    margin: 34px 0 8px;
+  }
+  p { margin: 0 0 18px; }
+  .lede { font-size: 20px; }
+
+  code {
+    font-family: var(--mono);
+    font-size: .86em;
+    background: var(--surface);
+    border: 1px solid var(--hair);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+  pre {
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.6;
+    background: var(--surface);
+    border: 1px solid var(--hair);
+    border-radius: 10px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 0 0 18px;
+  }
+  pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+
+  ol.steps { counter-reset: s; list-style: none; padding: 0; margin: 0 0 26px; }
+  ol.steps li {
+    counter-increment: s;
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 14px;
+    padding: 10px 0;
+    align-items: baseline;
+  }
+  ol.steps li::before {
+    content: counter(s);
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+  }
+
+  /* ---------- the before/after comparison ---------- */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin: 30px 0 8px;
+  }
+  @media (max-width: 640px) { .compare { grid-template-columns: 1fr; } }
+  .compare > div {
+    background: var(--surface);
+    border: 1px solid var(--hair);
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+  .compare .label {
+    font-family: var(--display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 12px;
+  }
+  .compare ol { margin: 0; padding-left: 1.15em; font-size: 15.5px; line-height: 1.75; }
+  .compare li::marker { color: var(--faint); }
+  .compare .single {
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--accent);
+  }
+  .compare.after > div:last-child { border-color: var(--accent); }
+
+  /* ---------- tables ---------- */
+  .tablewrap { overflow-x: auto; margin: 24px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--display);
+    font-size: 14.5px;
+    min-width: 460px;
+  }
+  th, td {
+    text-align: left;
+    padding: 11px 13px;
+    border-bottom: 1px solid var(--hair);
+    vertical-align: top;
+  }
+  th {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  tr:last-child td { border-bottom: none; }
+  td.file { font-family: var(--mono); font-size: 13px; white-space: nowrap; }
+  td.file .to { color: var(--accent); }
+  .matrix td, .matrix th { text-align: center; padding: 9px 8px; }
+  .matrix td:first-child, .matrix th:first-child { text-align: left; white-space: nowrap; }
+  .yes { color: var(--good); font-weight: 700; }
+  .no  { color: var(--faint); }
+  .partial { color: var(--accent); font-weight: 700; }
+
+  /* ---------- callout ---------- */
+  .note {
+    background: var(--surface);
+    border: 1px solid var(--hair);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 26px 0;
+    font-size: 16.5px;
+  }
+  .note p:last-child { margin-bottom: 0; }
+  .note strong { font-family: var(--display); }
+
+  figure { margin: 30px 0; text-align: center; }
+  figure img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid var(--hair);
+  }
+  figcaption {
+    font-family: var(--display);
+    font-size: 13px;
+    color: var(--faint);
+    margin-top: 12px;
+  }
+
+  footer {
+    max-width: 940px;
+    margin: 76px auto 0;
+    padding-top: 28px;
+    border-top: 1px solid var(--hair);
+    font-family: var(--display);
+    font-size: 14px;
+    color: var(--faint);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+    justify-content: space-between;
+  }
+  footer a { color: var(--muted); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <img class="icon" src="images/icon-256.png" alt="">
+  <h1>Suffix</h1>
+  <p class="tagline">Convert files by renaming them.</p>
+
+  <div class="gesture">
+    <span class="from">invoice.png</span>
+    <span class="arrow">→</span>
+    <span class="to">invoice.pdf</span>
+  </div>
+
+  <div>
+    <a class="cta" href="https://github.com/PewPewBiches/Suffix/releases/latest">Download for macOS</a>
+  </div>
+  <p class="requirements">
+    macOS 14 or later · free and open source ·
+    <a href="https://github.com/PewPewBiches/Suffix">source on GitHub</a>
+  </p>
+</header>
+
+<main>
+<div class="wrap">
+
+  <section>
+    <h2>The ritual this deletes</h2>
+    <p class="lede">
+      You have a photo. You need a PDF. So you search “png to pdf”, pick one of
+      the identical sites, and upload your file to a stranger's server.
+    </p>
+
+    <div class="compare after">
+      <div>
+        <div class="label">Every time, until now</div>
+        <ol>
+          <li>Search “png to pdf”</li>
+          <li>Pick a site</li>
+          <li>Upload your file</li>
+          <li>Wait</li>
+          <li>Close a popup</li>
+          <li>Download the result</li>
+          <li>Find it in Downloads</li>
+          <li>Move it back</li>
+          <li>Delete the original</li>
+        </ol>
+      </div>
+      <div>
+        <div class="label">With Suffix</div>
+        <ol>
+          <li>Rename the file</li>
+        </ol>
+        <p class="single" style="margin-top:14px">invoice.png&nbsp;→&nbsp;invoice.pdf</p>
+      </div>
+    </div>
+
+    <p>
+      Nothing is uploaded. Nothing leaves your Mac. There is no window to open,
+      no file picker, no “drag your file here”. You already know how to rename
+      a file.
+    </p>
+  </section>
+
+  <section>
+    <h2>How to use it</h2>
+    <ol class="steps">
+      <li><strong>Click a file</strong> in Finder</li>
+      <li><strong>Press Return</strong> and edit the part after the dot</li>
+      <li><strong>Press Return again</strong></li>
+    </ol>
+    <p>
+      A second later a notice confirms it, with <strong>Undo</strong> if you
+      didn't mean it.
+    </p>
+
+    <figure>
+      <img src="images/notice-dark.png" width="420" alt="A notice reading: Converted, invoice.png to invoice.pdf, with Undo and Show buttons">
+      <figcaption>The confirmation, with Undo where you can reach it</figcaption>
+    </figure>
+
+    <p>That is the whole app. It lives in your menu bar and does nothing else.</p>
+  </section>
+
+  <section>
+    <h2>Some things worth trying</h2>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Rename</th><th>And you get</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="file">screenshot.png → <span class="to">.txt</span></td>
+            <td><strong>The text inside the image</strong>, read out of it</td>
+          </tr>
+          <tr>
+            <td class="file">scan.pdf → <span class="to">.txt</span></td>
+            <td>The words from a scanned document that has no text layer</td>
+          </tr>
+          <tr>
+            <td class="file">photo.heic → <span class="to">.jpg</span></td>
+            <td>An iPhone photo anything can open</td>
+          </tr>
+          <tr>
+            <td class="file">report.docx → <span class="to">.pdf</span></td>
+            <td>A PDF you can send</td>
+          </tr>
+          <tr>
+            <td class="file">deck.pages → <span class="to">.pdf</span></td>
+            <td>Exactly what Pages itself would export</td>
+          </tr>
+          <tr>
+            <td class="file">clip.mov → <span class="to">.mp4</span></td>
+            <td>The same video, in the container everything accepts</td>
+          </tr>
+          <tr>
+            <td class="file">talk.mp4 → <span class="to">.m4a</span></td>
+            <td>Just the audio</td>
+          </tr>
+          <tr>
+            <td class="file">brochure.pdf → <span class="to">.jpg</span></td>
+            <td>Every page as an image, delivered as a <code>.zip</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Install it</h2>
+    <p>
+      <a href="https://github.com/PewPewBiches/Suffix/releases/latest">Download the latest release</a>,
+      open the disk image, and drag Suffix to your Applications folder.
+    </p>
+
+    <h3>macOS will block it the first time</h3>
+    <p>
+      Suffix isn't signed with a paid Apple Developer certificate, so macOS will
+      say it “cannot be verified”. That is Gatekeeper reacting to the missing
+      $99-a-year signature, not to anything the app does.
+    </p>
+    <ol class="steps">
+      <li>Open Suffix and let macOS block it</li>
+      <li>Go to <strong>System Settings → Privacy &amp; Security</strong></li>
+      <li>Scroll to the line about Suffix and click <strong>Open Anyway</strong></li>
+    </ol>
+    <p>You do this once.</p>
+
+    <h3>Then let it reach your files</h3>
+    <p>
+      macOS protects Desktop, Documents and Downloads. Without access Suffix
+      keeps running but silently does nothing in exactly the folders you use
+      most, so setup asks for <strong>Full Disk Access</strong> and then offers a
+      <strong>Test it</strong> button that converts a real file to prove the
+      whole chain works.
+    </p>
+    <div class="note">
+      <p>
+        <strong>Don't skip the test.</strong> A silent, healthy-looking failure
+        is this app's characteristic way of going wrong, and the test is what
+        catches it while you are still paying attention.
+      </p>
+    </div>
+
+    <h3>Would rather not trust a stranger's binary?</h3>
+    <p>Reasonable. Build your own — it takes about ten seconds:</p>
+<pre><code>git clone https://github.com/PewPewBiches/Suffix.git
+cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
+  </section>
+
+</div>
+
+<div class="wide">
+  <section>
+    <h2 style="text-align:center">What it converts</h2>
+
+    <h3>Images and PDFs</h3>
+    <div class="tablewrap">
+      <table class="matrix">
+        <thead>
+          <tr><th>From</th><th>PNG</th><th>JPEG</th><th>TIFF</th><th>GIF</th><th>BMP</th><th>HEIC</th><th>PDF</th><th>TXT</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>PNG · JPEG · TIFF · GIF · BMP · HEIC</td>
+            <td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td></tr>
+          <tr><td>WebP</td>
+            <td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td></tr>
+          <tr><td>PDF</td>
+            <td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="no">–</td><td class="yes">●</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="wrap">
+      <p>
+        Any image can become text: Suffix reads the words in it using the Vision
+        framework built into macOS. A PDF becomes text the same way, falling
+        back to reading the pages when the document is a scan.
+      </p>
+      <p>
+        A PDF of more than one page becomes a <code>.zip</code> of numbered
+        images, because one image cannot hold a hundred pages. Suffix asks
+        first, and names the result <code>document.zip</code> rather than the
+        <code>document.jpg</code> you typed.
+      </p>
+    </div>
+
+    <h3>Video and audio</h3>
+    <div class="tablewrap">
+      <table class="matrix">
+        <thead>
+          <tr><th>From</th><th>MOV</th><th>MP4</th><th>M4V</th><th>M4A</th><th>WAV</th><th>AIFF</th><th>MP3</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>MOV · MP4 · M4V</td>
+            <td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="partial">○</td></tr>
+          <tr><td>M4A · WAV · AIFF · MP3</td>
+            <td class="no">–</td><td class="no">–</td><td class="no">–</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="partial">○</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="wrap">
+      <p>
+        Video to video normally copies the existing streams instead of
+        re-encoding, so it is fast and loses nothing. Video to audio extracts
+        the soundtrack.
+      </p>
+      <p>
+        <strong>○ MP3 needs a helper.</strong> macOS ships an MP3 decoder but no
+        encoder, so Suffix uses <code>ffmpeg</code> or <code>lame</code> if one
+        is installed — <code>brew install ffmpeg</code>. It looks for an encoder
+        rather than bundling one. If you'd rather not, <code>.m4a</code> is the
+        native equivalent and needs nothing.
+      </p>
+    </div>
+
+    <h3>Documents</h3>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>From</th><th>To PDF</th></tr></thead>
+        <tbody>
+          <tr><td>Pages · Keynote · Numbers</td>
+            <td><span class="yes">●</span> exact — needs that Apple app installed</td></tr>
+          <tr><td>Word · RTF · OpenDocument · HTML · plain text</td>
+            <td><span class="partial">●</span> approximate</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="wrap">
+      <div class="note">
+        <p>
+          <strong>Read this before converting a document you plan to send.</strong>
+          Only iWork files convert exactly, because Suffix asks Pages to export
+          them. Everything else is re-laid-out by macOS's own text engine: text
+          and basic formatting survive, but tables, columns, headers and
+          footers, and exact pagination do not. Suffix says so on the notice —
+          check the result.
+        </p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+  <section>
+    <h2>Is this safe?</h2>
+
+    <h3>Your files never leave your Mac</h3>
+    <p>
+      Suffix contains no network code at all. Conversion uses only what ships
+      with macOS — ImageIO, PDFKit, AVFoundation and Vision. There is no
+      account, no service, and nothing to sign in to.
+    </p>
+
+    <h3>Nothing is destroyed</h3>
+    <p>
+      Before anything is overwritten the original is copied aside and kept for
+      seven days, so any conversion can be undone from the menu bar. Stored
+      originals are deleted automatically after a week, rather than quietly
+      becoming a second copy of your photo library.
+    </p>
+
+    <h3>You choose whether the original stays</h3>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th></th><th>After renaming photo.png to photo.pdf</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Replace the file</strong></td>
+            <td class="file">photo.pdf — one file, as renaming implies</td></tr>
+          <tr><td><strong>Keep both</strong></td>
+            <td class="file">photo.pdf &nbsp;and&nbsp; photo.png, side by side</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>It only acts on a deliberate rename</h3>
+    <p>
+      Not on files you copy, download or move — only when you change a file's
+      extension yourself, to something Suffix can actually produce, and the
+      contents don't already match. Archives, code, other apps' libraries and
+      anything it doesn't recognise are left exactly as they are. A
+      <code>.zip</code> renamed to <code>.png</code> is untouched, and your
+      Photos library is never opened.
+    </p>
+  </section>
+
+  <section>
+    <h2>How it works</h2>
+    <p>
+      Renaming a file in Finder only changes its name; the bytes are untouched.
+      Suffix watches for rename events, checks whether the file's real format
+      still matches its new extension, and re-encodes it when it doesn't.
+    </p>
+    <p>
+      Everything is decided from the file's <strong>contents</strong>, never its
+      name. A text file called <code>notes.jpg</code> is left alone. A PNG
+      called <code>photo.jpg</code> is converted.
+    </p>
+  </section>
+</div>
+</main>
+
+<footer class="wide">
+  <span>Suffix · MIT licensed · built for macOS</span>
+  <span>
+    <a href="https://github.com/PewPewBiches/Suffix">Source</a> ·
+    <a href="https://github.com/PewPewBiches/Suffix/releases/latest">Download</a> ·
+    <a href="https://github.com/PewPewBiches/Suffix/issues">Report a problem</a>
+  </span>
+</footer>
+
+</body>
+</html>
