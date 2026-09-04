@@ -69,38 +69,56 @@ That's the whole app. It lives in your menu bar and does nothing else.
 
 ## Install
 
-**[Download the latest release](https://github.com/PewPewBiches/Suffix/releases/latest)**, open the disk image, and drag Suffix to Applications.
+Download `Suffix.dmg` from [Releases](../../releases), drag Suffix to your
+Applications folder, and open it.
 
-### macOS will block it the first time
+### The first time you open it
 
-Suffix isn't signed with a paid Apple Developer certificate ($99/year), so
-macOS will say it "cannot be verified". This is Gatekeeper reacting to the
-missing signature, not to anything the app does.
+Suffix isn't signed with a paid Apple Developer certificate, so macOS will
+refuse to open it and say it "cannot be verified". This is Gatekeeper reacting
+to the missing $99/year signature, not to anything the app does.
 
-1. Open Suffix and let macOS block it
-2. Go to **System Settings → Privacy & Security**
-3. Scroll down to the line about Suffix and click **Open Anyway**
+1. Try to open Suffix. Let macOS block it.
+2. Go to **System Settings → Privacy & Security**.
+3. Scroll down. There's a line about Suffix being blocked — click **Open Anyway**.
 
-You do this once.
+You only do this once. If you'd rather not trust a stranger's build, the whole
+app is here — clone it and run `./Scripts/build-app.sh` to build your own.
 
-### Then let it reach your files
+### Give it access to your files
 
-macOS protects Desktop, Documents and Downloads. Without access, Suffix keeps
-running and silently does nothing in exactly the folders you use most — so the
+macOS protects Desktop, Documents and Downloads. Without access Suffix keeps
+running but silently does nothing in exactly the folders you use most, so the
 setup window asks for **Full Disk Access** and then offers a **Test it** button
 that converts a real file to prove the whole chain works.
 
-**Don't skip the test.** A silent, healthy-looking failure is this app's
+Don't skip the test. A silent, healthy-looking failure is this app's
 characteristic way of going wrong.
 
-### Don't trust a stranger's binary?
+---
 
-Reasonable. Build your own — it takes about ten seconds:
+## Two ways to use it
 
-```bash
-git clone https://github.com/PewPewBiches/Suffix.git
-cd Suffix && ./Scripts/build-app.sh && open build
-```
+### Rename a file
+
+Change its extension in Finder. That's the whole gesture, and it covers every
+conversion in the tables below.
+
+### Select several files, press ⌥⌘S
+
+Some things a filename can't say. "Merge these three" has no name to type it
+into, and "compress this" needs a quality setting. Those live in one panel,
+opened either by the shortcut or by right-clicking and choosing
+**Suffix: file actions**.
+
+| Action | What it does |
+|---|---|
+| **Merge into one PDF** | PDFs and images, combined in the order you selected them |
+| **Compress** | Smallest / Balanced / Best, plus a quality slider and a measured size estimate |
+| **Create ZIP archive** | A plain archive — nothing re-encoded |
+
+The panel greys out what doesn't apply and says why, rather than the entry
+quietly not being there. The shortcut is changeable in Settings → Finder.
 
 ---
 

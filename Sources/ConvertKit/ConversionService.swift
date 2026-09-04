@@ -61,12 +61,8 @@ public final class ConversionService: @unchecked Sendable {
             source: actual,
             targetExtension: url.pathExtension,
             pageCount: { PDFDocument(url: url)?.pageCount ?? 0 },
-            mediaSeconds: {
-                // Duration decides whether a media job is worth confirming.
-                let asset = AVURLAsset(url: url)
-                let seconds = CMTimeGetSeconds(asset.duration)
-                return seconds.isFinite ? seconds : 0
-            })
+            // Duration decides whether a media job is worth confirming.
+            mediaSeconds: { MediaConverter.duration(of: url) })
 
         switch result {
         case .failure:

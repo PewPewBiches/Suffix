@@ -13,13 +13,6 @@ import PDFKit
 public struct DocumentConverter {
     public init() {}
 
-    /// Formats whose PDF output is a faithful rendering rather than a re-flow.
-    public static func isFaithful(_ format: FileFormat) -> Bool {
-        // An iWork document is exported by the app that made it, so it matches
-        // exactly. Everything else is re-laid-out by AppKit.
-        format.isIWork
-    }
-
     public func toPDF(_ url: URL, from source: FileFormat, destination: URL) throws {
         if source.isIWork {
             try IWorkExport.toPDF(url, from: source, destination: destination)

@@ -48,33 +48,13 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <string>Suffix converts files on external drives when you change their extension.</string>
   <!-- Finder right-click entries. NSSendFileTypes decides which selections
        they appear for, so they stay out of the menu for everything else. -->
+  <!-- One entry, opening Suffix's own panel. Three separate ones sat two
+       levels deep and gave no clue why any was missing for a selection. -->
   <key>NSServices</key>
   <array>
     <dict>
-      <key>NSMenuItem</key><dict><key>default</key><string>Merge into one PDF</string></dict>
-      <key>NSMessage</key><string>mergeIntoPDF</string>
-      <key>NSPortName</key><string>Suffix</string>
-      <key>NSRequiredContext</key><dict><key>NSTextContent</key><string>FilePath</string></dict>
-      <key>NSSendFileTypes</key>
-      <array>
-        <string>com.adobe.pdf</string>
-        <string>public.image</string>
-      </array>
-    </dict>
-    <dict>
-      <key>NSMenuItem</key><dict><key>default</key><string>Compress…</string></dict>
-      <key>NSMessage</key><string>compressFiles</string>
-      <key>NSPortName</key><string>Suffix</string>
-      <key>NSRequiredContext</key><dict><key>NSTextContent</key><string>FilePath</string></dict>
-      <key>NSSendFileTypes</key>
-      <array>
-        <string>com.adobe.pdf</string>
-        <string>public.image</string>
-      </array>
-    </dict>
-    <dict>
-      <key>NSMenuItem</key><dict><key>default</key><string>Create ZIP archive</string></dict>
-      <key>NSMessage</key><string>createZIP</string>
+      <key>NSMenuItem</key><dict><key>default</key><string>Suffix: file actions…</string></dict>
+      <key>NSMessage</key><string>showActions</string>
       <key>NSPortName</key><string>Suffix</string>
       <key>NSRequiredContext</key><dict><key>NSTextContent</key><string>FilePath</string></dict>
       <key>NSSendFileTypes</key><array><string>public.item</string></array>

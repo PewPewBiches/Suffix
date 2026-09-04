@@ -74,7 +74,6 @@ public enum ConversionError: LocalizedError {
     case containerUnsupported(FileFormat)
     case needsExternalTool(String)
     case noTextFound
-    case noPagesPreview
     case iWorkExportFailed(String)
     case cancelled
     case alreadyRunning
@@ -90,7 +89,6 @@ public enum ConversionError: LocalizedError {
         case .containerUnsupported(let f): return "Cannot write \(f.displayName) from this file."
         case .needsExternalTool(let m): return m
         case .noTextFound:           return "This PDF has no text to extract — it may be scanned images."
-        case .noPagesPreview:        return "This Pages document has no preview saved."
         case .iWorkExportFailed(let m): return "Pages could not export this document: \(m)"
         case .cancelled:             return "Cancelled."
         case .alreadyRunning:        return "Already converting that file."

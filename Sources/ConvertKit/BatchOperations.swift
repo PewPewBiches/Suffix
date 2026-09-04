@@ -37,6 +37,26 @@ public enum BatchOperation: String, Sendable, CaseIterable, Identifiable {
             return true
         }
     }
+
+    /// Why a selection was rejected, in words worth showing someone.
+    ///
+    /// macOS decides which menu entries to display from the Info.plist, but it
+    /// matches on file *extension* — and a mislabelled file is this app's whole
+    /// reason for existing. So the selection is checked again by content, and
+    /// this is what to say when it doesn't hold up.
+    public var refusal: String {
+        switch self {
+        case .mergePDF: return "Only PDFs and images can be merged into a PDF."
+        case .compress: return "Only PDFs and images can be compressed. Use Create ZIP archive for anything else."
+        case .zip:      return "Nothing to archive."
+        }
+    }
+
+    /// Check a selection by reading the files, not trusting their names.
+    public func validate(_ urls: [URL]) -> String? {
+        guard !urls.isEmpty else { return "Nothing was selected." }
+        return accepts(urls.map(FileFormat.detect(at:))) ? nil : refusal
+    }
 }
 
 public enum BatchError: LocalizedError {

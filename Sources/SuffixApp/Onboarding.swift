@@ -156,9 +156,10 @@ private struct HowItWorksStep: View {
             Divider().opacity(0.4)
 
             VStack(alignment: .leading, spacing: 8) {
-                ForEach([("photo.on.rectangle.angled", "Works with images, PDFs, and HEIC photos"),
-                         ("doc.zipper", "A long PDF becomes a .zip of numbered pages"),
-                         ("arrow.uturn.backward", "Anything can be undone for seven days")],
+                ForEach([("photo.on.rectangle.angled", "Images, PDFs, video, audio and documents"),
+                         ("text.viewfinder", "Rename a screenshot to .txt to read the words in it"),
+                         ("arrow.uturn.backward", "Anything can be undone for seven days"),
+                         ("square.grid.2x2", "Select several files and press ⌥⌘S to merge, compress or zip")],
                         id: \.1) { icon, text in
                     HStack(spacing: 9) {
                         // Fixed column so the labels line up rather than

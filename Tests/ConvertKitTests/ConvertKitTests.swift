@@ -547,3 +547,25 @@ func batchOperationEligibility() {
     #expect(!BatchOperation.compress.accepts([.mov]))
     #expect(BatchOperation.zip.accepts([.mov, .docx, nil]))   // zip takes anything
 }
+
+@Test("a selection is validated by contents, not by its file names")
+func batchValidationReadsFiles() throws {
+    // A text file wearing a .pdf name: macOS would offer the menu entry
+    // because it matches on extension, so the check has to read the bytes.
+    let dir = FileManager.default.temporaryDirectory
+        .appendingPathComponent("ConvertKitTests/\(UUID().uuidString)")
+    try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    let liar = dir.appendingPathComponent("notes.pdf")
+    try "not a pdf at all".write(to: liar, atomically: true, encoding: .utf8)
+
+    let refusal = try #require(BatchOperation.mergePDF.validate([liar]))
+    #expect(refusal.contains("PDFs and images"))
+
+    // A genuine image passes.
+    let real = try makeImage(.png, named: "page.png")
+    #expect(BatchOperation.mergePDF.validate([real]) == nil)
+
+    // Zip takes anything, but still not nothing.
+    #expect(BatchOperation.zip.validate([liar]) == nil)
+    #expect(BatchOperation.zip.validate([]) != nil)
+}

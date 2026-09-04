@@ -111,14 +111,11 @@ public struct MediaConverter {
         return staged
     }
 
-    /// Roughly how long a job will take to matter to the user, used to decide
-    /// whether to warn before starting.
-    public static func duration(of url: URL) async -> Double {
-        let asset = AVURLAsset(url: url)
-        guard let seconds = try? await asset.load(.duration).seconds, seconds.isFinite else {
-            return 0
-        }
-        return seconds
+    /// Roughly how long a job will take, used to decide whether to warn before
+    /// starting one. Zero for anything that isn't time-based.
+    public static func duration(of url: URL) -> Double {
+        let seconds = CMTimeGetSeconds(AVURLAsset(url: url).duration)
+        return seconds.isFinite && seconds > 0 ? seconds : 0
     }
 }
 

@@ -26,6 +26,8 @@ final class AppModel: ObservableObject {
     /// Replace the renamed file, or leave the original beside the result.
     @AppStorage("outputMode")     var outputMode = OutputMode.replace { didSet { pushOptions() } }
     @AppStorage("hasOnboarded")   var hasOnboarded = false
+    /// Whether the global shortcut is claimed at all.
+    @AppStorage("shortcutEnabled") var shortcutEnabled = true { didSet { applyShortcut() } }
 
     /// Read from Finder's own preference, so the toggle stays truthful even if
     /// the user changes it in Finder's settings instead.
@@ -52,14 +54,49 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// The key combination that opens the actions panel for whatever is
+    /// selected in Finder. Stored as JSON because it is two numbers, not a
+    /// string, and AppStorage has no opinion about structs.
+    @Published var shortcut: Shortcut = Shortcut.default {
+        didSet {
+            if let data = try? JSONEncoder().encode(shortcut) {
+                UserDefaults.standard.set(data, forKey: "shortcut")
+            }
+            applyShortcut()
+        }
+    }
+    /// Set when the combination is already spoken for by another app.
+    @Published private(set) var shortcutUnavailable = false
+
     private let service = ConversionService()
     private var watcher: RenameWatcher?
     private var positionTimer: Timer?
 
     init() {
+        if let data = UserDefaults.standard.data(forKey: "shortcut"),
+           let saved = try? JSONDecoder().decode(Shortcut.self, from: data) {
+            shortcut = saved
+        }
         pushOptions()
         OriginalsStore.prune()
         syncWatching()
+        applyShortcut()
+    }
+
+    /// Claim (or release) the global shortcut. Pressing it asks Finder what is
+    /// selected and opens the actions panel on it.
+    func applyShortcut() {
+        guard shortcutEnabled else {
+            Hotkey.shared.unregister()
+            shortcutUnavailable = false
+            return
+        }
+        Hotkey.shared.register(shortcut) {
+            Task { @MainActor in
+                ActionsPanel.shared.show(files: FinderSelection.current())
+            }
+        }
+        shortcutUnavailable = !Hotkey.shared.isRegistered
     }
 
     var watchRoots: [URL] {
