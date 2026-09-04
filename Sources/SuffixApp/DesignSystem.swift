@@ -62,13 +62,19 @@ struct OutputModePicker: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Picker("", selection: $mode) {
-                ForEach(OutputMode.allCases) { option in
-                    Text(option.title).tag(option)
+            // Wrapped in an HStack with a trailing Spacer: inside a grouped
+            // Form, a Picker is laid out as a labelled row, which pushes the
+            // radio buttons to the far right instead of beside their labels.
+            HStack {
+                Picker("", selection: $mode) {
+                    ForEach(OutputMode.allCases) { option in
+                        Text(option.title).tag(option)
+                    }
                 }
+                .pickerStyle(.radioGroup)
+                .labelsHidden()
+                Spacer()
             }
-            .pickerStyle(.radioGroup)
-            .labelsHidden()
 
             VStack(alignment: .leading, spacing: 5) {
                 Text(mode.explanation())
