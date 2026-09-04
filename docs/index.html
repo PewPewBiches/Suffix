@@ -13,332 +13,535 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 
 <style>
-  :root {
-    --ink:      #1A1A1C;
-    --paper:    #F6F5F2;
-    --surface:  #FFFFFF;
-    --muted:    #6B6862;
-    --faint:    #93908A;
-    --hair:     #E0DDD6;
-    --accent:   #A8551A;
-    --accent-soft: #F3E7DA;
-    --good:     #2F6B4F;
+:root {
+  --ink:        #191817;
+  --paper:      #F5F3EF;
+  --surface:    #FFFFFF;
+  --muted:      #6A655D;
+  --faint:      #979187;
+  --hair:       #E2DED6;
+  --amber:      #A8551A;
+  --green:      #2E6B4C;
 
-    --display: "Schibsted Grotesk", ui-sans-serif, system-ui, sans-serif;
-    --body: "Newsreader", Georgia, serif;
-    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
-    --measure: 64ch;
-  }
+  /* the "desktop" behind the hero */
+  --desk:       #16171A;
+  --desk-glow:  #3A2A18;
+  --desk-ink:   #EDEAE4;
+  --desk-muted: #9A948B;
+  --desk-hair:  #2E2F33;
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --ink:      #ECEAE5;
-      --paper:    #131314;
-      --surface:  #1B1B1D;
-      --muted:    #A09C95;
-      --faint:    #78746D;
-      --hair:     #2C2C2E;
-      --accent:   #E39B5E;
-      --accent-soft: #2A1F14;
-      --good:     #6DBF95;
-    }
-  }
+  --display: "Instrument Serif", Georgia, serif;
+  --ui: "Schibsted Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --measure: 62ch;
+}
 
-  * { box-sizing: border-box; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
-  body {
-    margin: 0;
-    padding: 0 24px 80px;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--body);
-    font-size: 18px;
-    line-height: 1.65;
-    -webkit-font-smoothing: antialiased;
-  }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--ui);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
 
-  .wrap { max-width: var(--measure); margin: 0 auto; }
-  .wide { max-width: 940px; margin: 0 auto; }
+a { color: var(--amber); text-underline-offset: 2px; }
+.wrap { max-width: var(--measure); margin: 0 auto; padding: 0 24px; }
+.wide { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
 
-  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+/* ============ the desktop ============ */
+.desktop {
+  position: relative;
+  background: var(--desk);
+  color: var(--desk-ink);
+  overflow: hidden;
+  padding-bottom: 78px;
+}
+.desktop::before {
+  /* an off-centre warm glow, the way a wallpaper lights a dark screen */
+  content: "";
+  position: absolute;
+  inset: -20% -10% auto -10%;
+  height: 90%;
+  background: radial-gradient(60% 70% at 32% 18%, var(--desk-glow) 0%, transparent 68%);
+  opacity: .85;
+  pointer-events: none;
+}
 
-  /* ---------- hero ---------- */
-  header.hero {
-    max-width: 940px;
-    margin: 0 auto;
-    padding: 72px 0 56px;
-    text-align: center;
-  }
-  header.hero img.icon {
-    width: 104px; height: 104px;
-    border-radius: 23px;
-    margin-bottom: 26px;
-  }
-  h1 {
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: clamp(44px, 8vw, 76px);
-    letter-spacing: -.035em;
-    line-height: 1;
-    margin: 0 0 18px;
-  }
-  .tagline {
-    font-size: clamp(20px, 3vw, 25px);
-    line-height: 1.4;
-    color: var(--muted);
-    margin: 0 auto 30px;
-    max-width: 22ch;
-  }
+/* macOS menu bar */
+.menubar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 26px;
+  padding: 0 16px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: rgba(255,255,255,.86);
+  background: rgba(255,255,255,.07);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.menubar .apple { font-size: 14px; opacity: .9; }
+.menubar .app { font-weight: 700; }
+.menubar .spacer { margin-left: auto; }
+.menubar .right { display: flex; align-items: center; gap: 14px; opacity: .8; }
+.menubar .suffix-icon {
+  width: 15px; height: 15px;
+  border-radius: 4px;
+  display: inline-block;
+  vertical-align: -3px;
+  background: linear-gradient(#43464C, #24262A);
+  position: relative;
+}
+.menubar .suffix-icon::after {
+  content: "";
+  position: absolute; inset: 3.5px;
+  border: 1.6px solid #fff;
+  border-radius: 50%;
+  border-right-color: transparent;
+  transform: rotate(-35deg);
+}
+@media (max-width: 620px) { .menubar .hide-sm { display: none; } }
 
-  /* The gesture itself, as the hero image. */
-  .gesture {
-    display: inline-flex;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
-    justify-content: center;
-    font-family: var(--mono);
-    font-size: clamp(15px, 2.6vw, 21px);
-    background: var(--surface);
-    border: 1px solid var(--hair);
-    border-radius: 12px;
-    padding: 16px 22px;
-    margin-bottom: 34px;
-  }
-  .gesture .from { color: var(--muted); }
-  .gesture .arrow { color: var(--faint); }
-  .gesture .to { color: var(--accent); font-weight: 500; }
+/* hero copy */
+.hero {
+  position: relative;
+  text-align: center;
+  padding: 62px 24px 34px;
+}
+.hero img.icon { width: 78px; height: 78px; border-radius: 18px; margin-bottom: 20px; }
+.hero h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(52px, 9vw, 96px);
+  line-height: .95;
+  letter-spacing: -.02em;
+  margin: 0 0 14px;
+}
+.hero h1 em {
+  font-style: italic;
+  color: #E39B5E;
+}
+.hero .sub {
+  font-size: clamp(17px, 2.4vw, 21px);
+  color: var(--desk-muted);
+  margin: 0 auto 30px;
+  max-width: 30ch;
+}
 
-  .cta {
-    display: inline-block;
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: 17px;
-    letter-spacing: -.01em;
-    color: var(--paper);
-    background: var(--ink);
-    padding: 15px 32px;
-    border-radius: 999px;
-    text-decoration: none;
-    transition: transform .12s ease, opacity .12s ease;
-  }
-  .cta:hover { transform: translateY(-1px); opacity: .9; }
-  .cta:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+/* ============ the Finder window ============ */
+.stage { position: relative; display: flex; justify-content: center; padding: 0 16px; }
 
-  .requirements {
-    font-family: var(--display);
-    font-size: 13.5px;
-    color: var(--faint);
-    margin-top: 16px;
-  }
-  .requirements a { color: var(--faint); }
+.finder {
+  width: min(620px, 100%);
+  background: #FBFAF9;
+  color: #1C1B1A;
+  border-radius: 11px;
+  box-shadow: 0 40px 80px rgba(0,0,0,.55), 0 2px 0 rgba(255,255,255,.1) inset;
+  overflow: hidden;
+  text-align: left;
+  font-size: 13px;
+}
+@media (prefers-color-scheme: dark) {
+  .finder { background: #262629; color: #EDEBE8; }
+}
 
-  /* ---------- sections ---------- */
-  section { padding-top: 58px; }
-  h2 {
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: clamp(27px, 4vw, 34px);
-    letter-spacing: -.025em;
-    line-height: 1.15;
-    margin: 0 0 18px;
-    text-wrap: balance;
-  }
-  h3 {
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: 19px;
-    letter-spacing: -.012em;
-    margin: 34px 0 8px;
-  }
-  p { margin: 0 0 18px; }
-  .lede { font-size: 20px; }
+.finder .bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 13px;
+  background: linear-gradient(#F2F0EE, #E8E5E2);
+  border-bottom: 1px solid #D9D5D1;
+}
+@media (prefers-color-scheme: dark) {
+  .finder .bar { background: linear-gradient(#3A3A3E, #313134); border-bottom-color: #4A4A4E; }
+}
+.lights { display: flex; gap: 7px; }
+.lights i { width: 11px; height: 11px; border-radius: 50%; display: block; }
+.lights i:nth-child(1) { background: #FF5F57; }
+.lights i:nth-child(2) { background: #FEBC2E; }
+.lights i:nth-child(3) { background: #28C840; }
+.finder .bar .title { font-weight: 600; font-size: 12.5px; margin-left: 4px; }
+.finder .bar .chev { color: #9A958F; letter-spacing: 2px; font-size: 12px; }
 
-  code {
-    font-family: var(--mono);
-    font-size: .86em;
-    background: var(--surface);
-    border: 1px solid var(--hair);
-    border-radius: 4px;
-    padding: 1px 5px;
-  }
-  pre {
-    font-family: var(--mono);
-    font-size: 14px;
-    line-height: 1.6;
-    background: var(--surface);
-    border: 1px solid var(--hair);
-    border-radius: 10px;
-    padding: 16px 18px;
-    overflow-x: auto;
-    margin: 0 0 18px;
-  }
-  pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+.finder .head, .finder .row {
+  display: grid;
+  grid-template-columns: 1fr 78px 118px;
+  gap: 10px;
+  align-items: center;
+  padding: 0 14px;
+}
+.finder .head {
+  height: 26px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8B857D;
+  border-bottom: 1px solid #E6E2DD;
+}
+@media (prefers-color-scheme: dark) { .finder .head { border-bottom-color: #3C3C40; color: #918B84; } }
+.finder .rows { padding: 4px 0 8px; }
+.finder .row { height: 30px; border-radius: 6px; }
+.finder .row.alt { background: rgba(0,0,0,.025); }
+@media (prefers-color-scheme: dark) { .finder .row.alt { background: rgba(255,255,255,.035); } }
 
-  ol.steps { counter-reset: s; list-style: none; padding: 0; margin: 0 0 26px; }
-  ol.steps li {
-    counter-increment: s;
-    display: grid;
-    grid-template-columns: 30px 1fr;
-    gap: 14px;
-    padding: 10px 0;
-    align-items: baseline;
-  }
-  ol.steps li::before {
-    content: counter(s);
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--accent);
-  }
+.finder .row .nm { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.finder .fname { font-family: var(--mono); font-size: 12.5px; white-space: nowrap; }
+.finder .sz, .finder .kd { font-size: 11.5px; color: #8B857D; font-variant-numeric: tabular-nums; }
 
-  /* ---------- the before/after comparison ---------- */
-  .compare {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-    margin: 30px 0 8px;
-  }
-  @media (max-width: 640px) { .compare { grid-template-columns: 1fr; } }
-  .compare > div {
-    background: var(--surface);
-    border: 1px solid var(--hair);
-    border-radius: 12px;
-    padding: 20px 22px;
-  }
-  .compare .label {
-    font-family: var(--display);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: var(--faint);
-    margin-bottom: 12px;
-  }
-  .compare ol { margin: 0; padding-left: 1.15em; font-size: 15.5px; line-height: 1.75; }
-  .compare li::marker { color: var(--faint); }
-  .compare .single {
-    font-family: var(--mono);
-    font-size: 15px;
-    color: var(--accent);
-  }
-  .compare.after > div:last-child { border-color: var(--accent); }
+/* file icons, drawn rather than downloaded */
+.ficon {
+  width: 15px; height: 19px; flex: none;
+  background: #fff;
+  border: 1px solid #CFC9C2;
+  border-radius: 2.5px;
+  position: relative;
+  overflow: hidden;
+}
+.ficon::before { /* folded corner */
+  content: "";
+  position: absolute; top: 0; right: 0;
+  border-width: 0 5px 5px 0;
+  border-style: solid;
+  border-color: #E7E3DE transparent;
+}
+.ficon::after { /* the format tag */
+  content: attr(data-kind);
+  position: absolute; left: 0; right: 0; bottom: 0;
+  font-family: var(--ui);
+  font-size: 5px; font-weight: 700; letter-spacing: .02em;
+  text-align: center; color: #fff;
+  padding: 1px 0;
+  background: #9A958F;
+}
+.ficon[data-kind="PNG"]::after { background: #5C8DB8; }
+.ficon[data-kind="PDF"]::after { background: #C0392B; }
+.ficon[data-kind="JPG"]::after { background: #7C9A4A; }
+.ficon[data-kind="MOV"]::after { background: #7A5CA8; }
 
-  /* ---------- tables ---------- */
-  .tablewrap { overflow-x: auto; margin: 24px 0; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: var(--display);
-    font-size: 14.5px;
-    min-width: 460px;
-  }
-  th, td {
-    text-align: left;
-    padding: 11px 13px;
-    border-bottom: 1px solid var(--hair);
-    vertical-align: top;
-  }
-  th {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: var(--faint);
-  }
-  tr:last-child td { border-bottom: none; }
-  td.file { font-family: var(--mono); font-size: 13px; white-space: nowrap; }
-  td.file .to { color: var(--accent); }
-  .matrix td, .matrix th { text-align: center; padding: 9px 8px; }
-  .matrix td:first-child, .matrix th:first-child { text-align: left; white-space: nowrap; }
-  .yes { color: var(--good); font-weight: 700; }
-  .no  { color: var(--faint); }
-  .partial { color: var(--accent); font-weight: 700; }
+/* the row being renamed */
+#target.sel { background: #3478F6; color: #fff; }
+#target.sel .sz, #target.sel .kd { color: rgba(255,255,255,.82); }
+#target.editing .fname {
+  background: #fff;
+  color: #111;
+  border-radius: 3px;
+  padding: 1px 4px;
+  outline: 2px solid #3478F6;
+}
+#caret {
+  display: none;
+  width: 1px; height: 13px;
+  background: #111;
+  margin-left: -1px;
+  vertical-align: -2px;
+}
+#target.editing #caret { display: inline-block; animation: blink 1.06s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
 
-  /* ---------- callout ---------- */
-  .note {
-    background: var(--surface);
-    border: 1px solid var(--hair);
-    border-left: 3px solid var(--accent);
-    border-radius: 10px;
-    padding: 18px 22px;
-    margin: 26px 0;
-    font-size: 16.5px;
-  }
-  .note p:last-child { margin-bottom: 0; }
-  .note strong { font-family: var(--display); }
+#target.done { animation: flash .5s ease-out; }
+@keyframes flash {
+  0% { background: rgba(168,85,26,.28); }
+  100% { background: transparent; }
+}
 
-  figure { margin: 30px 0; text-align: center; }
-  figure img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 12px;
-    border: 1px solid var(--hair);
-  }
-  figcaption {
-    font-family: var(--display);
-    font-size: 13px;
-    color: var(--faint);
-    margin-top: 12px;
-  }
+/* the notification */
+.banner {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 262px;
+  display: flex; gap: 9px;
+  padding: 10px 11px;
+  border-radius: 11px;
+  background: rgba(38,38,41,.86);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,.1);
+  box-shadow: 0 14px 34px rgba(0,0,0,.4);
+  color: #F2F0ED;
+  text-align: left;
+  opacity: 0;
+  transform: translateX(24px);
+  transition: opacity .3s ease, transform .3s cubic-bezier(.2,.9,.3,1.2);
+  pointer-events: none;
+}
+.banner.in { opacity: 1; transform: none; }
+.banner .tick {
+  width: 26px; height: 26px; flex: none;
+  border-radius: 50%;
+  background: #2E6B4C;
+  display: grid; place-items: center;
+  font-size: 13px; font-weight: 700; color: #fff;
+}
+.banner .t { font-size: 12.5px; font-weight: 600; }
+.banner .s { font-family: var(--mono); font-size: 11px; color: #B8B2AA; }
+.banner .a { font-size: 11.5px; color: #E39B5E; font-weight: 600; margin-top: 3px; }
+@media (max-width: 720px) { .banner { display: none; } }
 
-  footer {
-    max-width: 940px;
-    margin: 76px auto 0;
-    padding-top: 28px;
-    border-top: 1px solid var(--hair);
-    font-family: var(--display);
-    font-size: 14px;
-    color: var(--faint);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 22px;
-    justify-content: space-between;
-  }
-  footer a { color: var(--muted); }
+/* hero actions */
+.actions { position: relative; text-align: center; margin-top: 40px; }
+.cta {
+  display: inline-block;
+  font-weight: 700; font-size: 16px;
+  color: #14151A;
+  background: #F3F0EA;
+  padding: 14px 30px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: transform .14s ease;
+}
+.cta:hover { transform: translateY(-2px); }
+.cta:focus-visible { outline: 3px solid #E39B5E; outline-offset: 3px; }
+.meta { margin-top: 14px; font-size: 13px; color: var(--desk-muted); }
+.meta a { color: var(--desk-muted); }
 
-  @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; }
-  }
+/* ============ page body ============ */
+section { padding: 74px 0; }
+section + section { padding-top: 0; }
+h2 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(32px, 4.6vw, 46px);
+  line-height: 1.06;
+  letter-spacing: -.015em;
+  margin: 0 0 20px;
+}
+h2 em { font-style: italic; color: var(--amber); }
+h3 {
+  font-size: 17px; font-weight: 700;
+  letter-spacing: -.008em;
+  margin: 34px 0 8px;
+}
+p { margin: 0 0 17px; }
+.lede { font-size: 19.5px; line-height: 1.55; }
+
+code {
+  font-family: var(--mono); font-size: .87em;
+  background: rgba(0,0,0,.045);
+  border-radius: 4px; padding: 1px 5px;
+}
+pre {
+  font-family: var(--mono); font-size: 13.5px; line-height: 1.65;
+  background: #1B1C20; color: #E8E5E0;
+  border-radius: 10px; padding: 16px 18px;
+  overflow-x: auto; margin: 0 0 18px;
+}
+pre code { background: none; padding: 0; }
+
+/* the nine-step receipt */
+.receipt-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  align-items: start;
+  margin-top: 34px;
+}
+@media (max-width: 700px) { .receipt-row { grid-template-columns: 1fr; } }
+.receipt {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: 4px;
+  padding: 20px 22px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 2;
+  color: var(--muted);
+  box-shadow: 0 1px 0 var(--hair);
+}
+.receipt .hdr {
+  font-family: var(--ui);
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--faint);
+  padding-bottom: 10px; margin-bottom: 12px;
+  border-bottom: 1px dashed var(--hair);
+}
+.receipt ol { margin: 0; padding-left: 1.4em; }
+.receipt.one {
+  border-color: var(--amber);
+  color: var(--ink);
+}
+.receipt.one .hdr { color: var(--amber); border-bottom-color: rgba(168,85,26,.3); }
+.receipt .big {
+  font-size: 15px;
+  color: var(--amber);
+  padding: 6px 0 2px;
+}
+.receipt .tally {
+  font-family: var(--ui);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--faint);
+  margin-top: 12px; padding-top: 10px;
+  border-top: 1px dashed var(--hair);
+}
+
+/* right-click menu mock */
+.menu-demo {
+  display: grid;
+  grid-template-columns: 1fr 250px;
+  gap: 30px;
+  align-items: center;
+  margin-top: 30px;
+}
+@media (max-width: 760px) { .menu-demo { grid-template-columns: 1fr; } }
+.ctxmenu {
+  background: rgba(246,244,241,.96);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0,0,0,.1);
+  border-radius: 8px;
+  box-shadow: 0 18px 40px rgba(0,0,0,.22);
+  padding: 5px;
+  font-size: 13px;
+}
+.ctxmenu div { padding: 5px 10px; border-radius: 5px; color: #45403A; }
+.ctxmenu div.sep { padding: 0; margin: 5px 8px; height: 1px; background: rgba(0,0,0,.09); }
+.ctxmenu div.dim { color: #A29B92; }
+.ctxmenu div.hi { background: #3478F6; color: #fff; font-weight: 500; }
+
+/* tables */
+.tablewrap { overflow-x: auto; margin: 22px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 440px; }
+th, td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--hair); vertical-align: top; }
+th { font-size: 10.5px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; color: var(--faint); }
+tr:last-child td { border-bottom: none; }
+td.f { font-family: var(--mono); font-size: 12.5px; white-space: nowrap; }
+td.f b { color: var(--amber); font-weight: 500; }
+.matrix td, .matrix th { text-align: center; padding: 9px 7px; }
+.matrix td:first-child, .matrix th:first-child { text-align: left; white-space: nowrap; }
+.y { color: var(--green); font-weight: 700; }
+.n { color: var(--faint); }
+.p { color: var(--amber); font-weight: 700; }
+
+.note {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-left: 3px solid var(--amber);
+  border-radius: 8px;
+  padding: 17px 20px;
+  margin: 24px 0;
+  font-size: 16px;
+}
+.note p:last-child { margin-bottom: 0; }
+
+ol.steps { counter-reset: s; list-style: none; padding: 0; margin: 0 0 20px; }
+ol.steps li {
+  counter-increment: s;
+  display: grid; grid-template-columns: 26px 1fr; gap: 12px;
+  padding: 7px 0;
+}
+ol.steps li::before {
+  content: counter(s);
+  font-family: var(--mono); font-size: 12.5px; color: var(--amber);
+}
+
+footer {
+  border-top: 1px solid var(--hair);
+  margin-top: 40px; padding: 26px 0 60px;
+  font-size: 13.5px; color: var(--faint);
+  display: flex; flex-wrap: wrap; gap: 10px 20px; justify-content: space-between;
+}
+footer a { color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
 </style>
 </head>
 <body>
 
-<header class="hero">
-  <img class="icon" src="images/icon-256.png" alt="">
-  <h1>Suffix</h1>
-  <p class="tagline">Convert files by renaming them.</p>
-
-  <div class="gesture">
-    <span class="from">invoice.png</span>
-    <span class="arrow">→</span>
-    <span class="to">invoice.pdf</span>
+<div class="desktop">
+  <div class="menubar">
+    <span class="apple">&#63743;</span>
+    <span class="app">Finder</span>
+    <span class="hide-sm">File</span>
+    <span class="hide-sm">Edit</span>
+    <span class="hide-sm">View</span>
+    <span class="spacer"></span>
+    <span class="right">
+      <span class="suffix-icon" title="Suffix"></span>
+      <span class="hide-sm">100%</span>
+      <span class="hide-sm">Fri 21:04</span>
+    </span>
   </div>
 
-  <div>
+  <div class="hero">
+    <img class="icon" src="images/icon-256.png" alt="">
+    <h1>Rename it.<br><em>It converts.</em></h1>
+    <p class="sub">The Mac app that changes a file's format when you change its extension.</p>
+  </div>
+
+  <div class="stage">
+    <div class="finder">
+      <div class="bar">
+        <span class="lights"><i></i><i></i><i></i></span>
+        <span class="chev">&lsaquo; &rsaquo;</span>
+        <span class="title">Downloads</span>
+      </div>
+      <div class="head"><span>Name</span><span>Size</span><span>Kind</span></div>
+      <div class="rows">
+        <div class="row">
+          <span class="nm"><span class="ficon" data-kind="MOV"></span><span class="fname">clip.mov</span></span>
+          <span class="sz">18.2 MB</span><span class="kd">QuickTime</span>
+        </div>
+        <div class="row alt" id="target">
+          <span class="nm">
+            <span class="ficon" data-kind="PNG" id="ticon"></span>
+            <span class="fname"><span id="stem">invoice</span><span id="ext">.png</span><i id="caret"></i></span>
+          </span>
+          <span class="sz">1.4 MB</span>
+          <span class="kd" id="kind">PNG image</span>
+        </div>
+        <div class="row">
+          <span class="nm"><span class="ficon" data-kind="JPG"></span><span class="fname">receipt.jpg</span></span>
+          <span class="sz">840 KB</span><span class="kd">JPEG image</span>
+        </div>
+        <div class="row alt">
+          <span class="nm"><span class="ficon" data-kind="PDF"></span><span class="fname">contract.pdf</span></span>
+          <span class="sz">210 KB</span><span class="kd">PDF Document</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="banner" id="banner">
+      <span class="tick">&check;</span>
+      <span>
+        <div class="t">Converted</div>
+        <div class="s">invoice.png &rarr; invoice.pdf</div>
+        <div class="a">Undo &nbsp;·&nbsp; Show</div>
+      </span>
+    </div>
+  </div>
+
+  <div class="actions">
     <a class="cta" href="https://github.com/PewPewBiches/Suffix/releases/latest">Download for macOS</a>
+    <p class="meta">
+      macOS 14 or later · free and open source ·
+      <a href="https://github.com/PewPewBiches/Suffix">source on GitHub</a>
+    </p>
   </div>
-  <p class="requirements">
-    macOS 14 or later · free and open source ·
-    <a href="https://github.com/PewPewBiches/Suffix">source on GitHub</a>
-  </p>
-</header>
+</div>
 
 <main>
-<div class="wrap">
 
-  <section>
-    <h2>The ritual this deletes</h2>
+<section>
+  <div class="wrap">
+    <h2>Nine steps, or <em>one</em>.</h2>
     <p class="lede">
       You have a photo. You need a PDF. So you search “png to pdf”, pick one of
       the identical sites, and upload your file to a stranger's server.
     </p>
 
-    <div class="compare after">
-      <div>
-        <div class="label">Every time, until now</div>
+    <div class="receipt-row">
+      <div class="receipt">
+        <div class="hdr">The usual</div>
         <ol>
           <li>Search “png to pdf”</li>
           <li>Pick a site</li>
@@ -350,99 +553,107 @@
           <li>Move it back</li>
           <li>Delete the original</li>
         </ol>
+        <div class="tally">9 steps · 1 stranger's server</div>
       </div>
-      <div>
-        <div class="label">With Suffix</div>
-        <ol>
-          <li>Rename the file</li>
-        </ol>
-        <p class="single" style="margin-top:14px">invoice.png&nbsp;→&nbsp;invoice.pdf</p>
+      <div class="receipt one">
+        <div class="hdr">With Suffix</div>
+        <ol><li>Rename the file</li></ol>
+        <div class="big">invoice.png → invoice.pdf</div>
+        <div class="tally">1 step · 0 uploads</div>
       </div>
     </div>
 
-    <p>
+    <p style="margin-top:26px">
       Nothing is uploaded. Nothing leaves your Mac. There is no window to open,
-      no file picker, no “drag your file here”. You already know how to rename
-      a file.
+      no file picker, no “drag your file here”. You already know how to rename a
+      file.
     </p>
-  </section>
+  </div>
+</section>
 
-  <section>
-    <h2>How to use it</h2>
-    <ol class="steps">
-      <li><strong>Click a file</strong> in Finder</li>
-      <li><strong>Press Return</strong> and edit the part after the dot</li>
-      <li><strong>Press Return again</strong></li>
-    </ol>
-    <p>
-      A second later a notice confirms it, with <strong>Undo</strong> if you
-      didn't mean it.
-    </p>
-
-    <figure>
-      <img src="images/notice-dark.png" width="420" alt="A notice reading: Converted, invoice.png to invoice.pdf, with Undo and Show buttons">
-      <figcaption>The confirmation, with Undo where you can reach it</figcaption>
-    </figure>
-
-    <p>That is the whole app. It lives in your menu bar and does nothing else.</p>
-  </section>
-
-  <section>
-    <h2>Some things worth trying</h2>
+<section>
+  <div class="wrap">
+    <h2>Things worth trying</h2>
     <div class="tablewrap">
       <table>
-        <thead>
-          <tr><th>Rename</th><th>And you get</th></tr>
-        </thead>
+        <thead><tr><th>Rename</th><th>And you get</th></tr></thead>
         <tbody>
-          <tr>
-            <td class="file">screenshot.png → <span class="to">.txt</span></td>
-            <td><strong>The text inside the image</strong>, read out of it</td>
-          </tr>
-          <tr>
-            <td class="file">scan.pdf → <span class="to">.txt</span></td>
-            <td>The words from a scanned document that has no text layer</td>
-          </tr>
-          <tr>
-            <td class="file">photo.heic → <span class="to">.jpg</span></td>
-            <td>An iPhone photo anything can open</td>
-          </tr>
-          <tr>
-            <td class="file">report.docx → <span class="to">.pdf</span></td>
-            <td>A PDF you can send</td>
-          </tr>
-          <tr>
-            <td class="file">deck.pages → <span class="to">.pdf</span></td>
-            <td>Exactly what Pages itself would export</td>
-          </tr>
-          <tr>
-            <td class="file">clip.mov → <span class="to">.mp4</span></td>
-            <td>The same video, in the container everything accepts</td>
-          </tr>
-          <tr>
-            <td class="file">talk.mp4 → <span class="to">.m4a</span></td>
-            <td>Just the audio</td>
-          </tr>
-          <tr>
-            <td class="file">brochure.pdf → <span class="to">.jpg</span></td>
-            <td>Every page as an image, delivered as a <code>.zip</code></td>
-          </tr>
+          <tr><td class="f">screenshot.png → <b>.txt</b></td><td><strong>The text inside the image</strong>, read out of it</td></tr>
+          <tr><td class="f">scan.pdf → <b>.txt</b></td><td>The words from a scan that has no text layer</td></tr>
+          <tr><td class="f">photo.heic → <b>.jpg</b></td><td>An iPhone photo anything can open</td></tr>
+          <tr><td class="f">report.docx → <b>.pdf</b></td><td>A PDF you can send</td></tr>
+          <tr><td class="f">deck.key → <b>.pdf</b></td><td>Exactly what Keynote itself would export</td></tr>
+          <tr><td class="f">clip.mov → <b>.mp4</b></td><td>The same video, in the container everything accepts</td></tr>
+          <tr><td class="f">talk.mp4 → <b>.m4a</b></td><td>Just the audio</td></tr>
+          <tr><td class="f">brochure.pdf → <b>.jpg</b></td><td>Every page as an image, in a <code>.zip</code></td></tr>
         </tbody>
       </table>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section>
+<section>
+  <div class="wide">
+    <h2>Some things a filename <em>can't</em> say</h2>
+    <div class="wrap" style="padding:0">
+      <p class="lede" style="margin-bottom:0">
+        “Merge these three” has no filename to type it into. Neither does
+        “compress this, but how much?” Those live where you'd look for them —
+        in the right-click menu.
+      </p>
+    </div>
+
+    <div class="menu-demo">
+      <div class="wrap" style="padding:0;max-width:none">
+        <h3>Merge into one PDF</h3>
+        <p>
+          Select PDFs, images, or a mix of both. They combine in the order
+          you see them, and the result is named after whatever they have in
+          common.
+        </p>
+        <h3>Compress…</h3>
+        <p>
+          A Smallest / Balanced / Best toggle and a quality slider. The
+          estimated size is <em>measured</em> — the first file is actually
+          compressed at that setting — so the number moves when you do. If a
+          file comes out bigger than it started, it's discarded rather than
+          handed to you as an improvement.
+        </p>
+        <h3>Create ZIP archive</h3>
+        <p>
+          A separate item, deliberately. “Compress” and “zip” are different
+          verbs that English happens to spell the same: one throws away detail,
+          the other doesn't.
+        </p>
+      </div>
+
+      <div class="ctxmenu" aria-hidden="true">
+        <div class="dim">Open</div>
+        <div class="dim">Open With</div>
+        <div class="sep"></div>
+        <div class="dim">Move to Bin</div>
+        <div class="dim">Get Info</div>
+        <div class="sep"></div>
+        <div class="hi">Merge into one PDF</div>
+        <div>Compress…</div>
+        <div>Create ZIP archive</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
     <h2>Install it</h2>
     <p>
       <a href="https://github.com/PewPewBiches/Suffix/releases/latest">Download the latest release</a>,
-      open the disk image, and drag Suffix to your Applications folder.
+      open the disk image, and drag Suffix to Applications.
     </p>
 
     <h3>macOS will block it the first time</h3>
     <p>
       Suffix isn't signed with a paid Apple Developer certificate, so macOS will
-      say it “cannot be verified”. That is Gatekeeper reacting to the missing
+      say it “cannot be verified”. That's Gatekeeper reacting to a missing
       $99-a-year signature, not to anything the app does.
     </p>
     <ol class="steps">
@@ -456,87 +667,50 @@
     <p>
       macOS protects Desktop, Documents and Downloads. Without access Suffix
       keeps running but silently does nothing in exactly the folders you use
-      most, so setup asks for <strong>Full Disk Access</strong> and then offers a
+      most — so setup asks for <strong>Full Disk Access</strong>, then offers a
       <strong>Test it</strong> button that converts a real file to prove the
       whole chain works.
     </p>
     <div class="note">
       <p>
         <strong>Don't skip the test.</strong> A silent, healthy-looking failure
-        is this app's characteristic way of going wrong, and the test is what
-        catches it while you are still paying attention.
+        is this app's characteristic way of going wrong, and the test catches it
+        while you're still paying attention.
       </p>
     </div>
 
-    <h3>Would rather not trust a stranger's binary?</h3>
-    <p>Reasonable. Build your own — it takes about ten seconds:</p>
+    <h3>Rather not trust a stranger's binary?</h3>
+    <p>Fair. Build your own — it takes about ten seconds:</p>
 <pre><code>git clone https://github.com/PewPewBiches/Suffix.git
 cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
-  </section>
+  </div>
+</section>
 
-</div>
-
-<div class="wide">
-  <section>
+<section>
+  <div class="wide">
     <h2 style="text-align:center">What it converts</h2>
 
     <h3>Images and PDFs</h3>
     <div class="tablewrap">
       <table class="matrix">
-        <thead>
-          <tr><th>From</th><th>PNG</th><th>JPEG</th><th>TIFF</th><th>GIF</th><th>BMP</th><th>HEIC</th><th>PDF</th><th>TXT</th></tr>
-        </thead>
+        <thead><tr><th>From</th><th>PNG</th><th>JPEG</th><th>TIFF</th><th>GIF</th><th>BMP</th><th>HEIC</th><th>PDF</th><th>TXT</th></tr></thead>
         <tbody>
-          <tr><td>PNG · JPEG · TIFF · GIF · BMP · HEIC</td>
-            <td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td></tr>
-          <tr><td>WebP</td>
-            <td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td></tr>
-          <tr><td>PDF</td>
-            <td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="no">–</td><td class="yes">●</td></tr>
+          <tr><td>PNG · JPEG · TIFF · GIF · BMP · HEIC</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td></tr>
+          <tr><td>WebP</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td></tr>
+          <tr><td>PDF</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="n">–</td><td class="y">●</td></tr>
         </tbody>
       </table>
-    </div>
-    <div class="wrap">
-      <p>
-        Any image can become text: Suffix reads the words in it using the Vision
-        framework built into macOS. A PDF becomes text the same way, falling
-        back to reading the pages when the document is a scan.
-      </p>
-      <p>
-        A PDF of more than one page becomes a <code>.zip</code> of numbered
-        images, because one image cannot hold a hundred pages. Suffix asks
-        first, and names the result <code>document.zip</code> rather than the
-        <code>document.jpg</code> you typed.
-      </p>
     </div>
 
     <h3>Video and audio</h3>
     <div class="tablewrap">
       <table class="matrix">
-        <thead>
-          <tr><th>From</th><th>MOV</th><th>MP4</th><th>M4V</th><th>M4A</th><th>WAV</th><th>AIFF</th><th>MP3</th></tr>
-        </thead>
+        <thead><tr><th>From</th><th>MOV</th><th>MP4</th><th>M4V</th><th>M4A</th><th>WAV</th><th>AIFF</th><th>MP3</th></tr></thead>
         <tbody>
-          <tr><td>MOV · MP4 · M4V</td>
-            <td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="partial">○</td></tr>
-          <tr><td>M4A · WAV · AIFF · MP3</td>
-            <td class="no">–</td><td class="no">–</td><td class="no">–</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="partial">○</td></tr>
+          <tr><td>MOV · MP4 · M4V</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="p">○</td></tr>
+          <tr><td>M4A · WAV · AIFF · MP3</td><td class="n">–</td><td class="n">–</td><td class="n">–</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="p">○</td></tr>
         </tbody>
       </table>
-    </div>
-    <div class="wrap">
-      <p>
-        Video to video normally copies the existing streams instead of
-        re-encoding, so it is fast and loses nothing. Video to audio extracts
-        the soundtrack.
-      </p>
-      <p>
-        <strong>○ MP3 needs a helper.</strong> macOS ships an MP3 decoder but no
-        encoder, so Suffix uses <code>ffmpeg</code> or <code>lame</code> if one
-        is installed — <code>brew install ffmpeg</code>. It looks for an encoder
-        rather than bundling one. If you'd rather not, <code>.m4a</code> is the
-        native equivalent and needs nothing.
-      </p>
     </div>
 
     <h3>Documents</h3>
@@ -544,37 +718,43 @@ cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
       <table>
         <thead><tr><th>From</th><th>To PDF</th></tr></thead>
         <tbody>
-          <tr><td>Pages · Keynote · Numbers</td>
-            <td><span class="yes">●</span> exact — needs that Apple app installed</td></tr>
-          <tr><td>Word · RTF · OpenDocument · HTML · plain text</td>
-            <td><span class="partial">●</span> approximate</td></tr>
+          <tr><td>Pages · Keynote · Numbers</td><td><span class="y">●</span> exact — needs that Apple app installed</td></tr>
+          <tr><td>Word · RTF · OpenDocument · HTML · plain text</td><td><span class="p">●</span> approximate</td></tr>
         </tbody>
       </table>
     </div>
-    <div class="wrap">
+
+    <div class="wrap" style="padding:0">
+      <p>
+        <strong>○ MP3 needs a helper.</strong> macOS ships an MP3 decoder but no
+        encoder, so Suffix uses <code>ffmpeg</code> or <code>lame</code> if one
+        is installed — <code>brew install ffmpeg</code>. It looks for an encoder
+        rather than bundling one. <code>.m4a</code> is the native equivalent and
+        needs nothing.
+      </p>
       <div class="note">
         <p>
           <strong>Read this before converting a document you plan to send.</strong>
-          Only iWork files convert exactly, because Suffix asks Pages to export
-          them. Everything else is re-laid-out by macOS's own text engine: text
-          and basic formatting survive, but tables, columns, headers and
-          footers, and exact pagination do not. Suffix says so on the notice —
-          check the result.
+          Only iWork files convert exactly, because Suffix asks Pages or Keynote
+          to export them. Everything else is re-laid-out by macOS's own text
+          engine: text and basic formatting survive, but tables, columns,
+          headers and footers, and exact pagination do not. Suffix says so on
+          the notice — check the result.
         </p>
       </div>
     </div>
-  </section>
-</div>
+  </div>
+</section>
 
-<div class="wrap">
-  <section>
+<section>
+  <div class="wrap">
     <h2>Is this safe?</h2>
 
     <h3>Your files never leave your Mac</h3>
     <p>
       Suffix contains no network code at all. Conversion uses only what ships
-      with macOS — ImageIO, PDFKit, AVFoundation and Vision. There is no
-      account, no service, and nothing to sign in to.
+      with macOS — ImageIO, PDFKit, AVFoundation and Vision. No account, no
+      service, nothing to sign in to.
     </p>
 
     <h3>Nothing is destroyed</h3>
@@ -590,10 +770,8 @@ cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
       <table>
         <thead><tr><th></th><th>After renaming photo.png to photo.pdf</th></tr></thead>
         <tbody>
-          <tr><td><strong>Replace the file</strong></td>
-            <td class="file">photo.pdf — one file, as renaming implies</td></tr>
-          <tr><td><strong>Keep both</strong></td>
-            <td class="file">photo.pdf &nbsp;and&nbsp; photo.png, side by side</td></tr>
+          <tr><td><strong>Replace</strong></td><td class="f">photo.pdf — one file, as renaming implies</td></tr>
+          <tr><td><strong>Keep both</strong></td><td class="f">photo.pdf &nbsp;+&nbsp; photo.png, side by side</td></tr>
         </tbody>
       </table>
     </div>
@@ -607,23 +785,8 @@ cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
       <code>.zip</code> renamed to <code>.png</code> is untouched, and your
       Photos library is never opened.
     </p>
-  </section>
-
-  <section>
-    <h2>How it works</h2>
-    <p>
-      Renaming a file in Finder only changes its name; the bytes are untouched.
-      Suffix watches for rename events, checks whether the file's real format
-      still matches its new extension, and re-encodes it when it doesn't.
-    </p>
-    <p>
-      Everything is decided from the file's <strong>contents</strong>, never its
-      name. A text file called <code>notes.jpg</code> is left alone. A PNG
-      called <code>photo.jpg</code> is converted.
-    </p>
-  </section>
-</div>
-</main>
+  </div>
+</section>
 
 <footer class="wide">
   <span>Suffix · MIT licensed · built for macOS</span>
@@ -633,6 +796,93 @@ cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
     <a href="https://github.com/PewPewBiches/Suffix/issues">Report a problem</a>
   </span>
 </footer>
+</main>
 
+<script>
+(function () {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const row    = document.getElementById('target');
+  const ext    = document.getElementById('ext');
+  const kind   = document.getElementById('kind');
+  const icon   = document.getElementById('ticon');
+  const banner = document.getElementById('banner');
+
+  // With reduced motion, show the finished state and stop.
+  if (reduce) {
+    ext.textContent = '.pdf';
+    kind.textContent = 'PDF Document';
+    icon.dataset.kind = 'PDF';
+    banner.classList.add('in');
+    return;
+  }
+
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+
+  async function typeOut(target, text, speed) {
+    for (const ch of text) {
+      target.textContent += ch;
+      await wait(speed);
+    }
+  }
+  async function backspace(target, count, speed) {
+    for (let i = 0; i < count; i++) {
+      target.textContent = target.textContent.slice(0, -1);
+      await wait(speed);
+    }
+  }
+
+  function reset() {
+    row.className = 'row alt';
+    ext.textContent = '.png';
+    kind.textContent = 'PNG image';
+    icon.dataset.kind = 'PNG';
+    banner.classList.remove('in');
+  }
+
+  async function cycle() {
+    reset();
+    await wait(1100);
+
+    row.classList.add('sel');            // click
+    await wait(750);
+
+    row.classList.add('editing');        // Return opens the name for editing
+    await wait(600);
+
+    await backspace(ext, 3, 110);        // delete "png"
+    await wait(220);
+    await typeOut(ext, 'pdf', 130);      // type "pdf"
+    await wait(520);
+
+    row.classList.remove('editing');     // Return again
+    await wait(420);
+
+    // the moment the file actually changes
+    kind.textContent = 'PDF Document';
+    icon.dataset.kind = 'PDF';
+    row.classList.remove('sel');
+    row.classList.add('done');
+    await wait(420);
+
+    banner.classList.add('in');
+    await wait(3400);
+    banner.classList.remove('in');
+    await wait(900);
+  }
+
+  // Only animate while it's actually on screen.
+  let running = false;
+  async function loop() {
+    running = true;
+    while (running) { await cycle(); }
+  }
+  const io = new IntersectionObserver(entries => {
+    const visible = entries[0].isIntersecting;
+    if (visible && !running) loop();
+    if (!visible) running = false;
+  }, { threshold: 0.15 });
+  io.observe(row);
+})();
+</script>
 </body>
 </html>
