@@ -30,8 +30,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Menu-bar only: no Dock icon, no app-switcher entry.
         NSApp.setActivationPolicy(.accessory)
 
-        if NotificationProbe.runIfRequested() { return }
-
         if DesignPreview.runIfRequested() {
             NSApp.terminate(nil)
             return
