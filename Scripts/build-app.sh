@@ -20,6 +20,7 @@ BIN=$(swift build -c "$CONFIG" --product RenameApp --show-bin-path)/RenameApp
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/REname"
+cp Resources/REname.icns "$APP/Contents/Resources/REname.icns"
 
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -32,6 +33,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleVersion</key><string>$VERSION</string>
   <key>CFBundleShortVersionString</key><string>$VERSION</string>
   <key>CFBundleExecutable</key><string>REname</string>
+  <key>CFBundleIconFile</key><string>REname</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>LSMinimumSystemVersion</key><string>14.0</string>
   <!-- Menu-bar only: no Dock icon. -->
