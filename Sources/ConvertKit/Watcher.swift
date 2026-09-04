@@ -25,13 +25,32 @@ public final class RenameWatcher {
         "/.build/", "/DerivedData/", "/.Spotlight-V100/", "/.fseventsd/",
     ]
 
+    /// A rename older than this is not acted on.
+    ///
+    /// When the stream resumes from a stored event id it replays everything
+    /// that happened while the app was closed, which could otherwise convert
+    /// files the user renamed days ago and left deliberately mismatched.
+    public static let maxAge: TimeInterval = 10 * 60
+
     private let roots: [URL]
-    private let queue = DispatchQueue(label: "com.rakshitchawla.Suffix.watcher", qos: .utility)
+    private let since: FSEventStreamEventId
+    private let queue = DispatchQueue(label: "io.github.pewpewbiches.Suffix.watcher", qos: .utility)
     private let handler: @Sendable (URL) -> Void
     private var stream: FSEventStreamRef?
 
-    /// - Parameter handler: called with each renamed file. Runs off the main thread.
-    public init(roots: [URL], handler: @escaping @Sendable (URL) -> Void) {
+    /// The most recent event seen, to be stored and passed back as `since` on
+    /// the next launch.
+    public private(set) var lastEventId: FSEventStreamEventId = 0
+
+    /// - Parameters:
+    ///   - since: resume from this event id. Passing the id stored at the last
+    ///     run closes the window between launching and the stream going live,
+    ///     during which renames were simply missed.
+    ///   - handler: called with each renamed file. Runs off the main thread.
+    public init(roots: [URL],
+                since: FSEventStreamEventId? = nil,
+                handler: @escaping @Sendable (URL) -> Void) {
+        self.since = since ?? FSEventStreamEventId(kFSEventStreamEventIdSinceNow)
         // FSEvents reports canonical paths, so watch canonical paths too —
         // otherwise a root reached through a symlink (/tmp -> /private/tmp)
         // silently never matches anything.
@@ -58,14 +77,17 @@ public final class RenameWatcher {
                          | kFSEventStreamCreateFlagIgnoreSelf
                          | kFSEventStreamCreateFlagUseCFTypes)
 
+        Log.write("watcher starting; roots=\(roots.map(\.path).joined(separator: ", ")) since=\(since == FSEventStreamEventId(kFSEventStreamEventIdSinceNow) ? "now" : String(since))")
+
         guard let s = FSEventStreamCreate(
             kCFAllocatorDefault,
-            { _, info, count, paths, flags, _ in
+            { _, info, count, paths, flags, ids in
                 guard let info else { return }
                 let watcher = Unmanaged<RenameWatcher>.fromOpaque(info).takeUnretainedValue()
                 let names = unsafeBitCast(paths, to: NSArray.self)
                 for i in 0..<count {
                     guard let path = names[i] as? String else { continue }
+                    watcher.lastEventId = max(watcher.lastEventId, ids[i])
                     if ProcessInfo.processInfo.environment["SUFFIX_DEBUG"] != nil {
                         FileHandle.standardError.write(
                             "raw event flags=0x\(String(flags[i], radix: 16)) \(path)\n".data(using: .utf8)!)
@@ -75,13 +97,17 @@ public final class RenameWatcher {
             },
             &context,
             roots.map(\.path) as CFArray,
-            FSEventStreamEventId(kFSEventStreamEventIdSinceNow),
+            since,
             0.2,                       // coalesce bursts; a rename is one event
             flags)
-        else { return }
+        else {
+            Log.write("FSEventStreamCreate FAILED — nothing will be watched")
+            return
+        }
 
         FSEventStreamSetDispatchQueue(s, queue)
-        FSEventStreamStart(s)
+        let started = FSEventStreamStart(s)
+        Log.write("FSEventStreamStart returned \(started)")
         stream = s
     }
 
@@ -98,12 +124,26 @@ public final class RenameWatcher {
         guard flags & UInt32(kFSEventStreamEventFlagItemIsFile) != 0 else { return }
         guard flags & UInt32(kFSEventStreamEventFlagItemRenamed) != 0 else { return }
         guard Self.isEligible(path: path) else { return }
+        guard Self.isRecent(path: path) else { return }
         // A rename reports both the old and the new name, and FSEvents may
         // coalesce Removed into the same event as Renamed. Existence on disk
         // is the reliable test of which name survived — the Removed flag is
         // not, and filtering on it drops real renames.
         guard FileManager.default.fileExists(atPath: path) else { return }
+        Log.write("rename seen: \(path)")
         handler(URL(fileURLWithPath: path))
+    }
+
+    /// Was this renamed recently enough to act on? Guards the replay of stored
+    /// events; a live rename is always well inside the window.
+    static func isRecent(path: String) -> Bool {
+        // Attribute-modification time (ctime), not content-modification time:
+        // renaming a file leaves mtime untouched, so checking mtime would skip
+        // every rename of an older file — which is most of them.
+        let url = URL(fileURLWithPath: path)
+        guard let changed = try? url.resourceValues(forKeys: [.attributeModificationDateKey])
+            .attributeModificationDate else { return false }
+        return Date().timeIntervalSince(changed) < maxAge
     }
 
     /// Cheap filters applied before touching the disk.

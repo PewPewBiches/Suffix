@@ -17,11 +17,19 @@ public struct HistoryEntry: Identifiable, Sendable {
 }
 
 /// What the service decided to do about a renamed file.
-public enum Decision: Sendable {
+public enum Decision: Sendable, CustomStringConvertible {
     case ignore
     case convert(ConversionPlan)
     /// Large or surprising jobs: ask before doing them.
     case confirm(ConversionPlan)
+
+    public var description: String {
+        switch self {
+        case .ignore:          return "ignore"
+        case .convert(let p):  return "convert(\(p.summary))"
+        case .confirm(let p):  return "confirm(\(p.summary))"
+        }
+    }
 }
 
 /// Glue between "a file was renamed" and "the file was converted".

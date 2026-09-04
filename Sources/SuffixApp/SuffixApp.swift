@@ -26,6 +26,10 @@ struct SuffixApp: App {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationWillTerminate(_ notification: Notification) {
+        AppModel.shared.rememberPosition()
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Menu-bar only: no Dock icon, no app-switcher entry.
         NSApp.setActivationPolicy(.accessory)

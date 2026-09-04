@@ -60,6 +60,18 @@ struct SettingsView: View {
 
             }
 
+            Section {
+                Toggle("Skip Finder's extension warning", isOn: Binding(
+                    get: { !model.finderWarningShown },
+                    set: { model.finderWarningShown = !$0 }))
+            } header: {
+                Text("Finder")
+            } footer: {
+                Text("Finder asks for confirmation every time you change an extension — before Suffix ever sees the file. Turning this off restarts Finder, which takes a moment and loses nothing.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Watching") {
                 Toggle("Launch at login", isOn: Binding(
                     get: { model.launchAtLogin },

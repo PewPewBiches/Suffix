@@ -9,7 +9,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 CONFIG="${CONFIG:-release}"
 APP="${APP_DEST:-build/Suffix.app}"
-BUNDLE_ID="com.local.Suffix"
+BUNDLE_ID="io.github.pewpewbiches.Suffix"
 VERSION="0.1.0"
 
 echo "Building ($CONFIG)…"

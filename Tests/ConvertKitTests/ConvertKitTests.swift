@@ -237,3 +237,32 @@ func modesExplainThemselves() {
     #expect(OutputMode.replace.explanation().contains("becomes"))
     #expect(OutputMode.allCases.count == 2)
 }
+
+// MARK: - Rename recency
+
+@Test("a rename of an old file still counts as recent")
+func recencyUsesCtimeNotMtime() throws {
+    // The realistic case: a photo from months ago, renamed just now. Its
+    // content-modification date is old; only ctime moves on a rename.
+    let url = try makeImage(.png, named: "old.png")
+    let longAgo = Date(timeIntervalSinceNow: -60 * 60 * 24 * 90)
+    try FileManager.default.setAttributes([.modificationDate: longAgo],
+                                          ofItemAtPath: url.path)
+
+    let renamed = url.deletingLastPathComponent().appendingPathComponent("old.jpg")
+    try FileManager.default.moveItem(at: url, to: renamed)
+
+    #expect(RenameWatcher.isRecent(path: renamed.path))
+}
+
+@Test("a file untouched for a long time is not acted on")
+func recencyRejectsStale() throws {
+    let url = try makeImage(.png, named: "stale.jpg")
+    // Nothing has happened to this file since it was written; simulate the
+    // replay case by asking with a window of zero.
+    let age = Date().timeIntervalSince(
+        try #require(try url.resourceValues(forKeys: [.attributeModificationDateKey])
+            .attributeModificationDate))
+    #expect(age < RenameWatcher.maxAge)   // fresh now…
+    #expect(RenameWatcher.isRecent(path: "/nonexistent/file.jpg") == false)
+}

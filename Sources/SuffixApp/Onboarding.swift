@@ -217,6 +217,16 @@ private struct PermissionStep: View {
 
             Divider().opacity(0.4)
 
+            Toggle("Skip Finder's extension warning", isOn: Binding(
+                get: { !model.finderWarningShown },
+                set: { model.finderWarningShown = !$0 }))
+            Text("Otherwise Finder asks you to confirm every rename, before Suffix ever sees the file. Changing this restarts Finder.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Divider().opacity(0.4)
+
             // Proving it works is the whole point of this screen.
             HStack(spacing: 11) {
                 Button("Test it now") {
