@@ -57,7 +57,7 @@ a{color:var(--amber)}
 @media(max-width:640px){.menubar .hide{display:none}}
 
 /* ---------- hero ---------- */
-.hero{position:relative;padding:70px 0 30px;text-align:center;overflow:hidden}
+.hero{position:relative;padding:92px 0 44px;text-align:center;overflow:hidden}
 .hero h1{
   font-family:var(--display);font-weight:800;
   font-size:clamp(64px,14vw,150px);line-height:.88;letter-spacing:-.045em;
@@ -329,7 +329,10 @@ footer{border-top:1px solid var(--hair);margin-top:50px;padding:34px 0 60px}
   html{scroll-behavior:auto}
   *,*::before,*::after{animation:none!important;transition:none!important}
 }
-@media(max-width:900px){ .scatter .drop{display:none} }
+/* The scatter lives in the margins either side of the text column. Narrow
+   viewports have no margins, so it goes rather than colliding with the words. */
+@media(max-width:1180px){ .scatter .drop{display:none} }
+@media(max-width:920px){ .scatter{display:none} }
 </style>
 </head>
 <body>
@@ -376,22 +379,22 @@ footer{border-top:1px solid var(--hair);margin-top:50px;padding:34px 0 60px}
       <div class="cap">works-everywhere.mov</div>
     </div>
 
-    <div class="kao float" style="left:19%;top:24%">^ ω ^</div>
-    <div class="kao float b" style="right:20%;top:30%">¯\_(ツ)_/¯</div>
-    <div class="kao float c" style="left:14%;bottom:32%">(⌐■_■)</div>
-    <div class="kao float" style="right:16%;bottom:26%">ʕ•ᴥ•ʔ</div>
+    <div class="kao float" style="left:3%;top:40%">^ ω ^</div>
+    <div class="kao float b" style="right:2%;top:37%">¯\_(ツ)_/¯</div>
+    <div class="kao float c" style="left:5%;bottom:30%">(⌐■_■)</div>
+    <div class="kao float" style="right:5%;bottom:23%">ʕ•ᴥ•ʔ</div>
 
-    <div class="float b" style="left:26%;top:9%"><span class="sticker rainbow">no<br>uploads!</span></div>
-    <div class="float" style="right:25%;bottom:6%"><span class="sticker tape" style="--r:7deg">0 servers involved</span></div>
-    <div class="float c" style="left:2%;top:44%"><span class="sticker dark" style="--r:9deg">it's just a rename</span></div>
-    <div class="float" style="right:2%;top:47%"><span class="sticker amber" style="--r:-6deg">free forever</span></div>
+    <div class="float b" style="left:12%;top:11%"><span class="sticker rainbow">no<br>uploads!</span></div>
+    <div class="float" style="right:12%;bottom:4%"><span class="sticker tape" style="--r:7deg">0 servers involved</span></div>
+    <div class="float c" style="left:1%;top:56%"><span class="sticker dark" style="--r:9deg">it's just a rename</span></div>
+    <div class="float" style="right:1%;top:54%"><span class="sticker amber" style="--r:-6deg">free forever</span></div>
 
-    <div class="float c" style="left:31%;bottom:14%"><span class="fold big"></span></div>
-    <div class="float" style="right:33%;top:19%"><span class="fold big"></span></div>
-    <div class="drop float b" style="left:11%;top:66%"><span class="trash">🗑️</span>
+    <div class="float c" style="left:17%;bottom:10%"><span class="fold big"></span></div>
+    <div class="float" style="right:18%;top:15%"><span class="fold big"></span></div>
+    <div class="drop float b" style="left:8%;top:72%"><span class="trash">🗑️</span>
       <div class="cap">converter&nbsp;sites</div>
     </div>
-    <div class="float" style="right:11%;top:64%"><span class="emoji-blob">🐈</span></div>
+    <div class="float" style="right:8%;top:70%"><span class="emoji-blob">🐈</span></div>
   </div>
 
   <div class="wrap">
