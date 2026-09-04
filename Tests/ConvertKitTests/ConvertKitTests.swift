@@ -22,7 +22,7 @@ private func makeImage(_ format: FileFormat, named name: String) throws -> URL {
     let image = ctx.makeImage()!
 
     let dest = CGImageDestinationCreateWithURL(
-        url as CFURL, format.utType.identifier as CFString, 1, nil)!
+        url as CFURL, format.utType!.identifier as CFString, 1, nil)!
     CGImageDestinationAddImage(dest, image, nil)
     #expect(CGImageDestinationFinalize(dest))
     return url
@@ -51,14 +51,18 @@ func detectionIgnoresName() throws {
     #expect(FileFormat.detect(at: url) == .png)
 }
 
-@Test("non-images are not mistaken for images")
+@Test("a text file named .jpg is identified as text, and refused as an image")
 func detectionRejectsJunk() throws {
     let dir = FileManager.default.temporaryDirectory
         .appendingPathComponent("ConvertKitTests/\(UUID().uuidString)")
     try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
     let url = dir.appendingPathComponent("notes.jpg")
     try "just some text".write(to: url, atomically: true, encoding: .utf8)
-    #expect(FileFormat.detect(at: url) == nil)
+
+    // Text is a format Suffix knows now, so it is identified rather than
+    // unknown — but nothing sensible turns prose into a JPEG.
+    #expect(FileFormat.detect(at: url) == .txt)
+    #expect(plan(source: .txt, ext: "jpg") == .failure(.incompatible(from: .txt, to: .jpeg)))
 }
 
 // MARK: - Planning
@@ -164,8 +168,10 @@ func watcherExcludesNoise() {
 func watcherExtensionGate() {
     #expect(RenameWatcher.isEligible(path: "/Users/me/Desktop/photo.jpg"))
     #expect(RenameWatcher.isEligible(path: "/Users/me/Desktop/scan.pdf"))
-    #expect(!RenameWatcher.isEligible(path: "/Users/me/Desktop/notes.txt"))
+    // .txt is a real target now (a PDF's text can be extracted to one).
+    #expect(RenameWatcher.isEligible(path: "/Users/me/Desktop/notes.txt"))
     #expect(!RenameWatcher.isEligible(path: "/Users/me/Desktop/archive.zip"))
+    #expect(!RenameWatcher.isEligible(path: "/Users/me/Desktop/notes.xyz"))
     #expect(!RenameWatcher.isEligible(path: "/Users/me/Desktop/.hidden.png"))
 }
 
@@ -265,4 +271,65 @@ func recencyRejectsStale() throws {
             .attributeModificationDate))
     #expect(age < RenameWatcher.maxAge)   // fresh now…
     #expect(RenameWatcher.isRecent(path: "/nonexistent/file.jpg") == false)
+}
+
+// MARK: - Media and documents
+
+@Test("video containers convert to one another")
+func planVideo() throws {
+    let p = try plan(source: .mov, ext: "mp4").get()
+    #expect(p == .media(from: .mov, to: .mp4, seconds: 0))
+}
+
+@Test("a long video asks before it starts, a short one doesn't")
+func longMediaConfirms() {
+    #expect(ConversionPlan.media(from: .mov, to: .mp4, seconds: 5).needsConfirmation == false)
+    #expect(ConversionPlan.media(from: .mov, to: .mp4, seconds: 600).needsConfirmation)
+}
+
+@Test("video yields audio, but audio cannot yield video")
+func planAudioExtraction() throws {
+    #expect(try plan(source: .mp4, ext: "m4a").get() == .media(from: .mp4, to: .m4a, seconds: 0))
+    #expect(plan(source: .m4a, ext: "mp4") == .failure(.incompatible(from: .m4a, to: .mp4)))
+}
+
+@Test("MP3 is refused with instructions when no encoder is installed")
+func mp3NeedsEncoder() {
+    let without = ConversionPlan.make(source: .mp4, targetExtension: "mp3",
+                                      pageCount: { 0 }, mediaSeconds: { 10 },
+                                      hasMP3Encoder: { false })
+    guard case .failure(.needsExternalTool(let format, let hint)) = without else {
+        Issue.record("expected a refusal naming the missing tool"); return
+    }
+    #expect(format == .mp3)
+    #expect(hint.contains("ffmpeg"))
+
+    // With one present it plans normally.
+    let with = ConversionPlan.make(source: .mp4, targetExtension: "mp3",
+                                   pageCount: { 0 }, mediaSeconds: { 10 },
+                                   hasMP3Encoder: { true })
+    #expect((try? with.get()) == .media(from: .mp4, to: .mp3, seconds: 10))
+}
+
+@Test("documents become PDFs, and only Pages is a faithful rendering")
+func planDocuments() throws {
+    let word = try plan(source: .docx, ext: "pdf").get()
+    #expect(word == .documentToPDF(from: .docx, faithful: false))
+    #expect(word.isApproximate)          // must be disclosed to the user
+
+    let pages = try plan(source: .pages, ext: "pdf").get()
+    #expect(pages == .documentToPDF(from: .pages, faithful: true))
+    #expect(!pages.isApproximate)
+}
+
+@Test("a PDF's text can be extracted")
+func planPDFText() throws {
+    #expect(try plan(source: .pdf, ext: "txt").get() == .pdfToText)
+}
+
+@Test("nonsense pairings are refused rather than attempted")
+func planIncompatible() {
+    #expect(plan(source: .mp4, ext: "png") == .failure(.incompatible(from: .mp4, to: .png)))
+    #expect(plan(source: .docx, ext: "jpg") == .failure(.incompatible(from: .docx, to: .jpeg)))
+    #expect(plan(source: .png, ext: "mp4") == .failure(.incompatible(from: .png, to: .mp4)))
 }

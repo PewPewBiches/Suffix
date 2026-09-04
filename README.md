@@ -43,18 +43,63 @@ characteristic way of going wrong.
 
 ## What it converts
 
-|                                            | PNG | JPEG | TIFF | GIF | BMP | HEIC | PDF |
-|--------------------------------------------|:---:|:----:|:----:|:---:|:---:|:----:|:---:|
-| **from** PNG / JPEG / TIFF / GIF / BMP / HEIC | ●   | ●    | ●    | ●   | ●   | ●    | ●   |
-| **from** PDF                                | ●   | ●    | ●    | ●   | ●   | ●    | –   |
-| **from** WebP                               | ●   | ●    | ●    | ●   | ●   | ●    | ●   |
+### Images and PDFs
 
-A PDF of more than one page becomes a **`.zip` of numbered images** rather than
-a single file, because one image cannot hold 100 pages. Suffix asks first, and
-names the result `document.zip` rather than the `document.jpg` you typed.
+|                                            | PNG | JPEG | TIFF | GIF | BMP | HEIC | PDF | TXT |
+|--------------------------------------------|:---:|:----:|:----:|:---:|:---:|:----:|:---:|:---:|
+| **from** PNG / JPEG / TIFF / GIF / BMP / HEIC | ●   | ●    | ●    | ●   | ●   | ●    | ●   | –   |
+| **from** WebP                               | ●   | ●    | ●    | ●   | ●   | ●    | ●   | –   |
+| **from** PDF                                | ●   | ●    | ●    | ●   | ●   | ●    | –   | ●   |
 
-WebP can be read but not written — macOS ships no WebP encoder — so renaming
-something *to* `.webp` is refused rather than half-done.
+A PDF of more than one page becomes a **`.zip` of numbered images**, because one
+image cannot hold 100 pages. Suffix asks first, and names the result
+`document.zip` rather than the `document.jpg` you typed.
+
+`PDF → .txt` pulls out the text. A scanned PDF has none, and says so rather than
+writing an empty file.
+
+### Video and audio
+
+|                | MOV | MP4 | M4V | M4A | WAV | AIFF | MP3 |
+|----------------|:---:|:---:|:---:|:---:|:---:|:----:|:---:|
+| **from** MOV / MP4 / M4V | ●   | ●   | ●   | ●   | ●   | ●    | ○   |
+| **from** M4A / WAV / AIFF / MP3 | –   | –   | –   | ●   | ●   | ●    | ○   |
+
+Video → video usually copies the existing streams rather than re-encoding, which
+is fast and lossless. Video → audio extracts the soundtrack. Audio cannot become
+video.
+
+**○ MP3 needs a helper.** macOS ships an MP3 decoder but no encoder, so Suffix
+uses `ffmpeg` or `lame` if one is installed and otherwise says so:
+
+```bash
+brew install ffmpeg
+```
+
+Rather than bundle an encoder, Suffix looks for one. Nothing to ship, nothing to
+license, and most people who want MP3 already have it. If you don't, `.m4a` is
+the native equivalent and needs nothing.
+
+### Documents
+
+| From | To PDF |
+|---|---|
+| **Pages** | ● exact — uses the PDF preview Pages itself saved |
+| **Word (.docx, .doc)**, **RTF**, **OpenDocument**, **HTML**, **plain text** | ● approximate |
+
+**Read this before converting a document you intend to send.** Everything except
+Pages is re-laid-out by macOS's own text engine, not by Word. Text and basic
+formatting survive; tables, columns, headers and footers, and exact pagination
+do not. Suffix says so on the notice, but check the result.
+
+Pages files are exact because a `.pages` file is a zip carrying a PDF that Pages
+generated. If the document was saved without a preview, Suffix explains how to
+turn that on rather than producing something wrong.
+
+### What it never touches
+
+Archives, code, spreadsheets, and anything whose contents aren't a format above.
+A `.zip` renamed to `.png` is left exactly as it is.
 
 ---
 

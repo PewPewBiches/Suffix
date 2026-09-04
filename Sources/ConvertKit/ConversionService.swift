@@ -1,5 +1,6 @@
 import Foundation
 import PDFKit
+import AVFoundation
 
 /// One completed conversion, kept so the user can see and undo it.
 public struct HistoryEntry: Identifiable, Sendable {
@@ -59,7 +60,13 @@ public final class ConversionService: @unchecked Sendable {
         let result = ConversionPlan.make(
             source: actual,
             targetExtension: url.pathExtension,
-            pageCount: { PDFDocument(url: url)?.pageCount ?? 0 })
+            pageCount: { PDFDocument(url: url)?.pageCount ?? 0 },
+            mediaSeconds: {
+                // Duration decides whether a media job is worth confirming.
+                let asset = AVURLAsset(url: url)
+                let seconds = CMTimeGetSeconds(asset.duration)
+                return seconds.isFinite ? seconds : 0
+            })
 
         switch result {
         case .failure:
@@ -72,30 +79,116 @@ public final class ConversionService: @unchecked Sendable {
 
     /// Run a plan, recording it in history. Safe to call concurrently; the same
     /// path will not be converted twice at once.
+    ///
+    /// The locking lives in small synchronous helpers because a lock must not
+    /// be held across a suspension point, and media conversions suspend.
     @discardableResult
-    public func perform(_ plan: ConversionPlan, on url: URL) throws -> ConversionResult {
-        lock.lock()
-        guard !inFlight.contains(url.path) else {
-            lock.unlock()
-            throw ConversionError.cannotRead(url)
-        }
-        inFlight.insert(url.path)
-        lock.unlock()
-        defer { lock.lock(); inFlight.remove(url.path); lock.unlock() }
+    public func perform(_ plan: ConversionPlan,
+                        on url: URL,
+                        progress: (@Sendable (Double) -> Void)? = nil) async throws -> ConversionResult {
+        try claim(url.path)
+        defer { release(url.path) }
 
         let originalName = url.lastPathComponent
-        let result = try Converter(options: options).run(plan, on: url)
+        let result: ConversionResult
+        switch plan {
+        case .media, .documentToPDF, .pdfToText:
+            result = try await performOutOfProcess(plan, on: url, progress: progress)
+        default:
+            result = try Converter(options: options).run(plan, on: url)
+        }
 
-        lock.lock()
-        _history.insert(HistoryEntry(date: Date(),
-                                     finalURL: result.finalURL,
-                                     originalName: originalName,
-                                     summary: plan.summary,
-                                     backup: result.originalBackup),
-                        at: 0)
-        if _history.count > 50 { _history.removeLast(_history.count - 50) }
-        lock.unlock()
+        record(HistoryEntry(date: Date(),
+                            finalURL: result.finalURL,
+                            originalName: originalName,
+                            summary: plan.summary,
+                            backup: result.originalBackup))
         return result
+    }
+
+    private func claim(_ path: String) throws {
+        lock.lock(); defer { lock.unlock() }
+        guard !inFlight.contains(path) else { throw ConversionError.alreadyRunning }
+        inFlight.insert(path)
+    }
+
+    private func release(_ path: String) {
+        lock.lock(); defer { lock.unlock() }
+        inFlight.remove(path)
+    }
+
+    private func record(_ entry: HistoryEntry) {
+        lock.lock(); defer { lock.unlock() }
+        _history.insert(entry, at: 0)
+        if _history.count > 50 { _history.removeLast(_history.count - 50) }
+    }
+
+    /// Media and document conversions write to a temporary file first, then
+    /// take the renamed file's place — so a long export that fails or is
+    /// cancelled leaves the original untouched.
+    private func performOutOfProcess(_ plan: ConversionPlan,
+                                     on url: URL,
+                                     progress: (@Sendable (Double) -> Void)?) async throws -> ConversionResult {
+        let fm = FileManager.default
+        let dir = url.deletingLastPathComponent()
+        let stem = url.deletingPathExtension().lastPathComponent
+        let target = FileFormat.forExtension(url.pathExtension)
+
+        let backup = options.keepOriginal ? try OriginalsStore.stash(url) : nil
+        var kept: URL?
+        if options.outputMode == .keepBoth, let actual = FileFormat.detect(at: url) {
+            let sibling = uniqueSibling(in: dir, stem: stem, ext: actual.preferredExtension)
+            try fm.copyItem(at: url, to: sibling)
+            kept = sibling
+        }
+
+        let scratch = fm.temporaryDirectory
+            .appendingPathComponent("\(UUID().uuidString).\(url.pathExtension)")
+        defer { try? fm.removeItem(at: scratch) }
+
+        switch plan {
+        case .media(let from, let to, _):
+            if SystemAudio.canWrite(to) {
+                let staged = try MediaConverter.stage(url, as: from)
+                defer { if staged != url { try? fm.removeItem(at: staged) } }
+                try SystemAudio.convert(staged, to: to, destination: scratch)
+            } else if to == .mp3 {
+                let staged = try MediaConverter.stage(url, as: from)
+                defer { if staged != url { try? fm.removeItem(at: staged) } }
+                try await ExternalEncoder.encodeMP3(from: staged, to: scratch)
+            } else {
+                try await MediaConverter().run(url, from: from, to: to,
+                                               destination: scratch, progress: progress)
+            }
+        case .documentToPDF(let from, _):
+            try await MainActor.run {
+                try DocumentConverter().toPDF(url, from: from, destination: scratch)
+            }
+        case .pdfToText:
+            try await MainActor.run {
+                try DocumentConverter().toText(url, destination: scratch)
+            }
+        default:
+            throw ConversionError.encodingFailed(target ?? .pdf)
+        }
+
+        guard fm.fileExists(atPath: scratch.path) else {
+            throw ConversionError.mediaExportFailed("no output was produced")
+        }
+        _ = try fm.replaceItemAt(url, withItemAt: scratch)
+        return ConversionResult(finalURL: url, originalBackup: backup,
+                                keptAlongside: kept, plan: plan)
+    }
+
+    private func uniqueSibling(in dir: URL, stem: String, ext: String) -> URL {
+        let fm = FileManager.default
+        var candidate = dir.appendingPathComponent("\(stem).\(ext)")
+        var n = 2
+        while fm.fileExists(atPath: candidate.path) {
+            candidate = dir.appendingPathComponent("\(stem) \(n).\(ext)")
+            n += 1
+        }
+        return candidate
     }
 
     /// Put a converted file back the way it was.

@@ -187,15 +187,29 @@ enum Confirmation {
     static func ask(plan: ConversionPlan, file: URL) -> Bool {
         let alert = NSAlert()
         alert.messageText = "Convert \(file.lastPathComponent)?"
-        alert.informativeText = """
-            \(plan.summary)
-
-            The pages arrive as a .zip next to the original, because there are \
-            too many to sit loose in the folder.
-            """
+        alert.informativeText = "\(plan.summary)\n\n\(reason(for: plan))"
         alert.addButton(withTitle: "Convert")
         alert.addButton(withTitle: "Cancel")
         NSApp.activate(ignoringOtherApps: true)
         return alert.runModal() == .alertFirstButtonReturn
+    }
+
+    /// Why this particular job is worth stopping for.
+    private static func reason(for plan: ConversionPlan) -> String {
+        switch plan {
+        case .pdfToImageArchive:
+            return """
+                The pages arrive as a .zip next to the original, because there \
+                are too many to sit loose in the folder.
+                """
+        case .media(_, _, let seconds):
+            let minutes = max(1, Int((seconds / 60).rounded()))
+            return """
+                This is about \(minutes) minute\(minutes == 1 ? "" : "s") of video. \
+                Converting it takes a while, and progress appears in the menu bar.
+                """
+        default:
+            return "This one takes longer than most."
+        }
     }
 }

@@ -70,6 +70,14 @@ public enum ConversionError: LocalizedError {
     case encodingFailed(FileFormat)
     case pdfRenderFailed(page: Int)
     case archiveFailed(String)
+    case mediaExportFailed(String)
+    case containerUnsupported(FileFormat)
+    case needsExternalTool(String)
+    case noTextFound
+    case noPagesPreview
+    case cancelled
+    case alreadyRunning
+    case noAudioTrack
 
     public var errorDescription: String? {
         switch self {
@@ -77,6 +85,14 @@ public enum ConversionError: LocalizedError {
         case .encodingFailed(let f): return "Could not encode as \(f.displayName)."
         case .pdfRenderFailed(let p): return "Could not render page \(p)."
         case .archiveFailed(let m):  return "Could not build the archive: \(m)"
+        case .mediaExportFailed(let m): return "Conversion failed: \(m)"
+        case .containerUnsupported(let f): return "Cannot write \(f.displayName) from this file."
+        case .needsExternalTool(let m): return m
+        case .noTextFound:           return "This PDF has no text to extract — it may be scanned images."
+        case .noPagesPreview:        return "This Pages document has no preview saved. In Pages, tick “Include preview in document” and save again."
+        case .cancelled:             return "Cancelled."
+        case .alreadyRunning:        return "Already converting that file."
+        case .noAudioTrack:          return "This file has no audio to extract."
         }
     }
 }
@@ -123,6 +139,11 @@ public struct Converter {
             // The renamed file was only ever a placeholder for the request.
             try? FileManager.default.removeItem(at: url)
             return .init(finalURL: zipURL, originalBackup: backup, keptAlongside: kept, plan: plan)
+
+        default:
+            // Media and document plans run elsewhere: they are asynchronous or
+            // main-actor bound, which this synchronous converter is not.
+            throw ConversionError.encodingFailed(.pdf)
         }
     }
 
@@ -134,8 +155,9 @@ public struct Converter {
         else { throw ConversionError.cannotRead(url) }
 
         let out = NSMutableData()
-        guard let dest = CGImageDestinationCreateWithData(
-            out, target.utType.identifier as CFString, 1, nil)
+        guard let type = target.utType,
+              let dest = CGImageDestinationCreateWithData(
+                out, type.identifier as CFString, 1, nil)
         else { throw ConversionError.encodingFailed(target) }
 
         CGImageDestinationAddImage(dest, image, [
@@ -191,8 +213,9 @@ public struct Converter {
 
             guard let image = ctx.makeImage() else { throw ConversionError.pdfRenderFailed(page: i + 1) }
             let out = NSMutableData()
-            guard let dest = CGImageDestinationCreateWithData(
-                out, target.utType.identifier as CFString, 1, nil)
+            guard let type = target.utType,
+                  let dest = CGImageDestinationCreateWithData(
+                    out, type.identifier as CFString, 1, nil)
             else { throw ConversionError.encodingFailed(target) }
             CGImageDestinationAddImage(dest, image, [
                 kCGImageDestinationLossyCompressionQuality: options.quality

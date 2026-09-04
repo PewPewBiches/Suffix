@@ -12,6 +12,9 @@ final class AppModel: ObservableObject {
     @Published private(set) var isWatching = false
     @Published private(set) var history: [HistoryEntry] = []
     @Published private(set) var lastError: String?
+    /// 0…1 while a long conversion runs, nil otherwise. Media exports can take
+    /// minutes, and a silent app during that is indistinguishable from a broken one.
+    @Published var progress: Double?
 
     @AppStorage("enabled")        var enabled = true      { didSet { syncWatching() } }
     @AppStorage("keepOriginals")  var keepOriginals = true { didSet { pushOptions() } }
@@ -154,16 +157,20 @@ final class AppModel: ObservableObject {
         Log.write("run \(plan.summary) on \(originalName)")
         Task.detached(priority: .userInitiated) { [service] in
             do {
-                let result = try service.perform(plan, on: url)
+                let result = try await service.perform(plan, on: url) { fraction in
+                    Task { @MainActor in AppModel.shared.progress = fraction }
+                }
                 Log.write("converted \(originalName) -> \(result.finalURL.lastPathComponent)")
                 await MainActor.run {
                     self.history = service.history
                     self.lastError = nil
+                    self.progress = nil
                     self.announce(result, originalName: originalName)
                 }
             } catch {
                 Log.write("FAILED \(originalName): \(error.localizedDescription)")
                 await MainActor.run {
+                    self.progress = nil
                     self.lastError = error.localizedDescription
                     NoticeCenter.shared.show(Notice(
                         title: "Couldn't convert \(originalName)",
@@ -180,13 +187,27 @@ final class AppModel: ObservableObject {
             title: "Converted",
             from: originalName,
             to: result.finalURL.lastPathComponent,
-            detail: result.keptAlongside.map { "\($0.lastPathComponent) kept alongside" },
+            detail: Self.detail(for: result),
             thumbnail: Thumbnail.image(for: result.finalURL),
             undo: entry.flatMap { e in e.canUndo ? { [weak self] in self?.undo(e) } : nil },
             reveal: { [weak self] in
                 _ = self
                 NSWorkspace.shared.activateFileViewerSelecting([result.finalURL])
             }))
+    }
+
+    /// The line under a conversion's name. A re-flowed document is worth
+    /// saying out loud: the layout will not match the original, and the user
+    /// is about to send this to someone.
+    private static func detail(for result: ConversionResult) -> String? {
+        var parts: [String] = []
+        if result.plan.isApproximate {
+            parts.append("Layout is approximate — check it before sending")
+        }
+        if let kept = result.keptAlongside {
+            parts.append("\(kept.lastPathComponent) kept alongside")
+        }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
     // MARK: - Actions the menu offers

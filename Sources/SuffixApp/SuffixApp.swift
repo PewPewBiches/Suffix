@@ -11,17 +11,33 @@ struct SuffixApp: App {
         MenuBarExtra {
             MenuView(model: model)
         } label: {
-            // Filled while active, outline while paused, so the state reads at
-            // a glance without opening the menu.
-            Image(systemName: model.enabled
-                  ? "arrow.triangle.2.circlepath.circle.fill"
-                  : "arrow.triangle.2.circlepath.circle")
+            // While a long conversion runs the icon shows how far along it is,
+            // so a video export is visibly working rather than apparently
+            // hung. Otherwise: filled when active, outline when paused.
+            if let fraction = model.progress {
+                Image(systemName: progressSymbol(fraction))
+            } else {
+                Image(systemName: model.enabled
+                      ? "arrow.triangle.2.circlepath.circle.fill"
+                      : "arrow.triangle.2.circlepath.circle")
+            }
         }
 
         Window("Suffix Settings", id: "settings") {
             SettingsView(model: model)
         }
         .windowResizability(.contentSize)
+    }
+}
+
+/// SF Symbols ships pie-chart glyphs in quarters, which is as much precision as
+/// a menu-bar icon can usefully carry.
+private func progressSymbol(_ fraction: Double) -> String {
+    switch fraction {
+    case ..<0.25: return "circle.dotted"
+    case ..<0.5:  return "circle.bottomhalf.filled"
+    case ..<0.75: return "circle.righthalf.filled"
+    default:      return "circle.fill"
     }
 }
 

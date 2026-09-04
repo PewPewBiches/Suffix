@@ -9,6 +9,11 @@ struct MenuView: View {
         Toggle("Convert on rename", isOn: $model.enabled)
             .toggleStyle(.checkbox)
 
+        if let fraction = model.progress {
+            Text("Converting… \(Int(fraction * 100))%")
+            Divider()
+        }
+
         Divider()
 
         if model.history.isEmpty {

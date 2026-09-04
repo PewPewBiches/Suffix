@@ -1,6 +1,14 @@
 import Foundation
 import ConvertKit
 import PDFKit
+import AVFoundation
+
+/// Top-level `var`s are main-actor isolated, so a task cannot write to them.
+/// This little box carries the result back out instead.
+final class Outcome: @unchecked Sendable {
+    var finished = false
+    var failure: String?
+}
 
 // A thin command-line front end to ConvertKit. The menu-bar app is the real
 // product; this exists so the engine can be driven and tested without a UI.
@@ -52,11 +60,22 @@ if command == "watch" {
             if isDry {
                 print("would convert \(renamed.lastPathComponent): \(plan.summary)")
             } else {
-                do {
-                    let r = try service.perform(plan, on: renamed)
-                    print("\(plan.summary)  →  \(r.finalURL.lastPathComponent)")
-                } catch {
-                    print("failed \(renamed.lastPathComponent): \(error.localizedDescription)")
+                let outcome = Outcome()
+                Task {
+                    do {
+                        let r = try await service.perform(plan, on: renamed) { fraction in
+                            if fraction > 0 && fraction < 1 {
+                                print("  \(Int(fraction * 100))%"); fflush(stdout)
+                            }
+                        }
+                        print("\(plan.summary)  →  \(r.finalURL.lastPathComponent)")
+                    } catch {
+                        print("failed \(renamed.lastPathComponent): \(error.localizedDescription)")
+                    }
+                    outcome.finished = true
+                }
+                while !outcome.finished {
+                    RunLoop.current.run(mode: .default, before: Date().addingTimeInterval(0.05))
                 }
             }
             fflush(stdout)
@@ -72,17 +91,24 @@ if command == "watch" {
 let actual = FileFormat.detect(at: url)
 
 func makePlan() -> Result<ConversionPlan, ConversionPlan.Refusal> {
-    ConversionPlan.make(source: actual, targetExtension: url.pathExtension) {
-        PDFDocument(url: url)?.pageCount ?? 0
-    }
+    ConversionPlan.make(
+        source: actual,
+        targetExtension: url.pathExtension,
+        pageCount: { PDFDocument(url: url)?.pageCount ?? 0 },
+        mediaSeconds: {
+            let seconds = CMTimeGetSeconds(AVURLAsset(url: url).duration)
+            return seconds.isFinite ? seconds : 0
+        })
 }
 
 func describe(_ refusal: ConversionPlan.Refusal) -> String {
     switch refusal {
     case .sameFormat(let f):             return "already a \(f.displayName) — nothing to do"
-    case .unreadableSource:              return "not a file Rename can read"
+    case .unreadableSource:              return "not a file Suffix can read"
     case .unwritableTarget(let f):       return "cannot write \(f.displayName)"
-    case .unknownTargetExtension(let e): return "'.\(e)' isn't a format Rename converts to"
+    case .unknownTargetExtension(let e): return "'.\(e)' isn't a format Suffix converts to"
+    case .incompatible(let f, let t):    return "\(f.displayName) can't become \(t.displayName)"
+    case .needsExternalTool(_, let hint): return hint
     }
 }
 
@@ -102,13 +128,27 @@ case "convert":
     case .failure(let why):
         print(describe(why)); exit(1)
     case .success(let plan):
-        do {
-            let result = try Converter(options: options).run(plan, on: url)
-            print("\(plan.summary)  →  \(result.finalURL.lastPathComponent)")
-            if let b = result.originalBackup { print("original kept at \(b.path)") }
-        } catch {
-            print("failed: \(error.localizedDescription)"); exit(1)
+        let service = ConversionService(options: options)
+        let outcome = Outcome()
+        Task {
+            do {
+                let result = try await service.perform(plan, on: url) { fraction in
+                    if fraction > 0 && fraction < 1 {
+                        print("  \(Int(fraction * 100))%"); fflush(stdout)
+                    }
+                }
+                print("\(plan.summary)  →  \(result.finalURL.lastPathComponent)")
+                if let b = result.originalBackup { print("original kept at \(b.path)") }
+                if let k = result.keptAlongside { print("original also left at \(k.lastPathComponent)") }
+            } catch {
+                outcome.failure = error.localizedDescription
+            }
+            outcome.finished = true
         }
+        while !outcome.finished {
+            RunLoop.current.run(mode: .default, before: Date().addingTimeInterval(0.05))
+        }
+        if let failure = outcome.failure { print("failed: \(failure)"); exit(1) }
     }
 
 default:
