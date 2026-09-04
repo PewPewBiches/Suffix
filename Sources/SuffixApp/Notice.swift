@@ -15,74 +15,70 @@ struct Notice: Identifiable {
     var reveal: (() -> Void)?
 }
 
-/// The card itself.
+/// A notification banner.
 ///
-/// Built as a real view rather than the hand-assembled panel it replaces, so it
-/// gets the system's own materials, type and focus behaviour — and can carry an
-/// Undo button, which is the thing that makes an automatic conversion feel safe
-/// rather than alarming.
+/// This app cannot use Notification Center: an ad-hoc signature has no Team
+/// Identifier, so macOS auto-denies authorization with "Notifications are not
+/// allowed for this application" and never even prompts. A stable identity
+/// costs $99/year.
+///
+/// So the banner is drawn here — but built from system parts (material, text
+/// styles, the user's accent) and to the system's own proportions, so it reads
+/// as part of macOS rather than as something invented.
 struct NoticeView: View {
     let notice: Notice
     let dismiss: () -> Void
     @State private var hovering = false
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: 10) {
             icon
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(notice.title)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(notice.isError ? Color.red : Color.primary)
+                    .font(.subheadline).fontWeight(.semibold)
 
                 if let from = notice.from, let to = notice.to {
-                    RenameChip(from: from, to: to, size: 11.5)
+                    RenameChip(from: from, to: to)
                 }
                 if let detail = notice.detail {
                     Text(detail)
-                        .font(.system(size: 11.5))
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
                 if notice.undo != nil || notice.reveal != nil {
-                    HStack(spacing: 14) {
+                    HStack(spacing: 8) {
                         if let undo = notice.undo {
                             Button("Undo") { undo(); dismiss() }
-                                .buttonStyle(.plain)
-                                .foregroundStyle(Style.accent)
                         }
                         if let reveal = notice.reveal {
-                            Button("Show in Finder") { reveal(); dismiss() }
-                                .buttonStyle(.plain)
-                                .foregroundStyle(.secondary)
+                            Button("Show") { reveal(); dismiss() }
                         }
                     }
-                    .font(.system(size: 11.5, weight: .medium))
-                    .padding(.top, 3)
+                    .controlSize(.small)
+                    .padding(.top, 4)
                 }
             }
 
             Spacer(minLength: 0)
 
-            // The close control appears on hover; at rest the card stays clean.
             Button(action: dismiss) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 9, weight: .bold))
+                Image(systemName: "xmark.circle.fill")
                     .foregroundStyle(.secondary)
-                    .padding(4)
             }
             .buttonStyle(.plain)
             .opacity(hovering ? 1 : 0)
         }
-        .padding(13)
+        .padding(12)
         .frame(width: Style.noticeWidth, alignment: .leading)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Style.corner))
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Style.noticeCorner))
         .overlay(
-            RoundedRectangle(cornerRadius: Style.corner)
-                .strokeBorder(Color.primary.opacity(0.08), lineWidth: 1)
+            RoundedRectangle(cornerRadius: Style.noticeCorner)
+                .strokeBorder(.separator, lineWidth: 0.5)
         )
-        .shadow(color: .black.opacity(0.22), radius: 14, y: 5)
+        .shadow(color: .black.opacity(0.18), radius: 10, y: 3)
         .onHover { hovering = $0 }
     }
 
@@ -91,34 +87,26 @@ struct NoticeView: View {
             Image(nsImage: thumb)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: 38, height: 38)
-                .clipShape(RoundedRectangle(cornerRadius: 6))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 6)
-                        .strokeBorder(Color.primary.opacity(0.1), lineWidth: 1)
-                )
+                .frame(width: 36, height: 36)
+                .clipShape(RoundedRectangle(cornerRadius: 5))
         } else {
             Image(systemName: notice.isError ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
-                .font(.system(size: 22))
+                .font(.title2)
                 .foregroundStyle(notice.isError ? Color.red : Style.accent)
-                .frame(width: 38, height: 38)
+                .frame(width: 36, height: 36)
         }
     }
 }
 
-/// Presents notices as floating panels under the menu bar.
-///
-/// The app cannot use Notification Center without a paid signing identity, so
-/// this is the real notification surface rather than a fallback — which is why
-/// it is built to the same standard as the rest of the UI.
+/// Presents notices where macOS puts its own: top-right, stacked, newest first.
 @MainActor
 final class NoticeCenter {
     static let shared = NoticeCenter()
     private var panels: [(panel: NSPanel, id: UUID)] = []
     private var dismissTasks: [UUID: Task<Void, Never>] = [:]
 
-    private let spacing: CGFloat = 10
-    private let margin: CGFloat = 14
+    private let spacing: CGFloat = 8
+    private let margin: CGFloat = 12
 
     func show(_ notice: Notice, duration: TimeInterval = 5) {
         let panel = NSPanel(contentRect: NSRect(x: 0, y: 0, width: Style.noticeWidth, height: 10),
@@ -126,7 +114,7 @@ final class NoticeCenter {
                             backing: .buffered, defer: false)
         panel.isOpaque = false
         panel.backgroundColor = .clear
-        panel.hasShadow = false            // the SwiftUI card draws its own
+        panel.hasShadow = false            // the view draws its own
         panel.level = .statusBar
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
         panel.isMovable = false
@@ -145,7 +133,7 @@ final class NoticeCenter {
         panel.orderFrontRegardless()
 
         NSAnimationContext.runAnimationGroup {
-            $0.duration = 0.22
+            $0.duration = 0.2
             $0.timingFunction = CAMediaTimingFunction(name: .easeOut)
             panel.animator().alphaValue = 1
         }
@@ -164,7 +152,7 @@ final class NoticeCenter {
         let panel = panels.remove(at: index).panel
 
         NSAnimationContext.runAnimationGroup {
-            $0.duration = 0.16
+            $0.duration = 0.15
             panel.animator().alphaValue = 0
         } completionHandler: {
             panel.orderOut(nil)
@@ -172,7 +160,6 @@ final class NoticeCenter {
         layout(animated: true)
     }
 
-    /// Stack notices downward from under the menu bar, newest on top.
     private func layout(animated: Bool) {
         guard let screen = NSScreen.main else { return }
         var y = screen.visibleFrame.maxY - margin
@@ -183,7 +170,7 @@ final class NoticeCenter {
                                  y: y - height)
             if animated {
                 NSAnimationContext.runAnimationGroup {
-                    $0.duration = 0.18
+                    $0.duration = 0.16
                     panel.animator().setFrameOrigin(origin)
                 }
             } else {

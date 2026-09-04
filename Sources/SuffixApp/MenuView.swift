@@ -41,11 +41,11 @@ struct MenuView: View {
         }
         .keyboardShortcut(",", modifiers: .command)
 
-        Button("How to use REname…") {
+        Button("How to use Suffix…") {
             SetupWindow.shared.show(model: model)
         }
 
-        Button("Quit REname") { NSApp.terminate(nil) }
+        Button("Quit Suffix") { NSApp.terminate(nil) }
             .keyboardShortcut("q", modifiers: .command)
     }
 }
@@ -55,21 +55,9 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section {
-                ForEach(OutputMode.allCases) { mode in
-                    ChoiceCard(title: mode.title,
-                               systemImage: mode == .replace
-                                   ? "arrow.triangle.2.circlepath" : "doc.on.doc",
-                               isSelected: model.outputMode == mode,
-                               action: { model.outputMode = mode }) {
-                        Text(mode.explanation())
-                            .font(.system(size: 12))
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-            } header: {
-                Text("When a file converts")
+            Section("When a file converts") {
+                OutputModePicker(mode: $model.outputMode)
+
             }
 
             Section("Watching") {

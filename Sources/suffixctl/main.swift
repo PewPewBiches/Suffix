@@ -8,11 +8,11 @@ import PDFKit
 func usage() -> Never {
     print("""
     usage:
-      renamectl inspect <file>            report the file's real format
-      renamectl plan <file>               what a conversion to its extension would do
-      renamectl convert <file> [--quality Q] [--scale S] [--no-backup]
+      suffixctl inspect <file>            report the file's real format
+      suffixctl plan <file>               what a conversion to its extension would do
+      suffixctl convert <file> [--quality Q] [--scale S] [--no-backup]
                                           convert the file in place
-      renamectl watch <dir>... [--dry-run] react to renames as they happen
+      suffixctl watch <dir>... [--dry-run] react to renames as they happen
     """)
     exit(2)
 }

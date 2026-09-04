@@ -26,7 +26,7 @@ public final class RenameWatcher {
     ]
 
     private let roots: [URL]
-    private let queue = DispatchQueue(label: "com.local.rename.watcher", qos: .utility)
+    private let queue = DispatchQueue(label: "com.rakshitchawla.Suffix.watcher", qos: .utility)
     private let handler: @Sendable (URL) -> Void
     private var stream: FSEventStreamRef?
 
@@ -66,7 +66,7 @@ public final class RenameWatcher {
                 let names = unsafeBitCast(paths, to: NSArray.self)
                 for i in 0..<count {
                     guard let path = names[i] as? String else { continue }
-                    if ProcessInfo.processInfo.environment["RENAME_DEBUG"] != nil {
+                    if ProcessInfo.processInfo.environment["SUFFIX_DEBUG"] != nil {
                         FileHandle.standardError.write(
                             "raw event flags=0x\(String(flags[i], radix: 16)) \(path)\n".data(using: .utf8)!)
                     }

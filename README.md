@@ -1,37 +1,37 @@
-# REname
+# Suffix
 
 **Convert files by renaming them.**
 
 Select a file in Finder, press Return, change `.png` to `.pdf`, and the file
 becomes a real PDF. No upload, no website, no app to open. It works in every
-folder on your Mac, and a small card confirms each conversion with an Undo
+folder on your Mac, and a banner confirms each conversion with an Undo
 button.
 
 ---
 
 ## Install
 
-Download `REname.dmg` from [Releases](../../releases), drag REname to your
+Download `Suffix.dmg` from [Releases](../../releases), drag Suffix to your
 Applications folder, and open it.
 
 ### The first time you open it
 
-REname isn't signed with a paid Apple Developer certificate, so macOS will
+Suffix isn't signed with a paid Apple Developer certificate, so macOS will
 refuse to open it and say it "cannot be verified". This is Gatekeeper reacting
 to the missing $99/year signature, not to anything the app does.
 
 To open it anyway:
 
-1. Try to open REname. Let macOS block it.
+1. Try to open Suffix. Let macOS block it.
 2. Go to **System Settings → Privacy & Security**.
-3. Scroll down. There's a line about REname being blocked — click **Open Anyway**.
+3. Scroll down. There's a line about Suffix being blocked — click **Open Anyway**.
 
 You only do this once. If you'd rather not trust a stranger's build, the whole
 app is here — clone it and run `./Scripts/build-app.sh` to build your own.
 
 ### Give it access to your files
 
-macOS protects Desktop, Documents and Downloads. Without access REname keeps
+macOS protects Desktop, Documents and Downloads. Without access Suffix keeps
 running but silently does nothing in exactly the folders you use most, so the
 setup window asks for **Full Disk Access** and then offers a **Test it** button
 that converts a real file to prove the whole chain works.
@@ -50,7 +50,7 @@ characteristic way of going wrong.
 | **from** WebP                               | ●   | ●    | ●    | ●   | ●   | ●    | ●   |
 
 A PDF of more than one page becomes a **`.zip` of numbered images** rather than
-a single file, because one image cannot hold 100 pages. REname asks first, and
+a single file, because one image cannot hold 100 pages. Suffix asks first, and
 names the result `document.zip` rather than the `document.jpg` you typed.
 
 WebP can be read but not written — macOS ships no WebP encoder — so renaming
@@ -72,17 +72,27 @@ conversion can be undone from the menu bar for seven days.
 
 ---
 
+## Why the banner isn't a real notification
+
+Suffix draws its own banner instead of using Notification Center. Not by
+choice: an ad-hoc signature carries no Team Identifier, so macOS auto-denies
+notification authorization with *"Notifications are not allowed for this
+application"* and never even prompts. A stable identity costs $99/year.
+
+The banner is therefore built from system parts — materials, text styles, your
+accent colour — and to the system's own proportions.
+
 ## How it works
 
 Renaming a file in Finder only changes its name — the bytes are untouched. So
-REname watches for rename events through FSEvents, checks whether the file's
+Suffix watches for rename events through FSEvents, checks whether the file's
 real format still matches its new extension, and re-encodes it when it doesn't.
 
 Everything is decided from the file's **contents**, never its name. A text file
 called `notes.jpg` is left alone; a PNG called `photo.jpg` is converted.
 
 Conversion uses only what ships with macOS — ImageIO, PDFKit, Core Graphics.
-No bundled binaries, no network access. REname never sends your files anywhere,
+No bundled binaries, no network access. Suffix never sends your files anywhere,
 because it has nowhere to send them.
 
 ---
@@ -91,31 +101,33 @@ because it has nowhere to send them.
 
 ```bash
 swift test                                    # engine tests
-./Scripts/build-app.sh                        # assemble REname.app
-build/REname.app/Contents/MacOS/REname --render-previews /tmp/ui
+./Scripts/build-app.sh                        # assemble Suffix.app
+build/Suffix.app/Contents/MacOS/Suffix --render-previews /tmp/ui
 ```
 
-That last one renders every screen to PNG in both light and dark, which is how
-the interface gets reviewed without a screen recording.
+That last one renders screens to PNG in both light and dark. Note its limit:
+`ImageRenderer` cannot rasterise AppKit-backed controls, so anything built from
+`Form`, `Picker` or `Toggle` comes out blank or as placeholder glyphs. It is
+useful for the notification banner and for layout, not for the settings window.
 
-`renamectl` drives the same engine from the command line:
+`suffixctl` drives the same engine from the command line:
 
 ```bash
-.build/debug/renamectl inspect photo.jpg    # what is it really?
-.build/debug/renamectl plan photo.jpg       # what would converting do?
-.build/debug/renamectl convert photo.jpg    # do it
-.build/debug/renamectl watch ~/Desktop      # react to renames in a folder
+.build/debug/suffixctl inspect photo.jpg    # what is it really?
+.build/debug/suffixctl plan photo.jpg       # what would converting do?
+.build/debug/suffixctl convert photo.jpg    # do it
+.build/debug/suffixctl watch ~/Desktop      # react to renames in a folder
 ```
 
-`RENAME_DEBUG=1` prints raw filesystem events.
+`SUFFIX_DEBUG=1` prints raw filesystem events.
 
 ### Layout
 
 | Path | What's in it |
 |---|---|
 | `Sources/ConvertKit` | Format detection, planning, conversion, watching. No UI. |
-| `Sources/RenameApp` | The menu-bar app. |
-| `Sources/renamectl` | Command-line front end. |
+| `Sources/SuffixApp` | The menu-bar app. |
+| `Sources/suffixctl` | Command-line front end. |
 
 ### Notes for anyone touching the watcher
 

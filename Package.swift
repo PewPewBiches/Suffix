@@ -2,17 +2,17 @@
 import PackageDescription
 
 let package = Package(
-    name: "Rename",
+    name: "Suffix",
     platforms: [.macOS(.v14)],
     products: [
         .library(name: "ConvertKit", targets: ["ConvertKit"]),
-        .executable(name: "renamectl", targets: ["renamectl"]),
-        .executable(name: "RenameApp", targets: ["RenameApp"]),
+        .executable(name: "suffixctl", targets: ["suffixctl"]),
+        .executable(name: "SuffixApp", targets: ["SuffixApp"]),
     ],
     targets: [
         .target(name: "ConvertKit"),
-        .executableTarget(name: "renamectl", dependencies: ["ConvertKit"]),
-        .executableTarget(name: "RenameApp", dependencies: ["ConvertKit"]),
+        .executableTarget(name: "suffixctl", dependencies: ["ConvertKit"]),
+        .executableTarget(name: "SuffixApp", dependencies: ["ConvertKit"]),
         .testTarget(name: "ConvertKitTests", dependencies: ["ConvertKit"]),
     ]
 )

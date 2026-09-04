@@ -66,12 +66,11 @@ struct OnboardingView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Button(step == steps.count - 1 ? "Start using REname" : "Continue") {
+            Button(step == steps.count - 1 ? "Start using Suffix" : "Continue") {
                 if step == steps.count - 1 { finish() } else { withAnimation { step += 1 } }
             }
             .buttonStyle(.borderedProminent)
-            .tint(Style.accent)
-            .keyboardShortcut(.defaultAction)
+                        .keyboardShortcut(.defaultAction)
         }
         .padding(.horizontal, 26)
         .padding(.vertical, 15)
@@ -85,19 +84,19 @@ private struct WelcomeStep: View {
         VStack(spacing: 18) {
             Spacer()
             Image(systemName: "arrow.triangle.2.circlepath")
-                .font(.system(size: 46, weight: .light))
+                .font(.system(size: 44, weight: .regular))
                 .foregroundStyle(Style.accent)
 
             VStack(spacing: 9) {
-                Text("REname")
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                Text("Suffix")
+                    .font(.largeTitle).fontWeight(.semibold)
                 Text("Convert files by renaming them.")
-                    .font(.system(size: 15))
+                    .font(.title3)
                     .foregroundStyle(.secondary)
             }
 
             Text("No uploads, no websites, no app to open.\nIt works in every folder on your Mac.")
-                .font(.system(size: 13))
+                .font(.body)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(3)
@@ -122,7 +121,7 @@ private struct HowItWorksStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             Text("Three keystrokes")
-                .font(.system(size: 21, weight: .bold))
+                .font(.title2).fontWeight(.semibold)
 
             VStack(alignment: .leading, spacing: 14) {
                 ForEach(frames.indices, id: \.self) { i in
@@ -132,18 +131,18 @@ private struct HowItWorksStep: View {
                                 .fill(i <= stage ? Style.accent : Color.secondary.opacity(0.2))
                                 .frame(width: 22, height: 22)
                             Text("\(i + 1)")
-                                .font(.system(size: 11, weight: .bold))
+                                .font(.caption).fontWeight(.bold)
                                 .foregroundStyle(i <= stage ? .white : .secondary)
                         }
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(frames[i].0).font(.system(size: 13, weight: .medium))
+                            Text(frames[i].0).font(.body).fontWeight(.medium)
                             Group {
                                 if let to = frames[i].2 {
-                                    RenameChip(from: frames[i].1, to: to, size: 11.5)
+                                    RenameChip(from: frames[i].1, to: to)
                                 } else {
                                     Text(frames[i].1)
-                                        .font(.system(size: 11.5, design: .monospaced))
-                                        .foregroundStyle(i == 2 ? Style.accent : .secondary)
+                                        .font(.caption.monospaced())
+                                        .foregroundStyle(.secondary)
                                 }
                             }
                             .opacity(i <= stage ? 1 : 0.35)
@@ -171,7 +170,7 @@ private struct HowItWorksStep: View {
                     }
                 }
             }
-            .font(.system(size: 12.5))
+            .font(.callout)
             .foregroundStyle(.secondary)
 
             Spacer()
@@ -193,15 +192,15 @@ private struct PermissionStep: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 17) {
-            Text("Let REname reach your files")
-                .font(.system(size: 21, weight: .bold))
+            Text("Let Suffix reach your files")
+                .font(.title2).fontWeight(.semibold)
 
             Text("""
                  macOS protects your Desktop, Documents and Downloads. Without \
-                 access, REname keeps running but silently does nothing in \
+                 access, Suffix keeps running but silently does nothing in \
                  exactly the folders you use most.
                  """)
-                .font(.system(size: 13))
+                .font(.body)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
@@ -212,8 +211,8 @@ private struct PermissionStep: View {
                 Label("Open Privacy & Security settings", systemImage: "arrow.up.forward.app")
             }
 
-            Text("Turn on **Full Disk Access** for REname, then come back and test it.")
-                .font(.system(size: 12))
+            Text("Turn on **Full Disk Access** for Suffix, then come back and test it.")
+                .font(.callout)
                 .foregroundStyle(.tertiary)
 
             Divider().opacity(0.4)
@@ -229,19 +228,19 @@ private struct PermissionStep: View {
                 switch test {
                 case .idle:
                     Text("Converts a sample file on your Desktop")
-                        .font(.system(size: 12)).foregroundStyle(.tertiary)
+                        .font(.callout).foregroundStyle(.tertiary)
                 case .running:
                     HStack(spacing: 6) {
                         ProgressView().controlSize(.small)
-                        Text("Testing…").font(.system(size: 12)).foregroundStyle(.secondary)
+                        Text("Testing…").font(.callout).foregroundStyle(.secondary)
                     }
                 case .passed:
                     Label("Working", systemImage: "checkmark.circle.fill")
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.callout).fontWeight(.medium)
                         .foregroundStyle(Style.accent)
                 case .failed(let why):
                     Label(why, systemImage: "exclamationmark.triangle.fill")
-                        .font(.system(size: 12))
+                        .font(.callout)
                         .foregroundStyle(.red)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -258,47 +257,19 @@ private struct ChoiceStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
             Text("When a file converts…")
-                .font(.system(size: 21, weight: .bold))
+                .font(.title2).fontWeight(.semibold)
             Text("Whichever you pick, you can change it later in Settings.")
-                .font(.system(size: 13))
+                .font(.body)
                 .foregroundStyle(.secondary)
 
-            VStack(spacing: 11) {
-                ForEach(OutputMode.allCases) { mode in
-                    ChoiceCard(title: mode.title,
-                               systemImage: mode == .replace
-                                   ? "arrow.triangle.2.circlepath" : "doc.on.doc",
-                               isSelected: model.outputMode == mode,
-                               action: { model.outputMode = mode }) {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(mode.explanation())
-                                .font(.system(size: 12))
-                                .foregroundStyle(.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                            resultPreview(for: mode)
-                        }
-                    }
-                }
-            }
+            OutputModePicker(mode: $model.outputMode)
+                .padding(.top, 4)
+
             Spacer()
         }
         .padding(30)
     }
 
-    /// Show the folder afterwards — the difference is easier to see than to read.
-    @ViewBuilder private func resultPreview(for mode: OutputMode) -> some View {
-        HStack(spacing: 7) {
-            Text("After:")
-                .font(.system(size: 11))
-                .foregroundStyle(.tertiary)
-            ForEach(mode == .replace ? ["photo.pdf"] : ["photo.png", "photo.pdf"], id: \.self) { name in
-                Text(name)
-                    .font(.system(size: 11, design: .monospaced))
-                    .padding(.horizontal, 6).padding(.vertical, 2)
-                    .background(Color.secondary.opacity(0.12), in: RoundedRectangle(cornerRadius: 4))
-            }
-        }
-    }
 }
 
 // MARK: - Self test
@@ -314,8 +285,8 @@ enum SelfTest {
 
     static func run() async -> State {
         let desktop = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask)[0]
-        let source = desktop.appendingPathComponent("REname test.png")
-        let renamed = desktop.appendingPathComponent("REname test.pdf")
+        let source = desktop.appendingPathComponent("Suffix test.png")
+        let renamed = desktop.appendingPathComponent("Suffix test.pdf")
 
         // A small image drawn here rather than shipped as a resource.
         guard let data = sampleImage() else { return .failed("Could not build the sample") }
@@ -340,7 +311,7 @@ enum SelfTest {
             try? await Task.sleep(for: .milliseconds(250))
             if FileFormat.detect(at: renamed) == .pdf {
                 try? FileManager.default.removeItem(at: renamed)
-                try? FileManager.default.removeItem(at: desktop.appendingPathComponent("REname test.png"))
+                try? FileManager.default.removeItem(at: desktop.appendingPathComponent("Suffix test.png"))
                 return .passed
             }
         }

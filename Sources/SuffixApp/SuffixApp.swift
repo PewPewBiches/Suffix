@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 @main
-struct REnameApp: App {
+struct SuffixApp: App {
     // Shared so the app delegate can reach the same model the scenes use.
     @StateObject private var model = AppModel.shared
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
@@ -18,7 +18,7 @@ struct REnameApp: App {
                   : "arrow.triangle.2.circlepath.circle")
         }
 
-        Window("REname Settings", id: "settings") {
+        Window("Suffix Settings", id: "settings") {
             SettingsView(model: model)
         }
         .windowResizability(.contentSize)
@@ -29,6 +29,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Menu-bar only: no Dock icon, no app-switcher entry.
         NSApp.setActivationPolicy(.accessory)
+
+        if NotificationProbe.runIfRequested() { return }
 
         if DesignPreview.runIfRequested() {
             NSApp.terminate(nil)

@@ -5,7 +5,7 @@ import ConvertKit
 /// Renders the app's surfaces to PNGs so the design can be reviewed without a
 /// screen recording permission or a human at the keyboard.
 ///
-/// Run with `REname --render-previews <dir>`; the app renders and exits.
+/// Run with `Suffix --render-previews <dir>`; the app renders and exits.
 @MainActor
 enum DesignPreview {
     static func runIfRequested() -> Bool {
