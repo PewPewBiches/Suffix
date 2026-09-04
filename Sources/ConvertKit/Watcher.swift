@@ -97,9 +97,11 @@ public final class RenameWatcher {
     private func handle(path: String, flags: FSEventStreamEventFlags) {
         guard flags & UInt32(kFSEventStreamEventFlagItemIsFile) != 0 else { return }
         guard flags & UInt32(kFSEventStreamEventFlagItemRenamed) != 0 else { return }
-        guard flags & UInt32(kFSEventStreamEventFlagItemRemoved) == 0 else { return }
         guard Self.isEligible(path: path) else { return }
-        // A rename fires for both the old and the new name; the old one is gone.
+        // A rename reports both the old and the new name, and FSEvents may
+        // coalesce Removed into the same event as Renamed. Existence on disk
+        // is the reliable test of which name survived — the Removed flag is
+        // not, and filtering on it drops real renames.
         guard FileManager.default.fileExists(atPath: path) else { return }
         handler(URL(fileURLWithPath: path))
     }
