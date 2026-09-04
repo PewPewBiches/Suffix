@@ -46,6 +46,40 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <string>Suffix converts files in Downloads when you change their extension.</string>
   <key>NSRemovableVolumesUsageDescription</key>
   <string>Suffix converts files on external drives when you change their extension.</string>
+  <!-- Finder right-click entries. NSSendFileTypes decides which selections
+       they appear for, so they stay out of the menu for everything else. -->
+  <key>NSServices</key>
+  <array>
+    <dict>
+      <key>NSMenuItem</key><dict><key>default</key><string>Merge into one PDF</string></dict>
+      <key>NSMessage</key><string>mergeIntoPDF</string>
+      <key>NSPortName</key><string>Suffix</string>
+      <key>NSRequiredContext</key><dict><key>NSTextContent</key><string>FilePath</string></dict>
+      <key>NSSendFileTypes</key>
+      <array>
+        <string>com.adobe.pdf</string>
+        <string>public.image</string>
+      </array>
+    </dict>
+    <dict>
+      <key>NSMenuItem</key><dict><key>default</key><string>Compress…</string></dict>
+      <key>NSMessage</key><string>compressFiles</string>
+      <key>NSPortName</key><string>Suffix</string>
+      <key>NSRequiredContext</key><dict><key>NSTextContent</key><string>FilePath</string></dict>
+      <key>NSSendFileTypes</key>
+      <array>
+        <string>com.adobe.pdf</string>
+        <string>public.image</string>
+      </array>
+    </dict>
+    <dict>
+      <key>NSMenuItem</key><dict><key>default</key><string>Create ZIP archive</string></dict>
+      <key>NSMessage</key><string>createZIP</string>
+      <key>NSPortName</key><string>Suffix</string>
+      <key>NSRequiredContext</key><dict><key>NSTextContent</key><string>FilePath</string></dict>
+      <key>NSSendFileTypes</key><array><string>public.item</string></array>
+    </dict>
+  </array>
 </dict>
 </plist>
 PLIST

@@ -2,6 +2,7 @@ import Testing
 import Foundation
 import ImageIO
 import AppKit
+import PDFKit
 import UniformTypeIdentifiers
 @testable import ConvertKit
 
@@ -442,4 +443,107 @@ func iWorkKindsAreDistinguished() throws {
     }
     // Word is still a re-flow, and still says so.
     #expect(try plan(source: .docx, ext: "pdf").get().isApproximate)
+}
+
+// MARK: - Batch operations
+
+@Test("merging keeps every page, in the order given")
+func mergeKeepsPages() throws {
+    let dir = FileManager.default.temporaryDirectory
+        .appendingPathComponent("ConvertKitTests/\(UUID().uuidString)")
+    try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+
+    // Two single-page PDFs, each made from an image.
+    var sources: [URL] = []
+    for name in ["one", "two"] {
+        let image = try makeTextImage(["Page \(name)"], named: "\(name).pdf")
+        let p = try plan(source: .png, ext: "pdf").get()
+        _ = try Converter(options: .init(keepOriginal: false)).run(p, on: image)
+        let moved = dir.appendingPathComponent("\(name).pdf")
+        try FileManager.default.moveItem(at: image, to: moved)
+        sources.append(moved)
+    }
+
+    let merged = dir.appendingPathComponent("merged.pdf")
+    try PDFMerge.merge(sources, to: merged)
+
+    let document = try #require(PDFDocument(url: merged))
+    #expect(document.pageCount == 2)
+}
+
+@Test("merging mixes images and PDFs in one document")
+func mergeMixedTypes() throws {
+    let dir = FileManager.default.temporaryDirectory
+        .appendingPathComponent("ConvertKitTests/\(UUID().uuidString)")
+    try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+
+    let picture = try makeImage(.png, named: "shot.png")
+    let asPDF = try makeTextImage(["A page"], named: "doc.pdf")
+    _ = try Converter(options: .init(keepOriginal: false))
+        .run(try plan(source: .png, ext: "pdf").get(), on: asPDF)
+
+    let merged = dir.appendingPathComponent("both.pdf")
+    try PDFMerge.merge([asPDF, picture], to: merged)
+    #expect(try #require(PDFDocument(url: merged)).pageCount == 2)
+}
+
+@Test("the merged file is named after what the selection has in common")
+func mergeNaming() {
+    let base = URL(fileURLWithPath: "/tmp")
+    #expect(PDFMerge.suggestedName(for: [
+        base.appendingPathComponent("invoice-1.pdf"),
+        base.appendingPathComponent("invoice-2.pdf"),
+    ]) == "invoice")
+
+    // Nothing in common: don't invent a misleading name.
+    #expect(PDFMerge.suggestedName(for: [
+        base.appendingPathComponent("alpha.pdf"),
+        base.appendingPathComponent("zulu.pdf"),
+    ]) == "Merged")
+}
+
+@Test("compressing an image actually makes it smaller")
+func compressionShrinks() throws {
+    // A photographic-looking image, since a flat colour compresses to nothing
+    // either way and would prove nothing.
+    let url = try makeTextImage((1...12).map { "Line \($0) of the document" },
+                                named: "big.png")
+    let out = url.deletingLastPathComponent().appendingPathComponent("small.jpg")
+    let result = try Compressor.compress(url, settings: .small, destination: out)
+
+    #expect(result.after > 0)
+    #expect(result.after < result.before)
+    #expect(result.isWorthKeeping)
+    #expect(result.ratio < 1)
+}
+
+@Test("quality settings are ordered, so the slider means something")
+func compressionQualityOrder() throws {
+    let url = try makeTextImage((1...12).map { "Line \($0) of the document" },
+                                named: "q.png")
+    let dir = url.deletingLastPathComponent()
+
+    var sizes: [Int64] = []
+    for settings in [CompressionSettings.small, .balanced, .gentle] {
+        let out = dir.appendingPathComponent("\(UUID().uuidString).jpg")
+        sizes.append(try Compressor.compress(url, settings: settings, destination: out).after)
+    }
+    #expect(sizes[0] < sizes[1])   // smallest < balanced
+    #expect(sizes[1] < sizes[2])   // balanced < best quality
+}
+
+@Test("a file that would grow is reported as not worth keeping")
+func compressionKnowsWhenItFailed() {
+    let pointless = CompressionResult(url: URL(fileURLWithPath: "/tmp/x.jpg"),
+                                      before: 1_000, after: 1_400)
+    #expect(!pointless.isWorthKeeping)
+    #expect(pointless.saved == 0)
+}
+
+@Test("operations refuse selections they cannot handle")
+func batchOperationEligibility() {
+    #expect(BatchOperation.mergePDF.accepts([.pdf, .png]))
+    #expect(!BatchOperation.mergePDF.accepts([.pdf, .mp4]))
+    #expect(!BatchOperation.compress.accepts([.mov]))
+    #expect(BatchOperation.zip.accepts([.mov, .docx, nil]))   // zip takes anything
 }

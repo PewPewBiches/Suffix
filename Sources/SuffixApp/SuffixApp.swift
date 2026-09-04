@@ -50,6 +50,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Menu-bar only: no Dock icon, no app-switcher entry.
         NSApp.setActivationPolicy(.accessory)
 
+        // Finder's right-click entries, for the things a rename cannot say.
+        ServicesProvider.shared.register()
+
         if DesignPreview.runIfRequested() {
             NSApp.terminate(nil)
             return
