@@ -103,10 +103,13 @@ An iWork document contains no PDF — only protobuf `.iwa` data and JPEG preview
 — so Suffix asks Pages, Keynote or Numbers to export it. If none is installed it
 says so rather than guessing.
 
-Those apps are addressed by **bundle identifier**, never by name. `tell
-application "Pages"` resolves through Launch Services and will hand your
-document to any app that has claimed the name — which on one test machine meant
-a third-party app registering Apple's own identifier.
+Those apps are addressed by **bundle identifier**, not by name. Apple ships them
+with display names that differ from the app ("Pages Creator Studio"), so
+matching on the visible name is unreliable. Both identifier forms are accepted:
+current versions use `com.apple.Pages`, older ones `com.apple.iWork.Pages`.
+
+Suffix quits an iWork app afterwards **only if it started it** — if Pages was
+already open, it is left exactly as it was.
 
 **Read this before converting a document you intend to send.** Everything except
 Pages is re-laid-out by macOS's own text engine, not by Word. Text and basic

@@ -91,35 +91,39 @@ public enum IWorkExport {
     /// path, and Pages will not open a Keynote document just because it was
     /// renamed. Since the zip's contents cannot tell the three apart, each
     /// pairing is tried in turn.
-    /// Apps are named by bundle identifier, never by name.
+    /// Apps are addressed by bundle identifier, never by name.
     ///
-    /// `tell application "Pages"` resolves through Launch Services, which will
-    /// happily hand the document to any app that has claimed that name — on
-    /// one machine this meant a third-party app registering Apple's own
-    /// identifier. Documents should only be opened by the app that made them.
-    private static let apps = [
-        (id: "com.apple.iWork.Pages",   ext: "pages"),
-        (id: "com.apple.iWork.Keynote", ext: "key"),
-        (id: "com.apple.iWork.Numbers", ext: "numbers"),
+    /// `tell application "Pages"` resolves through Launch Services by display
+    /// name, and Apple ships these apps with marketing display names ("Pages
+    /// Creator Studio") that differ from the app itself — so matching on the
+    /// visible name is unreliable in both directions.
+    ///
+    /// Both identifier forms are listed because Apple has used each: current
+    /// versions are `com.apple.Pages`, older ones `com.apple.iWork.Pages`.
+    private static let apps: [(ids: [String], ext: String)] = [
+        (["com.apple.Pages",   "com.apple.iWork.Pages"],   "pages"),
+        (["com.apple.Keynote", "com.apple.iWork.Keynote"], "key"),
+        (["com.apple.Numbers", "com.apple.iWork.Numbers"], "numbers"),
     ]
 
     public static func toPDF(_ source: URL, destination: URL) throws {
         var firstError: String?
 
-        for app in apps where isInstalled(app.id) {
-            let wasRunning = isRunning(app.id)
+        for app in apps {
+            guard let id = app.ids.first(where: isInstalled) else { continue }
+            let wasRunning = isRunning(id)
             let staged = try stage(source, extension: app.ext)
             defer { try? FileManager.default.removeItem(at: staged) }
 
             do {
-                try export(staged, to: destination, using: app.id)
+                try export(staged, to: destination, using: id)
                 if FileManager.default.fileExists(atPath: destination.path) {
                     // Leave the desktop as we found it.
-                    if !wasRunning { quit(app.id) }
+                    if !wasRunning { quit(id) }
                     return
                 }
             } catch let error as ConversionError {
-                if !wasRunning { quit(app.id) }
+                if !wasRunning { quit(id) }
                 if case .mediaExportFailed(let message) = error, firstError == nil {
                     // Report the first app's complaint, not the last: an app
                     // that lacks the terminology fails with a bare "syntax
