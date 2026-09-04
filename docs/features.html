@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>features — suffix</title>
+<meta name="description" content="What suffix does: rename to convert, read text out of images, merge, compress and zip from Finder.">
+<meta property="og:title" content="features — suffix">
+<meta property="og:description" content="What suffix does: rename to convert, read text out of images, merge, compress and zip from Finder.">
+<meta property="og:image" content="images/icon-256.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;700&family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="images/icon-256.png">
+</head>
+<body data-page="features">
+<nav class="top"><div class="inner">
+  <a class="brand" href="index.html"><img src="images/icon-256.png" alt="">suffix</a>
+  <div class="links">
+    <a href="index.html" data-page="index">overview</a>
+    <a href="features.html" data-page="features">features</a>
+    <a href="formats.html" data-page="formats">formats</a>
+    <a href="trust.html" data-page="trust" class="hide">trust</a>
+    <a href="changelog.html" data-page="changelog" class="hide">changelog</a>
+    <a class="ext" href="https://github.com/PewPewBiches/Suffix">github</a>
+  </div>
+</div></nav>
+
+<header class="head"><div class="shell">
+  <p class="eyebrow">features</p>
+  <h1>two gestures,<br>everything else follows</h1>
+  <p class="standfirst">
+    One for a single file, one for several. Nothing else to learn.
+  </p>
+</div></header>
+
+<main>
+<section><div class="shell">
+  <div class="split" style="align-items:start">
+    <div>
+      <h2>rename a file</h2>
+      <p class="lede">Change its extension in Finder. That is the whole gesture.</p>
+      <p>
+        Suffix decides from the file's <strong>contents</strong>, never its name.
+        A text file called <code>notes.jpg</code> is left alone. A PNG called
+        <code>photo.jpg</code> is converted. Renaming between spellings —
+        <code>.jpg</code> to <code>.jpeg</code> — does nothing, rather than
+        needlessly re-compressing your photo.
+      </p>
+    </div>
+    <div class="rows">
+      <div class="rowitem"><span class="k">images ⇄ images</span><span class="v">PNG, JPEG, TIFF, GIF, BMP, HEIC</span></div>
+      <div class="rowitem"><span class="k">anything → PDF</span><span class="v">one page per image</span></div>
+      <div class="rowitem"><span class="k">PDF → images</span><span class="v">many pages arrive as a .zip</span></div>
+      <div class="rowitem"><span class="k">video ⇄ video</span><span class="v">MOV, MP4, M4V — streams copied, not re-encoded</span></div>
+      <div class="rowitem"><span class="k">video → audio</span><span class="v">the soundtrack on its own</span></div>
+      <div class="rowitem"><span class="k">documents → PDF</span><span class="v">Pages and Keynote exactly; Word approximately</span></div>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="shell">
+  <h2>read the words in a picture</h2>
+  <div class="split" style="align-items:start">
+    <div>
+      <p class="lede">
+        Rename a screenshot to <span class="sel">.txt</span> and you get the text
+        that was in it.
+      </p>
+      <p>
+        This uses the Vision framework built into macOS — no service, no account,
+        no upload. It also rescues scanned PDFs, which hold pictures of text and
+        so return nothing from ordinary extraction: suffix reads the pages
+        instead.
+      </p>
+    </div>
+    <div>
+      <pre><code>receipt.png  →  receipt.txt
+
+Invoice 2026-0417
+Relevance Solutions - Dubai
+Amount due: AED 12,450.00
+Payment terms: net 30 days</code></pre>
+      <p class="meta">Actual output, from an actual image.</p>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="shell">
+  <h2>select several, press ⌥⌘S</h2>
+  <p class="lede">
+    Some things a filename cannot say. “Merge these three” has no name to type it
+    into, and “compress this” needs a quality setting.
+  </p>
+  <p>
+    Those live in one panel, opened by the shortcut or by right-clicking and
+    choosing <strong>suffix: file actions</strong>. The shortcut is yours to
+    change in Settings.
+  </p>
+  <div class="grid g3" style="margin-top:26px">
+    <div>
+      <h3>merge into one PDF</h3>
+      <p>PDFs and images, combined in the order you selected them, named after whatever they have in common.</p>
+    </div>
+    <div>
+      <h3>compress</h3>
+      <p>Smallest / balanced / best, plus a quality slider. The estimate is measured by actually compressing your first file — so it moves when you do.</p>
+    </div>
+    <div>
+      <h3>create ZIP archive</h3>
+      <p>Separate on purpose. “Compress” and “zip” are different verbs that English happens to spell the same.</p>
+    </div>
+  </div>
+  <div class="note">
+    <p>
+      The panel greys out what does not apply and says why, rather than the entry
+      quietly not being there. A file that comes out larger than it started is
+      discarded instead of handed to you as an improvement.
+    </p>
+  </div>
+</div></section>
+
+<section><div class="shell">
+  <h2>and when it goes wrong</h2>
+  <div class="grid g2">
+    <div>
+      <h3>undo, for seven days</h3>
+      <p>The original is copied aside before anything is overwritten. Any conversion can be undone from the menu bar. Copies are deleted automatically after a week, rather than quietly becoming a second copy of your photo library.</p>
+    </div>
+    <div>
+      <h3>replace, or keep both</h3>
+      <p>Your choice, set during setup and changeable any time. <strong>Replace</strong> leaves one file, as renaming implies. <strong>Keep both</strong> leaves <code>photo.pdf</code> and <code>photo.png</code> side by side.</p>
+    </div>
+  </div>
+</div></section>
+</main>
+<footer><div class="shell"><div class="inner">
+  <span>suffix · mit licensed · built for macos</span>
+  <span>
+    <a href="https://github.com/PewPewBiches/Suffix">source</a> ·
+    <a href="https://github.com/PewPewBiches/Suffix/releases/latest">download</a> ·
+    <a href="https://github.com/PewPewBiches/Suffix/issues">report a problem</a>
+  </span>
+</div></div></footer>
+<script>
+  // Mark the current page in the nav.
+  const here = document.body.dataset.page;
+  document.querySelectorAll('nav.top .links a[data-page]').forEach(a => {
+    if (a.dataset.page === here) a.setAttribute('aria-current', 'page');
+  });
+</script>
+</body>
+</html>

@@ -34,12 +34,15 @@ struct NoticeView: View {
         HStack(alignment: .top, spacing: 10) {
             icon
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(notice.title)
-                    .font(.subheadline).fontWeight(.semibold)
+                    .font(.system(size: 11, weight: .semibold))
+                    .textCase(.uppercase)
+                    .kerning(0.6)
+                    .foregroundStyle(notice.isError ? Color.red : .secondary)
 
                 if let from = notice.from, let to = notice.to {
-                    RenameChip(from: from, to: to)
+                    RenameChip(from: from, to: to, font: .system(size: 12.5))
                 }
                 if let detail = notice.detail {
                     Text(detail)
@@ -71,14 +74,23 @@ struct NoticeView: View {
             .buttonStyle(.plain)
             .opacity(hovering ? 1 : 0)
         }
-        .padding(12)
+        .padding(.horizontal, 13)
+        .padding(.vertical, 11)
         .frame(width: Style.noticeWidth, alignment: .leading)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Style.noticeCorner))
+        .overlay(alignment: .leading) {
+            // A hairline in selection blue: the same "this is the thing that
+            // changed" signal the extension block carries.
+            Rectangle()
+                .fill(notice.isError ? Color.red : Style.selection)
+                .frame(width: 2.5)
+                .clipShape(RoundedRectangle(cornerRadius: 2))
+        }
         .overlay(
             RoundedRectangle(cornerRadius: Style.noticeCorner)
                 .strokeBorder(.separator, lineWidth: 0.5)
         )
-        .shadow(color: .black.opacity(0.18), radius: 10, y: 3)
+        .shadow(color: .black.opacity(0.16), radius: 12, y: 4)
         .onHover { hovering = $0 }
     }
 
@@ -90,10 +102,10 @@ struct NoticeView: View {
                 .frame(width: 36, height: 36)
                 .clipShape(RoundedRectangle(cornerRadius: 5))
         } else {
-            Image(systemName: notice.isError ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
-                .font(.title2)
-                .foregroundStyle(notice.isError ? Color.red : Style.accent)
-                .frame(width: 36, height: 36)
+            Image(systemName: notice.isError ? "exclamationmark.triangle.fill" : "checkmark")
+                .font(.system(size: notice.isError ? 20 : 15, weight: .semibold))
+                .foregroundStyle(notice.isError ? Color.red : Color.secondary)
+                .frame(width: 34, height: 34)
         }
     }
 }

@@ -1,0 +1,111 @@
+<!--title:features — suffix-->
+<!--desc:What suffix does: rename to convert, read text out of images, merge, compress and zip from Finder.-->
+
+<header class="head"><div class="shell">
+  <p class="eyebrow">features</p>
+  <h1>two gestures,<br>everything else follows</h1>
+  <p class="standfirst">
+    One for a single file, one for several. Nothing else to learn.
+  </p>
+</div></header>
+
+<main>
+<section><div class="shell">
+  <div class="split" style="align-items:start">
+    <div>
+      <h2>rename a file</h2>
+      <p class="lede">Change its extension in Finder. That is the whole gesture.</p>
+      <p>
+        Suffix decides from the file's <strong>contents</strong>, never its name.
+        A text file called <code>notes.jpg</code> is left alone. A PNG called
+        <code>photo.jpg</code> is converted. Renaming between spellings —
+        <code>.jpg</code> to <code>.jpeg</code> — does nothing, rather than
+        needlessly re-compressing your photo.
+      </p>
+    </div>
+    <div class="rows">
+      <div class="rowitem"><span class="k">images ⇄ images</span><span class="v">PNG, JPEG, TIFF, GIF, BMP, HEIC</span></div>
+      <div class="rowitem"><span class="k">anything → PDF</span><span class="v">one page per image</span></div>
+      <div class="rowitem"><span class="k">PDF → images</span><span class="v">many pages arrive as a .zip</span></div>
+      <div class="rowitem"><span class="k">video ⇄ video</span><span class="v">MOV, MP4, M4V — streams copied, not re-encoded</span></div>
+      <div class="rowitem"><span class="k">video → audio</span><span class="v">the soundtrack on its own</span></div>
+      <div class="rowitem"><span class="k">documents → PDF</span><span class="v">Pages and Keynote exactly; Word approximately</span></div>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="shell">
+  <h2>read the words in a picture</h2>
+  <div class="split" style="align-items:start">
+    <div>
+      <p class="lede">
+        Rename a screenshot to <span class="sel">.txt</span> and you get the text
+        that was in it.
+      </p>
+      <p>
+        This uses the Vision framework built into macOS — no service, no account,
+        no upload. It also rescues scanned PDFs, which hold pictures of text and
+        so return nothing from ordinary extraction: suffix reads the pages
+        instead.
+      </p>
+    </div>
+    <div>
+      <pre><code>receipt.png  →  receipt.txt
+
+Invoice 2026-0417
+Relevance Solutions - Dubai
+Amount due: AED 12,450.00
+Payment terms: net 30 days</code></pre>
+      <p class="meta">Actual output, from an actual image.</p>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="shell">
+  <h2>select several, press ⌥⌘S</h2>
+  <p class="lede">
+    Some things a filename cannot say. “Merge these three” has no name to type it
+    into, and “compress this” needs a quality setting.
+  </p>
+  <p>
+    Those live in one panel, opened by the shortcut or by right-clicking and
+    choosing <strong>suffix: file actions</strong>. The shortcut is yours to
+    change in Settings.
+  </p>
+  <div class="grid g3" style="margin-top:26px">
+    <div>
+      <h3>merge into one PDF</h3>
+      <p>PDFs and images, combined in the order you selected them, named after whatever they have in common.</p>
+    </div>
+    <div>
+      <h3>compress</h3>
+      <p>Smallest / balanced / best, plus a quality slider. The estimate is measured by actually compressing your first file — so it moves when you do.</p>
+    </div>
+    <div>
+      <h3>create ZIP archive</h3>
+      <p>Separate on purpose. “Compress” and “zip” are different verbs that English happens to spell the same.</p>
+    </div>
+  </div>
+  <div class="note">
+    <p>
+      The panel greys out what does not apply and says why, rather than the entry
+      quietly not being there. A file that comes out larger than it started is
+      discarded instead of handed to you as an improvement.
+    </p>
+  </div>
+</div></section>
+
+<section><div class="shell">
+  <h2>and when it goes wrong</h2>
+  <div class="grid g2">
+    <div>
+      <h3>undo, for seven days</h3>
+      <p>The original is copied aside before anything is overwritten. Any conversion can be undone from the menu bar. Copies are deleted automatically after a week, rather than quietly becoming a second copy of your photo library.</p>
+    </div>
+    <div>
+      <h3>replace, or keep both</h3>
+      <p>Your choice, set during setup and changeable any time. <strong>Replace</strong> leaves one file, as renaming implies. <strong>Keep both</strong> leaves <code>photo.pdf</code> and <code>photo.png</code> side by side.</p>
+    </div>
+  </div>
+</div></section>
+</main>

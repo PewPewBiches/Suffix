@@ -11,19 +11,40 @@ import ConvertKit
 enum Style {
     /// The user's own accent colour, not one we picked.
     static let accent = Color.accentColor
-    /// Matches the corner radius macOS uses for notification banners.
+    /// The selection blue from DESIGN.md — used behind a destination
+    /// extension and nowhere else, so it always means "this is the new thing".
+    static let selection = Color(light: Color(red: 0.043, green: 0.384, blue: 0.965),
+                                 dark:  Color(red: 0.239, green: 0.545, blue: 1.0))
     static let noticeCorner: CGFloat = 10
-    static let noticeWidth: CGFloat = 344
+    static let noticeWidth: CGFloat = 348
 }
 
-/// `photo.png → photo.pdf`
+extension Color {
+    /// A colour that resolves per theme without an asset catalogue — this app
+    /// is built by SwiftPM, which has nowhere to put one.
+    init(light: Color, dark: Color) {
+        self.init(nsColor: NSColor(name: nil) { appearance in
+            appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+                ? NSColor(dark) : NSColor(light)
+        })
+    }
+}
+
+/// `photo.png → photo.` + a highlighted `pdf`
 ///
-/// Filenames are monospaced because that is what filenames are; the emphasis on
-/// the destination is weight, not colour, so it reads the same under any accent.
+/// The destination extension sits in a selection block, exactly as a
+/// highlighted filename does in Finder. That block is the app's one emphasis
+/// device — see DESIGN.md — so it appears here and nowhere decorative.
 struct RenameChip: View {
     let from: String
     let to: String
     var font: Font = .caption
+
+    /// Split a filename so the extension can be highlighted on its own.
+    private var parts: (stem: String, ext: String) {
+        guard let dot = to.lastIndex(of: ".") else { return (to, "") }
+        return (String(to[to.startIndex..<dot]), String(to[dot...]))
+    }
 
     var body: some View {
         HStack(spacing: 4) {
@@ -32,9 +53,13 @@ struct RenameChip: View {
             Image(systemName: "arrow.right")
                 .imageScale(.small)
                 .foregroundStyle(.tertiary)
-            Text(to)
-                .foregroundStyle(.primary)
-                .fontWeight(.medium)
+            HStack(spacing: 0) {
+                Text(parts.stem)
+                Text(parts.ext)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 3)
+                    .background(Style.selection, in: RoundedRectangle(cornerRadius: 3))
+            }
         }
         .font(font.monospaced())
         .lineLimit(1)

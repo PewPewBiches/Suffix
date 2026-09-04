@@ -1,0 +1,95 @@
+<!--title:trust — suffix-->
+<!--desc:What suffix can reach, what it never touches, why macOS blocks it, and how to check any of it yourself.-->
+
+<header class="head"><div class="shell">
+  <p class="eyebrow">trust</p>
+  <h1>what it can<br>and cannot reach</h1>
+  <p class="standfirst">
+    This app rewrites your files. That deserves a page rather than a sentence.
+  </p>
+</div></header>
+
+<main>
+<section><div class="shell">
+  <h2>your files never leave your Mac</h2>
+  <div class="split" style="align-items:start">
+    <p class="lede">
+      Suffix contains no network code at all. Conversion uses only what ships
+      with macOS — ImageIO, PDFKit, AVFoundation and Vision. There is no
+      account, no service, and nothing to sign in to.
+    </p>
+    <div class="rows">
+      <div class="rowitem"><span class="k">network requests</span><span class="v">none</span></div>
+      <div class="rowitem"><span class="k">telemetry / analytics</span><span class="v">none</span></div>
+      <div class="rowitem"><span class="k">accounts</span><span class="v">none</span></div>
+      <div class="rowitem"><span class="k">bundled binaries</span><span class="v">none</span></div>
+      <div class="rowitem" style="border-bottom:0"><span class="k">source</span><span class="v"><a href="https://github.com/PewPewBiches/Suffix">all of it, MIT</a></span></div>
+    </div>
+  </div>
+  <p>Don't take that on faith — the whole app is one command to build yourself:</p>
+<pre><code>git clone https://github.com/PewPewBiches/Suffix.git
+cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
+</div></section>
+
+<section><div class="shell">
+  <h2>it only acts on a deliberate rename</h2>
+  <p class="lede">
+    Not on files you copy, download or move. Only when you change a file's
+    extension yourself, to something suffix can actually produce, and the
+    contents do not already match.
+  </p>
+  <div class="grid g2" style="margin-top:22px">
+    <div>
+      <h3>skipped entirely</h3>
+      <p>Photos libraries, Photo Booth, Music, iMovie and Final Cut libraries, application bundles, caches, <code>node_modules</code>, <code>.git</code>, and the Trash. A Photos library is a database, not loose files — rewriting anything inside would corrupt it.</p>
+    </div>
+    <div>
+      <h3>nothing is destroyed</h3>
+      <p>Before anything is overwritten the original is copied aside and kept for seven days, so any conversion can be undone from the menu bar. Stored originals expire on their own rather than growing forever.</p>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="shell">
+  <h2>why macOS says it is unidentified</h2>
+  <p class="lede">
+    Because it is. Signing costs $99 a year and this is free.
+  </p>
+  <p>
+    Gatekeeper blocks the first launch and says the app “cannot be verified”.
+    That is a statement about the missing signature, not about what the app
+    does. Open <strong>System Settings → Privacy &amp; Security</strong> and
+    click <strong>Open Anyway</strong>; you do it once.
+  </p>
+  <p>
+    The same gap means suffix cannot use Notification Center — macOS refuses
+    authorization outright without a Team Identifier — so it draws its own
+    notice instead.
+  </p>
+</div></section>
+
+<section><div class="shell">
+  <h2>the permission it asks for, and why</h2>
+  <p class="lede">
+    Full Disk Access, so it can reach Desktop, Documents and Downloads.
+  </p>
+  <p>
+    Without it suffix keeps running and silently does nothing in exactly the
+    folders you use most — which is worse than failing, because it looks like it
+    is working. That is why setup ends in a <strong>test it</strong> button that
+    converts a real file and shows you the result.
+  </p>
+  <div class="note">
+    <p>
+      <strong>Do run the test.</strong> A silent, healthy-looking failure is this
+      app's characteristic way of going wrong. The test catches it while you are
+      still paying attention, instead of three days later.
+    </p>
+  </div>
+  <p>
+    The ⌥⌘S shortcut additionally asks Finder what you have selected, which macOS
+    prompts for separately the first time. Declining it costs you the shortcut
+    and nothing else — right-click still works.
+  </p>
+</div></section>
+</main>

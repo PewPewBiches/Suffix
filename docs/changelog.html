@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>changelog — suffix</title>
+<meta name="description" content="What changed in each release of suffix, including the things that were wrong and got fixed.">
+<meta property="og:title" content="changelog — suffix">
+<meta property="og:description" content="What changed in each release of suffix, including the things that were wrong and got fixed.">
+<meta property="og:image" content="images/icon-256.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;700&family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="images/icon-256.png">
+</head>
+<body data-page="changelog">
+<nav class="top"><div class="inner">
+  <a class="brand" href="index.html"><img src="images/icon-256.png" alt="">suffix</a>
+  <div class="links">
+    <a href="index.html" data-page="index">overview</a>
+    <a href="features.html" data-page="features">features</a>
+    <a href="formats.html" data-page="formats">formats</a>
+    <a href="trust.html" data-page="trust" class="hide">trust</a>
+    <a href="changelog.html" data-page="changelog" class="hide">changelog</a>
+    <a class="ext" href="https://github.com/PewPewBiches/Suffix">github</a>
+  </div>
+</div></nav>
+
+<header class="head"><div class="shell">
+  <p class="eyebrow">changelog</p>
+  <h1>what changed</h1>
+  <p class="standfirst">
+    Including the parts that were broken. A list of only good news is not a
+    changelog.
+  </p>
+</div></header>
+
+<main>
+<section><div class="shell">
+  <h2>0.4.0 — one door, and an identity</h2>
+  <p class="meta">latest</p>
+  <div class="rows" style="margin-top:14px">
+    <div class="rowitem"><span class="k">added</span><span class="v">⌥⌘S opens file actions for the Finder selection, and is yours to change</span></div>
+    <div class="rowitem"><span class="k">changed</span><span class="v">three Services entries became one panel that shows every action and greys out what does not apply, with the reason</span></div>
+    <div class="rowitem"><span class="k">changed</span><span class="v">settings split into four tabs; the file actions are finally mentioned inside the app</span></div>
+    <div class="rowitem"><span class="k">changed</span><span class="v">new icon and notice, both built from the same idea: a selected extension</span></div>
+    <div class="rowitem"><span class="k">removed</span><span class="v">dead code — an unused faithfulness check, an error case describing a Pages preview that turned out not to exist</span></div>
+    <div class="rowitem" style="border-bottom:0"><span class="k">fixed</span><span class="v">a test that raced on shared state and failed about one run in five</span></div>
+  </div>
+</div></section>
+
+<section><div class="shell">
+  <h2>0.3.1 — Pages export</h2>
+  <div class="rows" style="margin-top:14px">
+    <div class="rowitem" style="border-bottom:0"><span class="k">fixed</span><span class="v"><code>.pages → .pdf</code> failed with “Pages must be installed” <em>while Pages was installed</em>. Current versions use the bundle identifier <code>com.apple.Pages</code>; 0.3.0 looked only for <code>com.apple.iWork.Pages</code>.</span></div>
+  </div>
+</div></section>
+
+<section><div class="shell">
+  <h2>0.3.0 — text out of pictures</h2>
+  <div class="rows" style="margin-top:14px">
+    <div class="rowitem"><span class="k">added</span><span class="v">rename an image to <span class="sel">.txt</span> and get the words in it, via Vision</span></div>
+    <div class="rowitem"><span class="k">added</span><span class="v">scanned PDFs fall back to reading the pages when there is no text layer</span></div>
+    <div class="rowitem"><span class="k">added</span><span class="v">Pages, Keynote and Numbers export through the app that made them</span></div>
+    <div class="rowitem"><span class="k">fixed</span><span class="v">suffix was watching inside Photos libraries, raising a permission prompt it had no reason to ask for — and rewriting a file in there would corrupt the library</span></div>
+    <div class="rowitem" style="border-bottom:0"><span class="k">fixed</span><span class="v">iWork apps are addressed by bundle identifier, so a document cannot be handed to an app that merely claimed the name “Pages”</span></div>
+  </div>
+</div></section>
+
+<section><div class="shell">
+  <h2>0.2.0 — video, audio, documents</h2>
+  <div class="rows" style="margin-top:14px">
+    <div class="rowitem"><span class="k">added</span><span class="v">MOV ⇄ MP4 ⇄ M4V, audio extraction, and MP3 via ffmpeg or lame when installed</span></div>
+    <div class="rowitem"><span class="k">added</span><span class="v">Word, RTF, OpenDocument, HTML and text to PDF — with the fidelity limit stated in the app</span></div>
+    <div class="rowitem"><span class="k">added</span><span class="v">progress in the menu bar; long videos ask before starting</span></div>
+    <div class="rowitem" style="border-bottom:0"><span class="k">fixed</span><span class="v">every media conversion failed with “Cannot Open” — AVFoundation infers a file's type from its extension, which is the one thing this app cannot trust</span></div>
+  </div>
+</div></section>
+
+<section><div class="shell">
+  <h2>0.1.0 — first release</h2>
+  <div class="rows" style="margin-top:14px">
+    <div class="rowitem"><span class="k">added</span><span class="v">rename to convert, across images and PDFs</span></div>
+    <div class="rowitem"><span class="k">added</span><span class="v">seven-day undo, replace or keep both</span></div>
+    <div class="rowitem" style="border-bottom:0"><span class="k">fixed</span><span class="v">renames arriving as a coalesced <code>Removed | Renamed</code> event were dropped, so conversions worked in a quiet folder and failed in a busy one</span></div>
+  </div>
+</div></section>
+</main>
+<footer><div class="shell"><div class="inner">
+  <span>suffix · mit licensed · built for macos</span>
+  <span>
+    <a href="https://github.com/PewPewBiches/Suffix">source</a> ·
+    <a href="https://github.com/PewPewBiches/Suffix/releases/latest">download</a> ·
+    <a href="https://github.com/PewPewBiches/Suffix/issues">report a problem</a>
+  </span>
+</div></div></footer>
+<script>
+  // Mark the current page in the nav.
+  const here = document.body.dataset.page;
+  document.querySelectorAll('nav.top .links a[data-page]').forEach(a => {
+    if (a.dataset.page === here) a.setAttribute('aria-current', 'page');
+  });
+</script>
+</body>
+</html>

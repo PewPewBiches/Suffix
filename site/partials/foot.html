@@ -1,0 +1,15 @@
+<footer><div class="shell"><div class="inner">
+  <span>suffix · mit licensed · built for macos</span>
+  <span>
+    <a href="https://github.com/PewPewBiches/Suffix">source</a> ·
+    <a href="https://github.com/PewPewBiches/Suffix/releases/latest">download</a> ·
+    <a href="https://github.com/PewPewBiches/Suffix/issues">report a problem</a>
+  </span>
+</div></div></footer>
+<script>
+  // Mark the current page in the nav.
+  const here = document.body.dataset.page;
+  document.querySelectorAll('nav.top .links a[data-page]').forEach(a => {
+    if (a.dataset.page === here) a.setAttribute('aria-current', 'page');
+  });
+</script>

@@ -1,32 +1,5 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>suffix — convert files by renaming them</title>
-<meta name="description" content="A free macOS app that converts a file when you change its extension. Rename photo.png to photo.pdf and it becomes a real PDF. Nothing is uploaded.">
-<meta property="og:title" content="suffix — convert files by renaming them">
-<meta property="og:description" content="A free macOS app that converts a file when you change its extension. Rename photo.png to photo.pdf and it becomes a real PDF. Nothing is uploaded.">
-<meta property="og:image" content="images/icon-256.png">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;700&family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="style.css">
-<link rel="icon" href="images/icon-256.png">
-</head>
-<body data-page="index">
-<nav class="top"><div class="inner">
-  <a class="brand" href="index.html"><img src="images/icon-256.png" alt="">suffix</a>
-  <div class="links">
-    <a href="index.html" data-page="index">overview</a>
-    <a href="features.html" data-page="features">features</a>
-    <a href="formats.html" data-page="formats">formats</a>
-    <a href="trust.html" data-page="trust" class="hide">trust</a>
-    <a href="changelog.html" data-page="changelog" class="hide">changelog</a>
-    <a class="ext" href="https://github.com/PewPewBiches/Suffix">github</a>
-  </div>
-</div></nav>
+<!--title:suffix — convert files by renaming them-->
+<!--desc:A free macOS app that converts a file when you change its extension. Rename photo.png to photo.pdf and it becomes a real PDF. Nothing is uploaded.-->
 
 <header class="head"><div class="shell">
   <div class="split">
@@ -189,20 +162,3 @@ cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
   }, { threshold: .2 }).observe(row);
 })();
 </script>
-<footer><div class="shell"><div class="inner">
-  <span>suffix · mit licensed · built for macos</span>
-  <span>
-    <a href="https://github.com/PewPewBiches/Suffix">source</a> ·
-    <a href="https://github.com/PewPewBiches/Suffix/releases/latest">download</a> ·
-    <a href="https://github.com/PewPewBiches/Suffix/issues">report a problem</a>
-  </span>
-</div></div></footer>
-<script>
-  // Mark the current page in the nav.
-  const here = document.body.dataset.page;
-  document.querySelectorAll('nav.top .links a[data-page]').forEach(a => {
-    if (a.dataset.page === here) a.setAttribute('aria-current', 'page');
-  });
-</script>
-</body>
-</html>
