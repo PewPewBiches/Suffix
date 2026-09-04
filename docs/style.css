@@ -24,8 +24,7 @@
   --data:'IBM Plex Mono',ui-monospace,Menlo,monospace;
 
   /* The 1984 pointer, drawn pixel by pixel. */
-  --arrow1x:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAT0lEQVR42q3SOwoAIAwE0b3/pUcsBAlqfg7YmVeESBJqRhdh1kFYVRH2Kgi2LMKpDMKtKMKrCIKXh7yG7PPvoLzEbSC/RPOxBHw/b0WWNxvPLvkHxp4OMgAAAABJRU5ErkJggg==");
-  --arrow2x:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAZUlEQVR42uXWMQ4AIAgDwP7/07rohi4CbSNJV7iEAQBgrNBKBkCDaAB2MSBaAAZEE9AJ0QZ0QDwAlRAvQAXEE5AJ8QZkQLwAwQNzijmg80xrAYIB5RANwKXhPwDa80oHvK7MGzABFbjkRhmWL8IAAAAASUVORK5CYII=");
+  --arrow:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAZUlEQVR42uXWMQ4AIAgDwP7/07rohi4CbSNJV7iEAQBgrNBKBkCDaAB2MSBaAAZEE9AJ0QZ0QDwAlRAvQAXEE5AJ8QZkQLwAwQNzijmg80xrAYIB5RANwKXhPwDa80oHvK7MGzABFbjkRhmWL8IAAAAASUVORK5CYII=");
 }
 
 *{box-sizing:border-box}
@@ -43,10 +42,11 @@ body{
     linear-gradient(45deg,#8E8E8E 25%,transparent 25%,transparent 75%,#8E8E8E 75%);
   background-size:4px 4px;
   background-position:0 0,2px 2px;
-  cursor:image-set(var(--arrow1x) 1x, var(--arrow2x) 2x) 0 0, default;
+  cursor:var(--arrow) 0 0, default;
 }
 a{color:var(--black)}
-button,a,summary,.item,.btn{cursor:image-set(var(--arrow1x) 1x, var(--arrow2x) 2x) 0 0, default}
+/* Inherited by everything, so no element quietly reverts to the system arrow. */
+html,body,button,a,summary,.item,.btn,td,th,input{cursor:var(--arrow) 0 0, default}
 
 /* ── menu bar ─────────────────────────────────────────── */
 .menubar{
@@ -276,4 +276,53 @@ footer a{color:#3A3A3A}
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation:none!important;transition:none!important}
+}
+
+
+/* ── movement ─────────────────────────────────────────────
+   A file browser should not bounce. These are the three
+   places motion says something: a window arriving, a row
+   under the pointer, and the colour rule drawing itself. */
+
+.win{
+  opacity:0;transform:translateY(10px);
+  animation:open .34s cubic-bezier(.2,.8,.3,1) forwards;
+}
+.win:nth-of-type(2){animation-delay:.06s}
+.win:nth-of-type(3){animation-delay:.12s}
+.win:nth-of-type(4){animation-delay:.18s}
+.win:nth-of-type(5){animation-delay:.24s}
+.win .win{animation:none;opacity:1;transform:none}
+@keyframes open{to{opacity:1;transform:none}}
+
+/* the six-colour rule wipes in, left to right */
+.rule i{transform:scaleX(0);transform-origin:left;animation:wipe .5s ease forwards}
+.rule i:nth-child(1){animation-delay:.18s}
+.rule i:nth-child(2){animation-delay:.24s}
+.rule i:nth-child(3){animation-delay:.30s}
+.rule i:nth-child(4){animation-delay:.36s}
+.rule i:nth-child(5){animation-delay:.42s}
+.rule i:nth-child(6){animation-delay:.48s}
+@keyframes wipe{to{transform:scaleX(1)}}
+
+/* rows invert under the pointer, the way a Finder row does */
+tbody tr{transition:background .1s steps(1), color .1s steps(1)}
+tbody tr:hover{background:var(--black);color:var(--white)}
+tbody tr:hover .sel{background:var(--white);color:var(--black)}
+tbody tr:hover .y,tbody tr:hover .p,tbody tr:hover .n{color:var(--white)}
+tbody tr:hover code{background:transparent;color:var(--white)}
+
+/* windows lift very slightly when pointed at */
+.win{transition:box-shadow .16s ease, transform .16s ease}
+.win:hover{box-shadow:3px 3px 0 var(--shadow)}
+
+/* the title bar of the window you are pointing at looks active */
+.win .titlebar{transition:background .12s steps(1)}
+.win:not(:hover) > .titlebar{background:var(--white)}
+
+.btn{transition:transform .08s ease}
+.btn:active{transform:translate(1px,1px)}
+
+@media(prefers-reduced-motion:reduce){
+  .win,.rule i{opacity:1;transform:none;animation:none}
 }
