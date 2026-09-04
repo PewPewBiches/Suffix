@@ -11,140 +11,207 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;700&family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.cdnfonts.com/css/chicagoflf">
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="images/icon-256.png">
 </head>
 <body data-page="index">
-<nav class="top"><div class="inner">
-  <a class="brand" href="index.html">suffix</a>
-  <div class="links">
-    <a href="index.html" data-page="index">overview</a>
-    <a href="features.html" data-page="features">features</a>
-    <a href="formats.html" data-page="formats">formats</a>
-    <a href="trust.html" data-page="trust" class="hide">trust</a>
-    <a href="changelog.html" data-page="changelog" class="hide">changelog</a>
-    <a class="ext" href="https://github.com/PewPewBiches/Suffix">github</a>
-  </div>
-</div></nav>
-
-<header class="head"><div class="shell">
-  <div class="split">
-    <div>
-      <p class="eyebrow">macOS · free · open source</p>
-      <h1>rename it.<br>it converts.</h1>
-      <p class="standfirst">
-        Change a file's extension in Finder and suffix changes the file to match.
-        No upload, no website, no app to open.
-      </p>
-      <div class="btns" style="margin-top:26px">
-        <a class="btn" href="https://github.com/PewPewBiches/Suffix/releases/latest">download for macOS</a>
-        <a class="btn ghost" href="features.html">what it does</a>
-      </div>
-      <p class="meta">macOS 14 or later · nothing leaves your Mac</p>
+<div class="menubar">
+  <div class="item" data-menu="apple" aria-expanded="false" role="button" tabindex="0" aria-label="Apple menu">
+    <span class="rainbow"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+    <div class="menu" id="m-apple">
+      <a href="index.html">About suffix…</a>
+      <hr>
+      <a href="https://github.com/PewPewBiches/Suffix/releases/latest">Download suffix</a>
+      <a href="https://github.com/PewPewBiches/Suffix">Source on GitHub</a>
     </div>
+  </div>
 
-    <div>
-      <div class="finder">
-        <div class="bar">
-          <span class="lights"><i></i><i></i><i></i></span>
-          <span class="ttl">Downloads</span>
-        </div>
-        <div class="head-row"><span>name</span><span>size</span><span>kind</span></div>
-        <div class="list">
-          <div class="row"><span class="nm"><span class="ficon" data-kind="MOV"></span><span class="fname">clip.mov</span></span><span class="sz">18.2 MB</span><span class="kd">QuickTime</span></div>
-          <div class="row" id="target">
-            <span class="nm"><span class="ficon" data-kind="PNG" id="ticon"></span>
-              <span class="fname">invoice<span id="ext">.png</span><i id="caret"></i></span></span>
-            <span class="sz">1.4 MB</span><span class="kd" id="kind">PNG image</span>
+  <div class="item" data-menu="file" aria-expanded="false" role="button" tabindex="0">File
+    <div class="menu" id="m-file">
+      <a href="index.html">Overview</a>
+      <a href="features.html">Features</a>
+      <a href="formats.html">Formats</a>
+      <hr>
+      <a href="https://github.com/PewPewBiches/Suffix/releases/latest">Get suffix…</a>
+    </div>
+  </div>
+
+  <div class="item hide" data-menu="edit" aria-expanded="false" role="button" tabindex="0">Edit
+    <div class="menu" id="m-edit">
+      <span>Undo Rename</span>
+      <span>Cut</span>
+      <span>Copy</span>
+      <hr>
+      <a href="features.html">Rename…</a>
+    </div>
+  </div>
+
+  <div class="item" data-menu="special" aria-expanded="false" role="button" tabindex="0">Special
+    <div class="menu" id="m-special">
+      <a href="trust.html">What it can reach</a>
+      <a href="changelog.html">Changelog</a>
+      <hr>
+      <a href="https://github.com/PewPewBiches/Suffix/issues">Report a problem…</a>
+    </div>
+  </div>
+
+  <span class="spacer"></span>
+  <span class="right">suffix</span>
+</div>
+
+<div class="desk">
+
+  <div class="win">
+    <div class="titlebar">
+      <span class="box"></span>
+      <span class="name">suffix</span>
+      <span class="box zoom"></span>
+    </div>
+    <div class="wbody">
+      <div class="cols" style="align-items:center">
+        <div>
+          <h1>rename it.<br>it converts.</h1>
+          <div class="rule"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <p class="lede">
+            Change a file's extension in Finder and suffix changes the file to
+            match. No upload, no website, no app to open.
+          </p>
+          <div class="btns">
+            <a class="btn default" href="https://github.com/PewPewBiches/Suffix/releases/latest">Download</a>
+            <a class="btn" href="features.html">What it does</a>
           </div>
-          <div class="row"><span class="nm"><span class="ficon" data-kind="JPG"></span><span class="fname">receipt.jpg</span></span><span class="sz">840 KB</span><span class="kd">JPEG image</span></div>
-          <div class="row"><span class="nm"><span class="ficon" data-kind="PDF"></span><span class="fname">contract.pdf</span></span><span class="sz">210 KB</span><span class="kd">PDF Document</span></div>
+          <p class="small" style="margin-top:16px">macOS 14 or later · free · nothing leaves your Mac</p>
+        </div>
+
+        <div>
+          <div class="win finder" style="margin-bottom:14px;background:var(--white)">
+            <div class="titlebar">
+              <span class="box"></span>
+              <span class="name">Downloads</span>
+              <span class="box zoom"></span>
+            </div>
+            <div class="head-row"><span>Name</span><span>Size</span><span>Kind</span></div>
+            <div class="list">
+              <div class="row"><span class="nm"><span class="doc" data-k="MOV"></span><span class="fname">clip.mov</span></span><span class="sz">18.2 MB</span><span class="kd">movie</span></div>
+              <div class="row" id="target">
+                <span class="nm"><span class="doc" data-k="PNG" id="ticon"></span>
+                  <span class="fname">invoice<span id="ext">.png</span><i id="caret"></i></span></span>
+                <span class="sz">1.4 MB</span><span class="kd" id="kind">picture</span>
+              </div>
+              <div class="row"><span class="nm"><span class="doc" data-k="JPG"></span><span class="fname">receipt.jpg</span></span><span class="sz">840 KB</span><span class="kd">picture</span></div>
+              <div class="row"><span class="nm"><span class="doc" data-k="PDF"></span><span class="fname">contract.pdf</span></span><span class="sz">210 KB</span><span class="kd">document</span></div>
+            </div>
+          </div>
+
+          <div class="alert" id="notice">
+            <span class="bang">!</span>
+            <span>
+              <div class="t">Converted</div>
+              <div class="fn">invoice.png → invoice<span class="sel">.pdf</span></div>
+              <div class="a">Undo · Show in Finder</div>
+            </span>
+          </div>
         </div>
       </div>
-      <div class="notice" id="notice" style="margin-top:14px;margin-left:auto">
-        <span style="font-size:15px;color:var(--muted)">✓</span>
-        <span>
-          <div class="lbl">converted</div>
-          <div class="fn">invoice.png → invoice<span class="sel">.pdf</span></div>
-          <div class="act">undo · show in finder</div>
-        </span>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar">
+      <span class="box"></span>
+      <span class="name">Nine steps, or one</span>
+      <span class="box zoom"></span>
+    </div>
+    <div class="wbody">
+      <div class="cols">
+        <div>
+          <p class="lede">
+            You have a photo and you need a PDF. So you search “png to pdf”,
+            pick one of the identical sites, and hand your file to a stranger's
+            server.
+          </p>
+          <p>
+            Nothing is uploaded here. There is no window to open, no file
+            picker, no “drag your file here”. You already know how to rename a
+            file.
+          </p>
+        </div>
+        <div class="tw" style="margin:0">
+          <table>
+            <thead><tr><th><span>The usual way</span></th><th style="text-align:right"><span>Step</span></th></tr></thead>
+            <tbody>
+              <tr><td>Search “png to pdf”</td><td style="text-align:right">1</td></tr>
+              <tr><td>Pick a site, upload, wait</td><td style="text-align:right">2–4</td></tr>
+              <tr><td>Close a popup</td><td style="text-align:right">5</td></tr>
+              <tr><td>Download it, find it, move it back</td><td style="text-align:right">6–8</td></tr>
+              <tr><td>Delete the original</td><td style="text-align:right">9</td></tr>
+              <tr><td class="f">rename <span class="sel">.pdf</span></td><td style="text-align:right"><strong>1</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
-</div></header>
 
-<main>
-
-<section><div class="shell">
-  <h2>nine steps, or one</h2>
-  <div class="split" style="align-items:start;margin-top:24px">
-    <div>
-      <p class="lede">
-        You have a photo and you need a PDF. So you search “png to pdf”, pick one
-        of the identical sites, and hand your file to a stranger's server.
-      </p>
-      <p>
-        Nothing is uploaded here. There is no window to open, no file picker, no
-        “drag your file here”. You already know how to rename a file.
-      </p>
+  <div class="win">
+    <div class="titlebar">
+      <span class="box"></span>
+      <span class="name">Things worth renaming</span>
+      <span class="box zoom"></span>
     </div>
-    <div class="rows">
-      <div class="rowitem"><span class="k">search “png to pdf”</span><span class="v">1</span></div>
-      <div class="rowitem"><span class="k">pick a site, upload, wait</span><span class="v">2–4</span></div>
-      <div class="rowitem"><span class="k">close a popup</span><span class="v">5</span></div>
-      <div class="rowitem"><span class="k">download, find it, move it back</span><span class="v">6–8</span></div>
-      <div class="rowitem"><span class="k">delete the original</span><span class="v">9</span></div>
-      <div class="rowitem" style="border-bottom:0">
-        <span class="k">rename <span class="sel">.pdf</span></span>
-        <span class="v" style="color:var(--select);font-weight:600">with suffix — 1</span>
+    <div class="wbody">
+      <div class="tw">
+        <table>
+          <thead><tr><th><span>Rename</span></th><th><span>And you get</span></th></tr></thead>
+          <tbody>
+            <tr><td class="f">screenshot.png → <span class="sel">.txt</span></td><td>the text inside the image, read out of it</td></tr>
+            <tr><td class="f">scan.pdf → <span class="sel">.txt</span></td><td>words out of a scan that has no text layer</td></tr>
+            <tr><td class="f">photo.heic → <span class="sel">.jpg</span></td><td>an iPhone photo anything can open</td></tr>
+            <tr><td class="f">report.docx → <span class="sel">.pdf</span></td><td>a PDF you can send</td></tr>
+            <tr><td class="f">deck.key → <span class="sel">.pdf</span></td><td>exactly what Keynote itself would export</td></tr>
+            <tr><td class="f">clip.mov → <span class="sel">.mp4</span></td><td>the same video, in the container everything accepts</td></tr>
+            <tr><td class="f">talk.mp4 → <span class="sel">.m4a</span></td><td>just the audio</td></tr>
+            <tr><td class="f">brochure.pdf → <span class="sel">.jpg</span></td><td>every page as an image, in a .zip</td></tr>
+          </tbody>
+        </table>
       </div>
+      <p><a href="formats.html">Every format it handles →</a></p>
     </div>
   </div>
-</div></section>
 
-<section><div class="shell">
-  <h2>things worth renaming</h2>
-  <div class="tw"><table>
-    <thead><tr><th>rename</th><th>and you get</th></tr></thead>
-    <tbody>
-      <tr><td class="f">screenshot.png → <span class="sel">.txt</span></td><td>the text inside the image, read out of it</td></tr>
-      <tr><td class="f">scan.pdf → <span class="sel">.txt</span></td><td>words out of a scan that has no text layer</td></tr>
-      <tr><td class="f">photo.heic → <span class="sel">.jpg</span></td><td>an iPhone photo anything can open</td></tr>
-      <tr><td class="f">report.docx → <span class="sel">.pdf</span></td><td>a PDF you can send</td></tr>
-      <tr><td class="f">deck.key → <span class="sel">.pdf</span></td><td>exactly what Keynote itself would export</td></tr>
-      <tr><td class="f">clip.mov → <span class="sel">.mp4</span></td><td>the same video, in the container everything accepts</td></tr>
-      <tr><td class="f">talk.mp4 → <span class="sel">.m4a</span></td><td>just the audio</td></tr>
-      <tr><td class="f">brochure.pdf → <span class="sel">.jpg</span></td><td>every page as an image, in a .zip</td></tr>
-    </tbody>
-  </table></div>
-  <p><a href="formats.html">every format it handles →</a></p>
-</div></section>
-
-<section><div class="shell">
-  <h2>install it</h2>
-  <div class="grid g3" style="margin-top:22px">
-    <div>
-      <h3>1 · download</h3>
-      <p><a href="https://github.com/PewPewBiches/Suffix/releases/latest">Get the latest release</a>, open the disk image, drag suffix to Applications.</p>
+  <div class="win">
+    <div class="titlebar">
+      <span class="box"></span>
+      <span class="name">Installer</span>
+      <span class="box zoom"></span>
     </div>
-    <div>
-      <h3>2 · get past Gatekeeper</h3>
-      <p>macOS blocks it once, because the app is unsigned. Open <strong>System Settings → Privacy &amp; Security</strong> and click <strong>Open Anyway</strong>.</p>
-    </div>
-    <div>
-      <h3>3 · run the test</h3>
-      <p>Setup asks for Full Disk Access, then converts a real file to prove it works. <a href="trust.html">Why that matters →</a></p>
-    </div>
-  </div>
-  <div class="note blue" style="margin-top:28px">
-    <p>Rather not trust a stranger's binary? Build your own — it takes about ten seconds:</p>
-<pre style="margin:12px 0 0"><code>git clone https://github.com/PewPewBiches/Suffix.git
+    <div class="wbody">
+      <div class="cols3">
+        <div>
+          <h3>1 · Download</h3>
+          <p><a href="https://github.com/PewPewBiches/Suffix/releases/latest">Get the latest release</a>, open the disk image, drag suffix to Applications.</p>
+        </div>
+        <div>
+          <h3>2 · Get past Gatekeeper</h3>
+          <p>macOS blocks it once, because the app is unsigned. Open <strong>System Settings → Privacy &amp; Security</strong> and click <strong>Open Anyway</strong>.</p>
+        </div>
+        <div>
+          <h3>3 · Run the test</h3>
+          <p>Setup asks for Full Disk Access, then converts a real file to prove it works. <a href="trust.html">Why that matters →</a></p>
+        </div>
+      </div>
+      <div class="note">
+        <span class="tag">Build it yourself</span>
+        <p>Rather not trust a stranger's binary? It is one command:</p>
+<pre><code>git clone https://github.com/PewPewBiches/Suffix.git
 cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
+      </div>
+    </div>
   </div>
-</div></section>
 
-</main>
+</div>
 
 <script>
 (function () {
@@ -157,8 +224,8 @@ cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
   if (!row) return;
 
   if (reduce) {
-    ext.textContent = '.pdf'; kind.textContent = 'PDF Document';
-    icon.dataset.kind = 'PDF'; notice.classList.add('in');
+    ext.textContent = '.pdf'; kind.textContent = 'document';
+    icon.dataset.k = 'PDF'; notice.classList.add('in');
     return;
   }
 
@@ -168,17 +235,17 @@ cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
 
   async function cycle() {
     row.className = 'row';
-    ext.textContent = '.png'; kind.textContent = 'PNG image';
-    icon.dataset.kind = 'PNG'; notice.classList.remove('in');
+    ext.textContent = '.png'; kind.textContent = 'picture';
+    icon.dataset.k = 'PNG'; notice.classList.remove('in');
     await wait(1200);
-    row.classList.add('on');    await wait(700);
-    row.classList.add('edit');  await wait(520);
-    await back(ext, 3, 105);    await wait(180);
-    await type(ext, 'pdf', 125);await wait(480);
+    row.classList.add('on');     await wait(700);
+    row.classList.add('edit');   await wait(520);
+    await back(ext, 3, 105);     await wait(180);
+    await type(ext, 'pdf', 125); await wait(480);
     row.classList.remove('edit', 'on');
-    kind.textContent = 'PDF Document'; icon.dataset.kind = 'PDF';
-    await wait(340);
-    notice.classList.add('in'); await wait(3400);
+    kind.textContent = 'document'; icon.dataset.k = 'PDF';
+    await wait(320);
+    notice.classList.add('in');  await wait(3400);
     notice.classList.remove('in'); await wait(800);
   }
 
@@ -189,20 +256,42 @@ cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
   }, { threshold: .2 }).observe(row);
 })();
 </script>
-<footer><div class="shell"><div class="inner">
-  <span>suffix · mit licensed · built for macos</span>
-  <span>
-    <a href="https://github.com/PewPewBiches/Suffix">source</a> ·
-    <a href="https://github.com/PewPewBiches/Suffix/releases/latest">download</a> ·
-    <a href="https://github.com/PewPewBiches/Suffix/issues">report a problem</a>
-  </span>
-</div></div></footer>
+<div class="desk" style="padding-top:0">
+  <div class="trashline">
+    <footer>
+      suffix · mit licensed · built for macOS ·
+      <a href="https://github.com/PewPewBiches/Suffix">source</a> ·
+      <a href="https://github.com/PewPewBiches/Suffix/releases/latest">download</a> ·
+      <a href="https://github.com/PewPewBiches/Suffix/issues">report a problem</a>
+    </footer>
+    <span class="bin" aria-hidden="true"><i></i><i></i></span>
+  </div>
+</div>
+
 <script>
-  // Mark the current page in the nav.
-  const here = document.body.dataset.page;
-  document.querySelectorAll('nav.top .links a[data-page]').forEach(a => {
-    if (a.dataset.page === here) a.setAttribute('aria-current', 'page');
+// Menu-bar menus, as they behaved: click to open, click away to close.
+(function () {
+  const items = [...document.querySelectorAll('.menubar .item[data-menu]')];
+  const closeAll = () => items.forEach(i => {
+    i.setAttribute('aria-expanded', 'false');
+    i.querySelector('.menu')?.classList.remove('open');
   });
+  items.forEach(item => {
+    const open = e => {
+      e.preventDefault(); e.stopPropagation();
+      const wasOpen = item.getAttribute('aria-expanded') === 'true';
+      closeAll();
+      if (!wasOpen) {
+        item.setAttribute('aria-expanded', 'true');
+        item.querySelector('.menu').classList.add('open');
+      }
+    };
+    item.addEventListener('click', open);
+    item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') open(e); });
+  });
+  document.addEventListener('click', closeAll);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+})();
 </script>
 </body>
 </html>

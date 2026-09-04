@@ -1,15 +1,37 @@
-<footer><div class="shell"><div class="inner">
-  <span>suffix · mit licensed · built for macos</span>
-  <span>
-    <a href="https://github.com/PewPewBiches/Suffix">source</a> ·
-    <a href="https://github.com/PewPewBiches/Suffix/releases/latest">download</a> ·
-    <a href="https://github.com/PewPewBiches/Suffix/issues">report a problem</a>
-  </span>
-</div></div></footer>
+<div class="desk" style="padding-top:0">
+  <div class="trashline">
+    <footer>
+      suffix · mit licensed · built for macOS ·
+      <a href="https://github.com/PewPewBiches/Suffix">source</a> ·
+      <a href="https://github.com/PewPewBiches/Suffix/releases/latest">download</a> ·
+      <a href="https://github.com/PewPewBiches/Suffix/issues">report a problem</a>
+    </footer>
+    <span class="bin" aria-hidden="true"><i></i><i></i></span>
+  </div>
+</div>
+
 <script>
-  // Mark the current page in the nav.
-  const here = document.body.dataset.page;
-  document.querySelectorAll('nav.top .links a[data-page]').forEach(a => {
-    if (a.dataset.page === here) a.setAttribute('aria-current', 'page');
+// Menu-bar menus, as they behaved: click to open, click away to close.
+(function () {
+  const items = [...document.querySelectorAll('.menubar .item[data-menu]')];
+  const closeAll = () => items.forEach(i => {
+    i.setAttribute('aria-expanded', 'false');
+    i.querySelector('.menu')?.classList.remove('open');
   });
+  items.forEach(item => {
+    const open = e => {
+      e.preventDefault(); e.stopPropagation();
+      const wasOpen = item.getAttribute('aria-expanded') === 'true';
+      closeAll();
+      if (!wasOpen) {
+        item.setAttribute('aria-expanded', 'true');
+        item.querySelector('.menu').classList.add('open');
+      }
+    };
+    item.addEventListener('click', open);
+    item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') open(e); });
+  });
+  document.addEventListener('click', closeAll);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+})();
 </script>

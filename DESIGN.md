@@ -20,6 +20,17 @@ wherever a destination format is named.
 Everything else is a file list: rows, columns, hairlines, and aligned data.
 Cards are a last resort — a file browser has rows, not cards.
 
+## The world
+
+System 7, done properly rather than gestured at. Chicago for chrome, Geneva for
+reading, pinstriped title bars, 1px black frames, the 50% dither desktop, and
+the 1984 pointer as the cursor.
+
+It is not black and white: the six-colour Apple logo is the palette. Green,
+yellow, orange, red, purple, blue appear as the divider rule, the document
+icons, and the alert badge — the way System 7 itself used colour, sparingly and
+on objects rather than on text.
+
 ## Colour
 
 | Token | Light | Dark | For |

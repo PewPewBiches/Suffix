@@ -11,113 +11,165 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;700&family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.cdnfonts.com/css/chicagoflf">
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="images/icon-256.png">
 </head>
 <body data-page="formats">
-<nav class="top"><div class="inner">
-  <a class="brand" href="index.html">suffix</a>
-  <div class="links">
-    <a href="index.html" data-page="index">overview</a>
-    <a href="features.html" data-page="features">features</a>
-    <a href="formats.html" data-page="formats">formats</a>
-    <a href="trust.html" data-page="trust" class="hide">trust</a>
-    <a href="changelog.html" data-page="changelog" class="hide">changelog</a>
-    <a class="ext" href="https://github.com/PewPewBiches/Suffix">github</a>
-  </div>
-</div></nav>
-
-<header class="head"><div class="shell">
-  <p class="eyebrow">formats</p>
-  <h1>everything it handles</h1>
-  <p class="standfirst">
-    Verified against the real engine, not written from memory. Where something
-    does not work, it says so here rather than failing later.
-  </p>
-</div></header>
-
-<main>
-<section><div class="shell">
-  <h2>images and PDFs</h2>
-  <div class="tw"><table class="mx">
-    <thead><tr><th>from</th><th>PNG</th><th>JPEG</th><th>TIFF</th><th>GIF</th><th>BMP</th><th>HEIC</th><th>PDF</th><th>TXT</th></tr></thead>
-    <tbody>
-      <tr><td>PNG · JPEG · TIFF · GIF · BMP · HEIC</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td></tr>
-      <tr><td>WebP</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td></tr>
-      <tr><td>PDF</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="n">–</td><td class="y">●</td></tr>
-    </tbody>
-  </table></div>
-  <div class="grid g2">
-    <p>A PDF of more than one page becomes a <code>.zip</code> of numbered images, because one image cannot hold a hundred pages. Suffix asks first, and names the result <code>document.zip</code> rather than the <code>document.jpg</code> you typed.</p>
-    <p><strong>WebP goes in but not out.</strong> macOS ships a WebP decoder and no encoder, so renaming <em>to</em> <code>.webp</code> is refused outright rather than producing something broken.</p>
-  </div>
-</div></section>
-
-<section><div class="shell">
-  <h2>video and audio</h2>
-  <div class="tw"><table class="mx">
-    <thead><tr><th>from</th><th>MOV</th><th>MP4</th><th>M4V</th><th>M4A</th><th>WAV</th><th>AIFF</th><th>MP3</th></tr></thead>
-    <tbody>
-      <tr><td>MOV · MP4 · M4V</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="p">○</td></tr>
-      <tr><td>M4A · WAV · AIFF · MP3</td><td class="n">–</td><td class="n">–</td><td class="n">–</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="p">○</td></tr>
-    </tbody>
-  </table></div>
-  <div class="grid g2">
-    <p>Video to video normally copies the existing streams instead of re-encoding, so it is fast and loses nothing. Video to audio extracts the soundtrack. Audio cannot become video.</p>
-    <div>
-      <p><strong>○ MP3 needs a helper.</strong> macOS ships an MP3 decoder but no encoder, so suffix uses <code>ffmpeg</code> or <code>lame</code> when one is installed:</p>
-      <pre><code>brew install ffmpeg</code></pre>
-      <p>It looks for an encoder rather than bundling one — nothing to ship, nothing to license. <code>.m4a</code> is the native equivalent and needs nothing.</p>
+<div class="menubar">
+  <div class="item" data-menu="apple" aria-expanded="false" role="button" tabindex="0" aria-label="Apple menu">
+    <span class="rainbow"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+    <div class="menu" id="m-apple">
+      <a href="index.html">About suffix…</a>
+      <hr>
+      <a href="https://github.com/PewPewBiches/Suffix/releases/latest">Download suffix</a>
+      <a href="https://github.com/PewPewBiches/Suffix">Source on GitHub</a>
     </div>
   </div>
-</div></section>
 
-<section><div class="shell">
-  <h2>documents</h2>
-  <div class="tw"><table>
-    <thead><tr><th>from</th><th>to PDF</th></tr></thead>
-    <tbody>
-      <tr><td>Pages · Keynote · Numbers</td><td><span class="y">●</span> exact — needs that Apple app installed</td></tr>
-      <tr><td>Word · RTF · OpenDocument · HTML · plain text</td><td><span class="p">●</span> approximate</td></tr>
-    </tbody>
-  </table></div>
-  <div class="note">
-    <p>
-      <strong>Read this before converting a document you plan to send.</strong>
-      Only iWork files convert exactly, because suffix asks Pages or Keynote to
-      export them. Everything else is re-laid-out by macOS's own text engine:
-      text and basic formatting survive, but tables, columns, headers and
-      footers, and exact pagination do not. Suffix says so on the notice — check
-      the result.
-    </p>
+  <div class="item" data-menu="file" aria-expanded="false" role="button" tabindex="0">File
+    <div class="menu" id="m-file">
+      <a href="index.html">Overview</a>
+      <a href="features.html">Features</a>
+      <a href="formats.html">Formats</a>
+      <hr>
+      <a href="https://github.com/PewPewBiches/Suffix/releases/latest">Get suffix…</a>
+    </div>
   </div>
-</div></section>
 
-<section><div class="shell">
-  <h2>what it never touches</h2>
-  <p>
-    Archives, code, spreadsheets, other applications' libraries, and anything
-    whose contents are not a format above. A <code>.zip</code> renamed to
-    <code>.png</code> is left exactly as it is, and your Photos library is never
-    opened — it is a database, not loose files, and writing into it would break it.
-  </p>
-</div></section>
-</main>
-<footer><div class="shell"><div class="inner">
-  <span>suffix · mit licensed · built for macos</span>
-  <span>
-    <a href="https://github.com/PewPewBiches/Suffix">source</a> ·
-    <a href="https://github.com/PewPewBiches/Suffix/releases/latest">download</a> ·
-    <a href="https://github.com/PewPewBiches/Suffix/issues">report a problem</a>
-  </span>
-</div></div></footer>
+  <div class="item hide" data-menu="edit" aria-expanded="false" role="button" tabindex="0">Edit
+    <div class="menu" id="m-edit">
+      <span>Undo Rename</span>
+      <span>Cut</span>
+      <span>Copy</span>
+      <hr>
+      <a href="features.html">Rename…</a>
+    </div>
+  </div>
+
+  <div class="item" data-menu="special" aria-expanded="false" role="button" tabindex="0">Special
+    <div class="menu" id="m-special">
+      <a href="trust.html">What it can reach</a>
+      <a href="changelog.html">Changelog</a>
+      <hr>
+      <a href="https://github.com/PewPewBiches/Suffix/issues">Report a problem…</a>
+    </div>
+  </div>
+
+  <span class="spacer"></span>
+  <span class="right">suffix</span>
+</div>
+
+<div class="desk">
+  <div class="win">
+    <div class="titlebar"><span class="box"></span><span class="name">Formats</span><span class="box zoom"></span></div>
+    <div class="wbody">
+      <h1>everything it handles</h1>
+      <div class="rule"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <p class="lede">Verified against the real engine, not written from memory. Where something does not work, it says so here rather than failing later.</p>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span class="box"></span><span class="name">Images and PDFs</span><span class="box zoom"></span></div>
+    <div class="wbody">
+      <div class="tw"><table class="mx">
+        <thead><tr><th><span>From</span></th><th><span>PNG</span></th><th><span>JPEG</span></th><th><span>TIFF</span></th><th><span>GIF</span></th><th><span>BMP</span></th><th><span>HEIC</span></th><th><span>PDF</span></th><th><span>TXT</span></th></tr></thead>
+        <tbody>
+          <tr><td>PNG · JPEG · TIFF · GIF · BMP · HEIC</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td></tr>
+          <tr><td>WebP</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td></tr>
+          <tr><td>PDF</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="n">–</td><td class="y">●</td></tr>
+        </tbody>
+      </table></div>
+      <div class="cols">
+        <p>A PDF of more than one page becomes a <code>.zip</code> of numbered images, because one image cannot hold a hundred pages. Suffix asks first, and names the result <code>document.zip</code> rather than the <code>document.jpg</code> you typed.</p>
+        <p><strong>WebP goes in but not out.</strong> macOS ships a WebP decoder and no encoder, so renaming <em>to</em> <code>.webp</code> is refused outright rather than producing something broken.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span class="box"></span><span class="name">Video and audio</span><span class="box zoom"></span></div>
+    <div class="wbody">
+      <div class="tw"><table class="mx">
+        <thead><tr><th><span>From</span></th><th><span>MOV</span></th><th><span>MP4</span></th><th><span>M4V</span></th><th><span>M4A</span></th><th><span>WAV</span></th><th><span>AIFF</span></th><th><span>MP3</span></th></tr></thead>
+        <tbody>
+          <tr><td>MOV · MP4 · M4V</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="p">○</td></tr>
+          <tr><td>M4A · WAV · AIFF · MP3</td><td class="n">–</td><td class="n">–</td><td class="n">–</td><td class="y">●</td><td class="y">●</td><td class="y">●</td><td class="p">○</td></tr>
+        </tbody>
+      </table></div>
+      <div class="cols">
+        <p>Video to video normally copies the existing streams instead of re-encoding, so it is fast and loses nothing. Video to audio extracts the soundtrack. Audio cannot become video.</p>
+        <div>
+          <p><strong>○ MP3 needs a helper.</strong> macOS ships an MP3 decoder but no encoder, so suffix uses <code>ffmpeg</code> or <code>lame</code> when one is installed:</p>
+<pre><code>brew install ffmpeg</code></pre>
+          <p class="small"><code>.m4a</code> is the native equivalent and needs nothing.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span class="box"></span><span class="name">Documents</span><span class="box zoom"></span></div>
+    <div class="wbody">
+      <div class="tw"><table>
+        <thead><tr><th><span>From</span></th><th><span>To PDF</span></th></tr></thead>
+        <tbody>
+          <tr><td>Pages · Keynote · Numbers</td><td><span class="y">●</span> exact — needs that Apple app installed</td></tr>
+          <tr><td>Word · RTF · OpenDocument · HTML · plain text</td><td><span class="p">●</span> approximate</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note">
+        <span class="tag">Before you send it</span>
+        <p>Only iWork files convert exactly, because suffix asks Pages or Keynote to export them. Everything else is re-laid-out by macOS's own text engine: text and basic formatting survive, but tables, columns, headers and footers, and exact pagination do not. Suffix says so on the notice — check the result.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span class="box"></span><span class="name">What it never touches</span><span class="box zoom"></span></div>
+    <div class="wbody">
+      <p>Archives, code, spreadsheets, other applications' libraries, and anything whose contents are not a format above. A <code>.zip</code> renamed to <code>.png</code> is left exactly as it is, and your Photos library is never opened — it is a database, not loose files, and writing into it would break it.</p>
+    </div>
+  </div>
+</div>
+<div class="desk" style="padding-top:0">
+  <div class="trashline">
+    <footer>
+      suffix · mit licensed · built for macOS ·
+      <a href="https://github.com/PewPewBiches/Suffix">source</a> ·
+      <a href="https://github.com/PewPewBiches/Suffix/releases/latest">download</a> ·
+      <a href="https://github.com/PewPewBiches/Suffix/issues">report a problem</a>
+    </footer>
+    <span class="bin" aria-hidden="true"><i></i><i></i></span>
+  </div>
+</div>
+
 <script>
-  // Mark the current page in the nav.
-  const here = document.body.dataset.page;
-  document.querySelectorAll('nav.top .links a[data-page]').forEach(a => {
-    if (a.dataset.page === here) a.setAttribute('aria-current', 'page');
+// Menu-bar menus, as they behaved: click to open, click away to close.
+(function () {
+  const items = [...document.querySelectorAll('.menubar .item[data-menu]')];
+  const closeAll = () => items.forEach(i => {
+    i.setAttribute('aria-expanded', 'false');
+    i.querySelector('.menu')?.classList.remove('open');
   });
+  items.forEach(item => {
+    const open = e => {
+      e.preventDefault(); e.stopPropagation();
+      const wasOpen = item.getAttribute('aria-expanded') === 'true';
+      closeAll();
+      if (!wasOpen) {
+        item.setAttribute('aria-expanded', 'true');
+        item.querySelector('.menu').classList.add('open');
+      }
+    };
+    item.addEventListener('click', open);
+    item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') open(e); });
+  });
+  document.addEventListener('click', closeAll);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+})();
 </script>
 </body>
 </html>
