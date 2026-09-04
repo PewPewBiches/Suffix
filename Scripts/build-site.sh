@@ -6,7 +6,11 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-HEAD=$(cat site/partials/head.html)
+# Stamp the stylesheet link with the content hash. Without it browsers keep
+# serving the previous CSS after a deploy, which looks exactly like the change
+# never shipped — it cost an afternoon once.
+VERSION=$(shasum -a 1 site/style.css | cut -c1-10)
+HEAD=$(sed "s/__VERSION__/$VERSION/" site/partials/head.html)
 NAV=$(cat site/partials/nav.html)
 FOOT=$(cat site/partials/foot.html)
 
