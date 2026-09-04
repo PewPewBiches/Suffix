@@ -192,7 +192,10 @@ public enum FileFormat: String, Sendable, CaseIterable {
             "/usr/bin/unzip", ["-l", "-qq", url.path]) else { return nil }
         if listing.contains("word/document.xml") { return .docx }
         if listing.contains("mimetypeapplication/vnd.oasis") || listing.contains("content.xml") { return .odt }
-        if listing.contains("Index.zip") || listing.contains("index.xml")
+        // Modern iWork documents carry protobuf .iwa files; older ones a
+        // single Index.zip. Neither contains a PDF, despite what the previous
+        // version of this code assumed.
+        if listing.contains("Index/Document.iwa") || listing.contains("Index.zip")
             || listing.contains("QuickLook/Preview.pdf") { return .pages }
         return nil
     }

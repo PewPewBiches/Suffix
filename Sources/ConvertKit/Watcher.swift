@@ -25,6 +25,21 @@ public final class RenameWatcher {
         "/.build/", "/DerivedData/", "/.Spotlight-V100/", "/.fseventsd/",
     ]
 
+    /// Document packages belonging to other applications.
+    ///
+    /// These look like folders but are one application's private database. A
+    /// Photos library in particular is not a pile of loose pictures — rewriting
+    /// a file inside it corrupts the library, and merely *reading* one raises a
+    /// "would like to access your Photo Library" prompt the app has no business
+    /// asking for.
+    private static let excludedPackages = [
+        ".photoslibrary", ".photolibrary", ".aplibrary",
+        ".musiclibrary", ".tvlibrary", ".imovielibrary", ".theater",
+        ".fcpbundle", ".logicx", ".band", ".sparsebundle",
+        ".app", ".bundle", ".framework", ".xcodeproj", ".xcworkspace",
+        "Photo Booth Library",
+    ]
+
     /// A rename older than this is not acted on.
     ///
     /// When the stream resumes from a stored event id it replays everything
@@ -134,6 +149,16 @@ public final class RenameWatcher {
         handler(URL(fileURLWithPath: path))
     }
 
+    /// Is any folder along this path another application's package?
+    static func isInsideAnotherAppsPackage(_ path: String) -> Bool {
+        // Checked per path component so a file merely *named* like a package
+        // is unaffected — only the folders above it count.
+        let components = (path as NSString).deletingLastPathComponent.split(separator: "/")
+        return components.contains { component in
+            excludedPackages.contains { component.hasSuffix($0) }
+        }
+    }
+
     /// Was this renamed recently enough to act on? Guards the replay of stored
     /// events; a live rename is always well inside the window.
     static func isRecent(path: String) -> Bool {
@@ -150,6 +175,7 @@ public final class RenameWatcher {
     static func isEligible(path: String) -> Bool {
         if excludedPrefixes.contains(where: path.hasPrefix) { return false }
         if excludedFragments.contains(where: path.contains) { return false }
+        if isInsideAnotherAppsPackage(path) { return false }
         let name = (path as NSString).lastPathComponent
         if name.hasPrefix(".") { return false }
         // Only extensions we could actually convert to are worth a look.

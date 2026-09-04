@@ -1,6 +1,7 @@
 import Testing
 import Foundation
 import ImageIO
+import AppKit
 import UniformTypeIdentifiers
 @testable import ConvertKit
 
@@ -332,4 +333,90 @@ func planIncompatible() {
     #expect(plan(source: .mp4, ext: "png") == .failure(.incompatible(from: .mp4, to: .png)))
     #expect(plan(source: .docx, ext: "jpg") == .failure(.incompatible(from: .docx, to: .jpeg)))
     #expect(plan(source: .png, ext: "mp4") == .failure(.incompatible(from: .png, to: .mp4)))
+}
+
+// MARK: - Reading text out of pictures
+
+/// Draw known words into an image, so what OCR should return is not in doubt.
+private func makeTextImage(_ lines: [String], named name: String) throws -> URL {
+    let dir = FileManager.default.temporaryDirectory
+        .appendingPathComponent("ConvertKitTests/\(UUID().uuidString)")
+    try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    let url = dir.appendingPathComponent(name)
+
+    let size = NSSize(width: 800, height: CGFloat(80 + lines.count * 60))
+    let image = NSImage(size: size)
+    image.lockFocus()
+    NSColor.white.setFill()
+    NSRect(origin: .zero, size: size).fill()
+    var y = size.height - 70
+    for line in lines {
+        (line as NSString).draw(at: NSPoint(x: 40, y: y), withAttributes: [
+            .font: NSFont.systemFont(ofSize: 34),
+            .foregroundColor: NSColor.black,
+        ])
+        y -= 58
+    }
+    image.unlockFocus()
+
+    let rep = NSBitmapImageRep(data: image.tiffRepresentation!)!
+    try rep.representation(using: .png, properties: [:])!.write(to: url)
+    return url
+}
+
+@Test("an image of words becomes those words")
+func ocrReadsAnImage() throws {
+    let url = try makeTextImage(["Total due 4200", "Due on Friday"], named: "note.png")
+    let text = try TextRecognizer.text(inImageAt: url)
+    #expect(text.contains("Total due 4200"))
+    #expect(text.contains("Due on Friday"))
+}
+
+@Test("renaming a picture to .txt is planned as text recognition")
+func planImageToText() throws {
+    #expect(try plan(source: .png, ext: "txt").get() == .imageToText(from: .png))
+    #expect(try plan(source: .heic, ext: "txt").get() == .imageToText(from: .heic))
+}
+
+@Test("a picture with no words in it says so rather than writing an empty file")
+func ocrEmptyImage() throws {
+    // A plain grey square: nothing to read.
+    let url = try makeImage(.png, named: "blank.png")
+    let text = try TextRecognizer.text(inImageAt: url)
+    #expect(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+}
+
+@Test("a scanned PDF falls back to reading the pages")
+func ocrScannedPDF() throws {
+    // An image wrapped in a PDF has no text layer, which is what a scan is.
+    let image = try makeTextImage(["Scanned heading", "Second line here"], named: "page.pdf")
+    let wrap = try plan(source: .png, ext: "pdf").get()
+    _ = try Converter(options: .init(keepOriginal: false)).run(wrap, on: image)
+
+    let text = try TextRecognizer.text(inPDFAt: image)
+    #expect(text.contains("Scanned heading"))
+}
+
+@Test("iWork documents are recognised, and count as a faithful conversion")
+func planPagesIsFaithful() throws {
+    let p = try plan(source: .pages, ext: "pdf").get()
+    #expect(p == .documentToPDF(from: .pages, faithful: true))
+    #expect(!p.isApproximate)
+}
+
+@Test("other applications' libraries are left alone entirely")
+func watcherSkipsAppPackages() {
+    let home = NSHomeDirectory()
+    // Reading inside a Photos library raises a permission prompt and rewriting
+    // anything in it corrupts the library.
+    #expect(!RenameWatcher.isEligible(
+        path: "\(home)/Pictures/Photos Library.photoslibrary/originals/4/IMG_1.jpeg"))
+    #expect(!RenameWatcher.isEligible(
+        path: "\(home)/Pictures/Photo Booth Library/Pictures/Movie.mov"))
+    #expect(!RenameWatcher.isEligible(path: "/Applications/Some.app/Contents/Resources/icon.png"))
+    #expect(!RenameWatcher.isEligible(path: "\(home)/Movies/Film.fcpbundle/x/clip.mov"))
+
+    // A file whose own name resembles a package is still fair game.
+    #expect(RenameWatcher.isEligible(path: "\(home)/Desktop/notes.app.png"))
+    #expect(RenameWatcher.isEligible(path: "\(home)/Desktop/holiday.png"))
 }

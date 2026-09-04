@@ -92,7 +92,7 @@ public final class ConversionService: @unchecked Sendable {
         let originalName = url.lastPathComponent
         let result: ConversionResult
         switch plan {
-        case .media, .documentToPDF, .pdfToText:
+        case .media, .documentToPDF, .pdfToText, .imageToText:
             result = try await performOutOfProcess(plan, on: url, progress: progress)
         default:
             result = try Converter(options: options).run(plan, on: url)
@@ -166,7 +166,11 @@ public final class ConversionService: @unchecked Sendable {
             }
         case .pdfToText:
             try await MainActor.run {
-                try DocumentConverter().toText(url, destination: scratch)
+                try DocumentConverter().toText(url, destination: scratch, progress: progress)
+            }
+        case .imageToText:
+            try await MainActor.run {
+                try DocumentConverter().toText(image: url, destination: scratch)
             }
         default:
             throw ConversionError.encodingFailed(target ?? .pdf)

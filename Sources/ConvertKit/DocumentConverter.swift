@@ -15,14 +15,14 @@ public struct DocumentConverter {
 
     /// Formats whose PDF output is a faithful rendering rather than a re-flow.
     public static func isFaithful(_ format: FileFormat) -> Bool {
-        // A Pages file carries a PDF made by Pages itself, so it matches
+        // An iWork document is exported by the app that made it, so it matches
         // exactly. Everything else is re-laid-out by AppKit.
         format == .pages
     }
 
     public func toPDF(_ url: URL, from source: FileFormat, destination: URL) throws {
         if source == .pages {
-            try Self.extractPagesPreview(url, to: destination)
+            try IWorkExport.toPDF(url, destination: destination)
             return
         }
 
@@ -55,10 +55,18 @@ public struct DocumentConverter {
         guard operation.run() else { throw ConversionError.encodingFailed(.pdf) }
     }
 
-    /// Pull the readable text out of a PDF.
-    public func toText(_ url: URL, destination: URL) throws {
-        guard let document = PDFDocument(url: url) else { throw ConversionError.cannotRead(url) }
-        guard let text = document.string, !text.isEmpty else {
+    /// Pull the readable text out of a PDF, reading the pages with OCR when
+    /// there is no text layer — which is the case for anything scanned.
+    public func toText(_ url: URL, destination: URL,
+                       progress: (@Sendable (Double) -> Void)? = nil) throws {
+        let text = try TextRecognizer.text(inPDFAt: url, progress: progress)
+        try text.write(to: destination, atomically: true, encoding: .utf8)
+    }
+
+    /// Read the words out of a picture.
+    public func toText(image url: URL, destination: URL) throws {
+        let text = try TextRecognizer.text(inImageAt: url)
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             throw ConversionError.noTextFound
         }
         try text.write(to: destination, atomically: true, encoding: .utf8)
@@ -73,30 +81,5 @@ public struct DocumentConverter {
         case .html: return .html
         default:    return .plain
         }
-    }
-
-    /// A .pages file is a zip that usually carries a PDF preview written by
-    /// Pages itself — perfect fidelity, and no need to drive the app.
-    static func extractPagesPreview(_ url: URL, to destination: URL) throws {
-        let staging = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString)
-        defer { try? FileManager.default.removeItem(at: staging) }
-
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/unzip")
-        process.arguments = ["-q", "-o", "-j", url.path, "QuickLook/Preview.pdf", "-d", staging.path]
-        process.standardError = Pipe()
-        process.standardOutput = Pipe()
-        try process.run()
-        process.waitUntilExit()
-
-        let preview = staging.appendingPathComponent("Preview.pdf")
-        guard FileManager.default.fileExists(atPath: preview.path) else {
-            throw ConversionError.noPagesPreview
-        }
-        if FileManager.default.fileExists(atPath: destination.path) {
-            try FileManager.default.removeItem(at: destination)
-        }
-        try FileManager.default.moveItem(at: preview, to: destination)
     }
 }

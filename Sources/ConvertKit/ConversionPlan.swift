@@ -17,8 +17,10 @@ public enum ConversionPlan: Equatable, Sendable {
     case media(from: FileFormat, to: FileFormat, seconds: Double)
     /// Lay a word-processing document out as a PDF.
     case documentToPDF(from: FileFormat, faithful: Bool)
-    /// Pull the text out of a PDF.
+    /// Pull the text out of a PDF, reading the pages if it has no text layer.
     case pdfToText
+    /// Read the words out of a picture.
+    case imageToText(from: FileFormat)
 
     /// Conversions we refuse, each with a reason worth showing the user.
     public enum Refusal: Error, Equatable, Sendable {
@@ -63,6 +65,8 @@ public enum ConversionPlan: Equatable, Sendable {
                 : ConversionPlan.pdfToImageArchive(to: target, pages: pages))
         case (.pdf, .document) where target == .txt:
             return .success(ConversionPlan.pdfToText)
+        case (.image, .document) where target == .txt:
+            return .success(ConversionPlan.imageToText(from: source))
         case (.document, .pdf):
             return .success(ConversionPlan.documentToPDF(
                 from: source, faithful: source == .pages))
@@ -106,6 +110,7 @@ public enum ConversionPlan: Equatable, Sendable {
         case .media(let f, let t, _):        return "\(f.displayName) → \(t.displayName)"
         case .documentToPDF(let f, _):       return "\(f.displayName) → PDF"
         case .pdfToText:                     return "PDF → Text"
+        case .imageToText(let f):            return "\(f.displayName) → Text"
         }
     }
 }

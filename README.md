@@ -80,12 +80,33 @@ Rather than bundle an encoder, Suffix looks for one. Nothing to ship, nothing to
 license, and most people who want MP3 already have it. If you don't, `.m4a` is
 the native equivalent and needs nothing.
 
+### Text out of pictures
+
+Rename a screenshot to `.txt` and you get the words in it:
+
+```
+receipt.png  →  receipt.txt
+```
+
+This uses the Vision framework built into macOS — no service, no upload, no
+account. It also rescues **scanned PDFs**: `scan.pdf → scan.txt` reads the pages
+when there is no text layer to extract.
+
 ### Documents
 
 | From | To PDF |
 |---|---|
-| **Pages** | ● exact — uses the PDF preview Pages itself saved |
+| **Pages, Keynote, Numbers** | ● exact — but needs that Apple app installed |
 | **Word (.docx, .doc)**, **RTF**, **OpenDocument**, **HTML**, **plain text** | ● approximate |
+
+An iWork document contains no PDF — only protobuf `.iwa` data and JPEG previews
+— so Suffix asks Pages, Keynote or Numbers to export it. If none is installed it
+says so rather than guessing.
+
+Those apps are addressed by **bundle identifier**, never by name. `tell
+application "Pages"` resolves through Launch Services and will hand your
+document to any app that has claimed the name — which on one test machine meant
+a third-party app registering Apple's own identifier.
 
 **Read this before converting a document you intend to send.** Everything except
 Pages is re-laid-out by macOS's own text engine, not by Word. Text and basic
