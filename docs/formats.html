@@ -25,40 +25,20 @@
       <hr>
       <a href="https://github.com/PewPewBiches/Suffix/releases/latest">Download suffix</a>
       <a href="https://github.com/PewPewBiches/Suffix">Source on GitHub</a>
-    </div>
-  </div>
-
-  <div class="item" data-menu="file" aria-expanded="false" role="button" tabindex="0">File
-    <div class="menu" id="m-file">
-      <a href="index.html">Overview</a>
-      <a href="features.html">Features</a>
-      <a href="formats.html">Formats</a>
-      <hr>
-      <a href="https://github.com/PewPewBiches/Suffix/releases/latest">Get suffix…</a>
-    </div>
-  </div>
-
-  <div class="item hide" data-menu="edit" aria-expanded="false" role="button" tabindex="0">Edit
-    <div class="menu" id="m-edit">
-      <span>Undo Rename</span>
-      <span>Cut</span>
-      <span>Copy</span>
-      <hr>
-      <a href="features.html">Rename…</a>
-    </div>
-  </div>
-
-  <div class="item" data-menu="special" aria-expanded="false" role="button" tabindex="0">Special
-    <div class="menu" id="m-special">
-      <a href="trust.html">What it can reach</a>
-      <a href="changelog.html">Changelog</a>
-      <hr>
       <a href="https://github.com/PewPewBiches/Suffix/issues">Report a problem…</a>
     </div>
   </div>
 
+  <!-- The pages themselves, not a File/Edit/Special costume. Each one goes
+       somewhere; a menu bar whose items do nothing is worse than no menu bar. -->
+  <a class="item" href="index.html" data-page="index">Overview</a>
+  <a class="item" href="features.html" data-page="features">Features</a>
+  <a class="item" href="formats.html" data-page="formats">Formats</a>
+  <a class="item" href="trust.html" data-page="trust">Trust</a>
+  <a class="item" href="changelog.html" data-page="changelog">Changelog</a>
+
   <span class="spacer"></span>
-  <span class="right">suffix</span>
+  <a class="item hide" href="https://github.com/PewPewBiches/Suffix">GitHub</a>
 </div>
 
 <div class="desk">
@@ -147,28 +127,28 @@
 </div>
 
 <script>
-// Menu-bar menus, as they behaved: click to open, click away to close.
 (function () {
-  const items = [...document.querySelectorAll('.menubar .item[data-menu]')];
-  const closeAll = () => items.forEach(i => {
-    i.setAttribute('aria-expanded', 'false');
-    i.querySelector('.menu')?.classList.remove('open');
-  });
-  items.forEach(item => {
-    const open = e => {
+  // The Apple menu drops down; every other item is a plain link.
+  const apple = document.querySelector('.menubar .item[data-menu]');
+  if (apple) {
+    const menu = apple.querySelector('.menu');
+    const close = () => { apple.setAttribute('aria-expanded', 'false'); menu.classList.remove('open'); };
+    const toggle = e => {
       e.preventDefault(); e.stopPropagation();
-      const wasOpen = item.getAttribute('aria-expanded') === 'true';
-      closeAll();
-      if (!wasOpen) {
-        item.setAttribute('aria-expanded', 'true');
-        item.querySelector('.menu').classList.add('open');
-      }
+      const open = apple.getAttribute('aria-expanded') === 'true';
+      apple.setAttribute('aria-expanded', String(!open));
+      menu.classList.toggle('open', !open);
     };
-    item.addEventListener('click', open);
-    item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') open(e); });
+    apple.addEventListener('click', toggle);
+    apple.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') toggle(e); });
+    document.addEventListener('click', close);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  }
+  // Mark the page you are on.
+  const here = document.body.dataset.page;
+  document.querySelectorAll('.menubar a[data-page]').forEach(a => {
+    if (a.dataset.page === here) a.setAttribute('aria-current', 'page');
   });
-  document.addEventListener('click', closeAll);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
 })();
 </script>
 </body>

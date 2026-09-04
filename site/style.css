@@ -24,7 +24,8 @@
   --data:'IBM Plex Mono',ui-monospace,Menlo,monospace;
 
   /* The 1984 pointer, drawn pixel by pixel. */
-  --arrow:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAZUlEQVR42uXWMQ4AIAgDwP7/07rohi4CbSNJV7iEAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwuwGZBAABp7wV7wAAAABJRU5ErkJggg==");
+  --arrow1x:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAT0lEQVR42q3SOwoAIAwE0b3/pUcsBAlqfg7YmVeESBJqRhdh1kFYVRH2Kgi2LMKpDMKtKMKrCIKXh7yG7PPvoLzEbSC/RPOxBHw/b0WWNxvPLvkHxp4OMgAAAABJRU5ErkJggg==");
+  --arrow2x:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAZUlEQVR42uXWMQ4AIAgDwP7/07rohi4CbSNJV7iEAQBgrNBKBkCDaAB2MSBaAAZEE9AJ0QZ0QDwAlRAvQAXEE5AJ8QZkQLwAwQNzijmg80xrAYIB5RANwKXhPwDa80oHvK7MGzABFbjkRhmWL8IAAAAASUVORK5CYII=");
 }
 
 *{box-sizing:border-box}
@@ -42,10 +43,10 @@ body{
     linear-gradient(45deg,#8E8E8E 25%,transparent 25%,transparent 75%,#8E8E8E 75%);
   background-size:4px 4px;
   background-position:0 0,2px 2px;
-  cursor:var(--arrow) 0 0, default;
+  cursor:image-set(var(--arrow1x) 1x, var(--arrow2x) 2x) 0 0, default;
 }
 a{color:var(--black)}
-button,a,summary{cursor:var(--arrow) 0 0, default}
+button,a,summary,.item,.btn{cursor:image-set(var(--arrow1x) 1x, var(--arrow2x) 2x) 0 0, default}
 
 /* ── menu bar ─────────────────────────────────────────── */
 .menubar{
@@ -59,7 +60,8 @@ button,a,summary{cursor:var(--arrow) 0 0, default}
   display:flex;align-items:center;padding:0 11px;position:relative;
   text-decoration:none;color:var(--black);
 }
-.menubar .item:hover,.menubar .item[aria-expanded="true"]{background:var(--black);color:var(--white)}
+.menubar .item:hover,.menubar .item[aria-expanded="true"],
+.menubar a[aria-current="page"]{background:var(--black);color:var(--white)}
 .menubar .item:hover .rainbow i,.menubar .item[aria-expanded="true"] .rainbow i{opacity:.9}
 .menubar .spacer{margin-left:auto}
 .menubar .right{display:flex;align-items:center;padding:0 8px;font-size:11px;color:var(--dim)}
@@ -90,7 +92,7 @@ button,a,summary{cursor:var(--arrow) 0 0, default}
 @media(max-width:620px){.menubar .hide{display:none}}
 
 /* ── windows ──────────────────────────────────────────── */
-.desk{max-width:1080px;margin:0 auto;padding:26px 20px 70px}
+.desk{max-width:min(1560px,94vw);margin:0 auto;padding:24px 0 70px}
 @media(max-width:620px){.desk{padding:16px 12px 48px}}
 
 .win{
@@ -165,6 +167,17 @@ pre{
   margin:4px 6px;
 }
 .btns{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin:18px 0 0}
+/* The six-colour apple, drawn rather than typed — U+F8FF only renders on
+   Apple platforms, and this button is the one thing everyone must be able
+   to read. */
+.applemark{
+  display:inline-flex;flex-direction:column;gap:1px;
+  width:9px;height:11px;vertical-align:-1px;margin-right:8px;
+}
+.applemark::before,.applemark::after{content:"";display:block;flex:1;border-radius:1px}
+.applemark::before{background:linear-gradient(var(--g) 0 33%, var(--y) 33% 66%, var(--o) 66% 100%)}
+.applemark::after{background:linear-gradient(var(--r) 0 33%, var(--p) 33% 66%, var(--b) 66% 100%)}
+.btn.default:active .applemark{filter:brightness(1.6)}
 
 /* ── layout helpers ───────────────────────────────────── */
 .cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px}
