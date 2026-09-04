@@ -106,10 +106,16 @@ public enum IWorkExport {
         (["com.apple.Numbers", "com.apple.iWork.Numbers"], "numbers"),
     ]
 
-    public static func toPDF(_ source: URL, destination: URL) throws {
+    public static func toPDF(_ source: URL, from format: FileFormat = .pages,
+                             destination: URL) throws {
         var firstError: String?
 
-        for app in apps {
+        // The app that made the document goes first; the others remain as a
+        // fallback for anything the index didn't identify.
+        let preferred = format.preferredExtension
+        let ordered = apps.sorted { a, _ in a.ext == preferred }
+
+        for app in ordered {
             guard let id = app.ids.first(where: isInstalled) else { continue }
             let wasRunning = isRunning(id)
             let staged = try stage(source, extension: app.ext)

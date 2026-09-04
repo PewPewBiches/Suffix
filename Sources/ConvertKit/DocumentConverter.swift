@@ -17,12 +17,12 @@ public struct DocumentConverter {
     public static func isFaithful(_ format: FileFormat) -> Bool {
         // An iWork document is exported by the app that made it, so it matches
         // exactly. Everything else is re-laid-out by AppKit.
-        format == .pages
+        format.isIWork
     }
 
     public func toPDF(_ url: URL, from source: FileFormat, destination: URL) throws {
-        if source == .pages {
-            try IWorkExport.toPDF(url, destination: destination)
+        if source.isIWork {
+            try IWorkExport.toPDF(url, from: source, destination: destination)
             return
         }
 

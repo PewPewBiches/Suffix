@@ -137,11 +137,11 @@ func backupKeepsRealExtension() throws {
 
 @Test("pruning removes stale originals and keeps fresh ones")
 func pruning() throws {
+    // Its own directory, passed in — swapping the shared one raced with any
+    // test reading it at the same time, which made this suite flaky.
     let root = FileManager.default.temporaryDirectory
         .appendingPathComponent("ConvertKitTests/prune-\(UUID().uuidString)")
-    let saved = OriginalsStore.root
-    OriginalsStore.root = root
-    defer { OriginalsStore.root = saved; try? FileManager.default.removeItem(at: root) }
+    defer { try? FileManager.default.removeItem(at: root) }
 
     let fm = FileManager.default
     let old = root.appendingPathComponent("2020-01-01")
@@ -149,7 +149,7 @@ func pruning() throws {
     try fm.createDirectory(at: old, withIntermediateDirectories: true)
     try fm.createDirectory(at: new, withIntermediateDirectories: true)
 
-    OriginalsStore.prune()
+    OriginalsStore.prune(in: root)
     #expect(!fm.fileExists(atPath: old.path))
     #expect(fm.fileExists(atPath: new.path))
 }
@@ -419,4 +419,27 @@ func watcherSkipsAppPackages() {
     // A file whose own name resembles a package is still fair game.
     #expect(RenameWatcher.isEligible(path: "\(home)/Desktop/notes.app.png"))
     #expect(RenameWatcher.isEligible(path: "\(home)/Desktop/holiday.png"))
+}
+
+@Test("Keynote and Pages files are told apart, not lumped together")
+func iWorkKindsAreDistinguished() throws {
+    // All three apps produce near-identical zips; only the index differs.
+    // Getting this wrong hands the document to the wrong app.
+    #expect(FileFormat.pages.isIWork)
+    #expect(FileFormat.key.isIWork)
+    #expect(FileFormat.numbers.isIWork)
+    #expect(!FileFormat.docx.isIWork)
+
+    #expect(FileFormat.forExtension("key") == .key)
+    #expect(FileFormat.forExtension("numbers") == .numbers)
+    #expect(FileFormat.key.displayName == "Keynote")
+
+    // Each converts exactly, because its own app does the exporting.
+    for kind in [FileFormat.pages, .key, .numbers] {
+        let p = try plan(source: kind, ext: "pdf").get()
+        #expect(p == .documentToPDF(from: kind, faithful: true))
+        #expect(!p.isApproximate)
+    }
+    // Word is still a re-flow, and still says so.
+    #expect(try plan(source: .docx, ext: "pdf").get().isApproximate)
 }

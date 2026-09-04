@@ -43,7 +43,11 @@ public enum OriginalsStore {
     }
 
     /// Delete stashed originals older than `retention`.
-    public static func prune(now: Date = Date()) {
+    ///
+    /// Takes the directory rather than reading the shared one, so a caller —
+    /// a test especially — can work on its own without mutating global state
+    /// that another concurrent caller is reading.
+    public static func prune(in root: URL = OriginalsStore.root, now: Date = Date()) {
         let fm = FileManager.default
         guard let days = try? fm.contentsOfDirectory(at: root, includingPropertiesForKeys: nil) else { return }
         for day in days {
@@ -55,7 +59,7 @@ public enum OriginalsStore {
     }
 
     /// Total bytes currently held, for display in settings.
-    public static func size() -> Int64 {
+    public static func size(in root: URL = OriginalsStore.root) -> Int64 {
         guard let e = FileManager.default.enumerator(
             at: root, includingPropertiesForKeys: [.fileSizeKey]) else { return 0 }
         var total: Int64 = 0

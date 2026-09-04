@@ -69,7 +69,7 @@ public enum ConversionPlan: Equatable, Sendable {
             return .success(ConversionPlan.imageToText(from: source))
         case (.document, .pdf):
             return .success(ConversionPlan.documentToPDF(
-                from: source, faithful: source == .pages))
+                from: source, faithful: source.isIWork))
         case (.video, .video), (.video, .audio), (.audio, .audio):
             return .success(ConversionPlan.media(from: source, to: target,
                                                  seconds: mediaSeconds()))

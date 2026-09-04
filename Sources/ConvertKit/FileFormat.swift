@@ -18,7 +18,7 @@ public enum FileFormat: String, Sendable, CaseIterable {
     // Audio
     case m4a, mp3, wav, aiff
     // Word-processing documents
-    case docx, doc, rtf, odt, html, txt, pages
+    case docx, doc, rtf, odt, html, txt, pages, key, numbers
 
     public var family: Family {
         switch self {
@@ -26,7 +26,8 @@ public enum FileFormat: String, Sendable, CaseIterable {
         case .pdf:                                          return .pdf
         case .mov, .mp4, .m4v:                              return .video
         case .m4a, .mp3, .wav, .aiff:                       return .audio
-        case .docx, .doc, .rtf, .odt, .html, .txt, .pages:  return .document
+        case .docx, .doc, .rtf, .odt, .html, .txt,
+             .pages, .key, .numbers:                        return .document
         }
     }
 
@@ -55,6 +56,8 @@ public enum FileFormat: String, Sendable, CaseIterable {
         case .html: return ["html", "htm"]
         case .txt:  return ["txt", "text"]
         case .pages: return ["pages"]
+        case .key:   return ["key", "keynote"]
+        case .numbers: return ["numbers"]
         }
     }
 
@@ -73,6 +76,8 @@ public enum FileFormat: String, Sendable, CaseIterable {
         case .html: return "HTML"
         case .txt:  return "Text"
         case .pages: return "Pages"
+        case .key:   return "Keynote"
+        case .numbers: return "Numbers"
         default:    return rawValue.uppercased()
         }
     }
@@ -105,9 +110,16 @@ public enum FileFormat: String, Sendable, CaseIterable {
     /// separately so the refusal can say what to install.
     public var isWritable: Bool {
         switch self {
-        case .webp, .docx, .doc, .odt, .html, .pages, .rtf: return false
+        case .webp, .docx, .doc, .odt, .html, .rtf,
+             .pages, .key, .numbers: return false
         default: return true
         }
+    }
+
+    /// Pages, Keynote and Numbers documents, which only their own app can
+    /// export faithfully.
+    public var isIWork: Bool {
+        self == .pages || self == .key || self == .numbers
     }
 
     /// True for formats macOS itself cannot encode, needing an outside tool.
@@ -195,8 +207,18 @@ public enum FileFormat: String, Sendable, CaseIterable {
         // Modern iWork documents carry protobuf .iwa files; older ones a
         // single Index.zip. Neither contains a PDF, despite what the previous
         // version of this code assumed.
-        if listing.contains("Index/Document.iwa") || listing.contains("Index.zip")
-            || listing.contains("QuickLook/Preview.pdf") { return .pages }
+        //
+        // Which of the three apps made it shows in the index: only Keynote has
+        // slides, only Numbers has sheets. Getting this right matters because
+        // the document has to be handed back to the app that made it.
+        let isIWork = listing.contains("Index/Document.iwa")
+            || listing.contains("Index.zip")
+            || listing.contains("QuickLook/Preview.pdf")
+        if isIWork {
+            if listing.contains("Index/Slide") { return .key }
+            if listing.contains("Index/Sheet") { return .numbers }
+            return .pages
+        }
         return nil
     }
 }
