@@ -19,7 +19,7 @@
             match. No upload, no website, no app to open.
           </p>
           <div class="btns">
-            <a class="btn default" href="https://github.com/PewPewBiches/Suffix/releases/latest"><span class="applemark" aria-hidden="true"></span>Download for Mac</a>
+            <a class="btn default" href="download.html"><svg class="applelogo" viewBox="0 0 100 122" aria-hidden="true"><defs><clipPath id="ap"><path d="M74.6 64.9c-.1-11.5 9.4-17 9.8-17.3-5.3-7.8-13.6-8.9-16.6-9-7-.7-13.8 4.1-17.3 4.1-3.6 0-9.1-4-14.9-3.9-7.7.1-14.7 4.5-18.6 11.3-8 13.8-2 34.2 5.7 45.4 3.8 5.5 8.4 11.6 14.3 11.4 5.7-.2 7.9-3.7 14.8-3.7s8.9 3.7 14.9 3.6c6.2-.1 10-5.5 13.8-11.1 4.3-6.4 6.1-12.5 6.2-12.8-.1-.1-11.9-4.6-12.1-18z"/><path d="M63.3 30.9c3.1-3.8 5.2-9.2 4.6-14.5-4.5.2-10 3-13.2 6.8-2.9 3.4-5.4 8.8-4.7 13.9 5 .4 10.2-2.5 13.3-6.2z"/></clipPath></defs><g clip-path="url(#ap)"><rect y="0"    width="100" height="21" fill="#61BB46"/><rect y="21"   width="100" height="20" fill="#FDB827"/><rect y="41"   width="100" height="20" fill="#F5821F"/><rect y="61"   width="100" height="20" fill="#E03A3E"/><rect y="81"   width="100" height="20" fill="#963D97"/><rect y="101"  width="100" height="21" fill="#009DDC"/></g></svg>Download for Mac</a>
             <a class="btn" href="features.html">What it does</a>
           </div>
           <p class="small" style="margin-top:16px">macOS 14 or later · free · nothing leaves your Mac</p>
@@ -90,6 +90,52 @@
               <tr><td class="f">rename <span class="sel">.pdf</span></td><td style="text-align:right"><strong>1</strong></td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="win">
+    <div class="titlebar">
+      <span class="box"></span>
+      <span class="name">Practice folder</span>
+      <span class="box zoom"></span>
+    </div>
+    <div class="wbody">
+      <div class="cols" style="align-items:start">
+        <div>
+          <h2>have a go</h2>
+          <div class="rule"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <p>
+            These files are not real, but the rules are. Click a name, change
+            what comes after the dot, press Return. The same answers the app
+            would give — including the times it says no.
+          </p>
+          <p class="small dim">
+            Worth trying: <span class="mono">receipt.png</span> → .txt,
+            <span class="mono">clip.mov</span> → .mp3,
+            <span class="mono">manual.pdf</span> → .docx.
+          </p>
+
+          <div class="s7alert" id="s7">
+            <span class="ico" id="s7ico">!</span>
+            <span><span class="msg" id="s7msg"></span><span class="why" id="s7why"></span></span>
+          </div>
+        </div>
+
+        <div class="win finder play" style="margin:0;background:var(--white)">
+          <div class="titlebar">
+            <span class="box"></span>
+            <span class="name">Practice</span>
+            <span class="box zoom"></span>
+          </div>
+          <div class="head-row"><span>Name</span><span>Size</span><span>Kind</span></div>
+          <div class="list" id="playlist"></div>
+          <div class="playbar">
+            <span id="tally">nothing converted yet</span>
+            <span class="score" id="hint">click a name to rename it</span>
+          </div>
         </div>
       </div>
     </div>
@@ -194,5 +240,173 @@ cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
     if (e.isIntersecting && !running) { running = true; while (running) await cycle(); }
     if (!e.isIntersecting) running = false;
   }, { threshold: .2 }).observe(row);
+})();
+</script>
+
+<script>
+/* ── the practice folder ──────────────────────────────────────────────
+   A playable copy of the app's decision: look at what the file is,
+   look at what it was renamed to, and answer. The answers below are
+   the real ones, including the refusals — a demo that only ever says
+   yes teaches the wrong thing. */
+(function () {
+  const list = document.getElementById('playlist');
+  if (!list) return;
+
+  const FAM = {
+    png:'image', jpg:'image', jpeg:'image', heic:'image', tiff:'image',
+    gif:'image', bmp:'image', webp:'image',
+    pdf:'pdf',
+    mov:'video', mp4:'video', m4v:'video',
+    m4a:'audio', mp3:'audio', wav:'audio', aiff:'audio',
+    docx:'doc', pages:'doc', key:'doc', numbers:'doc', rtf:'doc',
+    txt:'text', zip:'zip',
+  };
+  const KIND = { image:'picture', pdf:'document', video:'movie', audio:'sound',
+                 doc:'document', text:'plain text', zip:'archive' };
+
+  const files = [
+    { name:'receipt',  ext:'png',  size:'1.4 MB',  fam:'image' },
+    { name:'manual',   ext:'pdf',  size:'3.1 MB',  fam:'pdf'   },
+    { name:'clip',     ext:'mov',  size:'18.2 MB', fam:'video' },
+    { name:'deck',     ext:'key',  size:'6.7 MB',  fam:'doc'   },
+    { name:'notes',    ext:'docx', size:'88 KB',   fam:'doc'   },
+  ];
+
+  let picked = -1, editing = false, wins = 0;
+  const seen = new Set();
+
+  /* what the app would actually do */
+  function decide(from, to) {
+    const a = FAM[from], b = FAM[to];
+    if (from === to) return { ok:false, icon:'?', msg:'It is already a <b>.' + to + '</b>.',
+      why:'suffix reads the file, not the name, so renaming it to what it already is does nothing at all.' };
+    if (['exe','dll','msi'].includes(to)) return { ok:false, icon:'☹', msg:'This is a Mac.',
+      why:'And suffix converts files, not operating systems. <a href="windows.html">Windows waitlist →</a>' };
+    if (['app','dmg'].includes(to)) return { ok:false, icon:'☹', msg:'A picture cannot become an application.',
+      why:'Tempting, though. That is roughly how the nineties went.' };
+    if (!b) return { ok:false, icon:'?', msg:'<b>.' + to + '</b> is not a format suffix writes.',
+      why:'<a href="formats.html">Here is everything it does write →</a>' };
+
+    if (to === 'mp3') return { ok:false, icon:'!', msg:'macOS cannot write MP3.',
+      why:'Nothing in the system encodes it. Install ffmpeg (<span class="mono">brew install ffmpeg</span>) and this starts working — the app says so too, rather than failing quietly.' };
+
+    if (a === 'image' && b === 'image') return { ok:true, out:to, icon:'✓',
+      msg:'Re-encoded as <b>.' + to + '</b>.', why:'Same picture, different container.' };
+    if (a === 'image' && b === 'pdf')   return { ok:true, out:'pdf', icon:'✓',
+      msg:'A one-page PDF, the size of the image.', why:'No margins invented, no page it did not have.' };
+    if ((a === 'image' || a === 'pdf') && b === 'text') return { ok:true, out:'txt', icon:'✓',
+      msg:'The words inside it, read out and saved as text.',
+      why:a === 'pdf' ? 'Uses the text layer if the PDF has one, and reads the pixels if it does not.'
+                      : 'Vision does the reading, on your Mac. It is good, not perfect — check names and numbers.' };
+    if (a === 'pdf' && b === 'image')  return { ok:true, out:'zip', icon:'✓',
+      msg:'Every page as a <b>.' + to + '</b>, collected in a .zip.',
+      why:'A 40-page PDF is 40 images, so it does not scatter them across your folder.' };
+    if (a === 'pdf' && b === 'doc')    return { ok:false, icon:'!',
+      msg:'suffix will not pretend to rebuild a document.',
+      why:'A PDF has no paragraphs or styles left in it. Reconstructing them is guesswork, and the guesses look fine until you edit one. Rename it to <b>.txt</b> for the words.' };
+    if (a === 'video' && b === 'video') return { ok:true, out:to, icon:'✓',
+      msg:'Same video, in the container everything accepts.', why:'Passed through where it can be; re-encoded only when it must.' };
+    if (a === 'video' && b === 'audio') return { ok:true, out:to, icon:'✓',
+      msg:'Just the audio, as <b>.' + to + '</b>.', why:'The video track is dropped, not re-encoded into anything.' };
+    if (a === 'audio' && b === 'audio') return { ok:true, out:to, icon:'✓',
+      msg:'Re-encoded as <b>.' + to + '</b>.', why:'Everything but MP3, which macOS cannot write.' };
+    if (a === 'audio' && b === 'video') return { ok:false, icon:'?',
+      msg:'There is no picture in a sound file.', why:'Nothing to put on the screen, so suffix leaves it alone.' };
+    if (a === 'doc' && b === 'pdf')    return { ok:true, out:'pdf', icon:'✓',
+      msg:'Exported to PDF by the app that owns it.',
+      why:'Pages, Keynote and Numbers do their own export in the background, so the result is exactly theirs.' };
+    if (a === 'doc' && b === 'text')   return { ok:true, out:'txt', icon:'✓',
+      msg:'The text, without the formatting.', why:'Via PDF, so page order survives and layout does not.' };
+    if (a === 'doc' && b === 'image')  return { ok:true, out:'zip', icon:'✓',
+      msg:'Each page as a <b>.' + to + '</b>, in a .zip.', why:'Exported to PDF first, then rendered page by page.' };
+
+    return { ok:false, icon:'?', msg:'<b>.' + from + '</b> to <b>.' + to + '</b> is not a conversion suffix makes.',
+      why:'<a href="formats.html">The full matrix is here →</a>' };
+  }
+
+  function say(r) {
+    const box = document.getElementById('s7');
+    document.getElementById('s7ico').textContent = r.icon;
+    document.getElementById('s7msg').innerHTML = r.msg;
+    document.getElementById('s7why').innerHTML = r.why || '';
+    box.classList.remove('on'); void box.offsetWidth; box.classList.add('on');
+  }
+
+  function tally() {
+    const t = document.getElementById('tally');
+    const h = document.getElementById('hint');
+    t.textContent = wins === 0 ? 'nothing converted yet'
+      : wins + (wins === 1 ? ' file converted' : ' files converted') + ' · none of them left this page';
+    if (wins >= 7) h.textContent = 'you are better at this than most file converters';
+    else if (seen.size >= 3) h.textContent = 'the real one does this while you are elsewhere';
+    else h.textContent = 'click a name to rename it';
+  }
+
+  function draw() {
+    list.innerHTML = '';
+    files.forEach((f, i) => {
+      const row = document.createElement('div');
+      row.className = 'row' + (i === picked ? ' on' : '');
+      row.innerHTML =
+        '<span class="nm"><span class="doc" data-k="' + f.ext.toUpperCase() + '"></span>' +
+        '<span class="fname">' + f.name + '<span class="x">.' + f.ext + '</span></span></span>' +
+        '<span class="sz">' + f.size + '</span>' +
+        '<span class="kd">' + (KIND[f.fam] || 'file') + '</span>';
+      row.tabIndex = 0;
+      row.addEventListener('click', e => {
+        // A click inside the field is a click in the field, not on the row.
+        if (e.target.classList.contains('edit')) return;
+        if (picked === i && !editing) edit(i); else { picked = i; editing = false; draw(); }
+      });
+      // Return renames, the way it does in Finder.
+      row.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !editing) { e.preventDefault(); picked = i; edit(i); }
+      });
+      list.appendChild(row);
+    });
+    tally();
+  }
+
+  function edit(i) {
+    editing = true;
+    const row = list.children[i];
+    const slot = row.querySelector('.x');
+    const input = document.createElement('input');
+    input.className = 'edit'; input.value = files[i].ext;
+    input.setAttribute('aria-label', 'new extension for ' + files[i].name);
+    slot.replaceWith(input);
+    input.focus(); input.select();
+
+    const cancel = () => { editing = false; draw(); };
+    input.addEventListener('keydown', e => {
+      if (e.key !== 'Escape' && e.key !== 'Enter') return;
+      // Stop it here. The row listens for Return too, and letting it bubble
+      // reopens the editor the instant you close it.
+      e.preventDefault(); e.stopPropagation();
+      if (e.key === 'Escape') cancel(); else commit(i, input.value);
+    });
+    input.addEventListener('blur', cancel);
+  }
+
+  function commit(i, raw) {
+    editing = false;
+    const to = raw.trim().toLowerCase().replace(/^\.+/, '');
+    if (!to) return draw();
+    const f = files[i];
+    const r = decide(f.ext, to);
+    if (r.ok) {
+      f.ext = r.out; f.fam = FAM[r.out] || 'file';
+      if (r.out === 'zip') { f.size = '2.4 MB'; }
+      wins++; seen.add(to);
+      draw();
+      list.children[i].classList.add('done');
+    } else {
+      draw();
+    }
+    say(r);
+  }
+
+  draw();
 })();
 </script>

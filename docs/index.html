@@ -13,32 +13,48 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/chicagoflf">
-<link rel="stylesheet" href="style.css?v=8d81f24428">
+<link rel="stylesheet" href="style.css?v=5aadb9b701">
 <link rel="icon" href="images/icon-256.png">
+<script>
+  // Before first paint, so the page never flashes the wrong theme.
+  // A stored choice always wins; otherwise follow the Mac's own setting.
+  try {
+    var t = localStorage.getItem('suffix-theme');
+    if (!t && matchMedia('(prefers-color-scheme: dark)').matches) t = 'dark';
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  } catch (e) {}
+</script>
 </head>
 <body data-page="index">
 <div class="menubar">
+  <!-- The Apple menu opens a menu. It does not navigate — that was the whole
+       point of it being a menu, and two things going to the same page is just
+       a broken link with extra steps. -->
   <div class="item" data-menu="apple" aria-expanded="false" role="button" tabindex="0" aria-label="Apple menu">
     <span class="rainbow"><i></i><i></i><i></i><i></i><i></i><i></i></span>
     <div class="menu" id="m-apple">
-      <a href="index.html">About suffix…</a>
+      <a href="#" data-about>About suffix…</a>
       <hr>
-      <a href="https://github.com/PewPewBiches/Suffix/releases/latest">Download suffix</a>
+      <a href="download.html">Get suffix…</a>
+      <a href="windows.html">Windows waitlist…</a>
+      <hr>
       <a href="https://github.com/PewPewBiches/Suffix">Source on GitHub</a>
-      <a href="https://github.com/PewPewBiches/Suffix/issues">Report a problem…</a>
+      <a href="https://github.com/PewPewBiches/Suffix/issues/new">Report a problem…</a>
     </div>
   </div>
 
-  <!-- The pages themselves, not a File/Edit/Special costume. Each one goes
-       somewhere; a menu bar whose items do nothing is worse than no menu bar. -->
   <a class="item" href="index.html" data-page="index">Overview</a>
   <a class="item" href="features.html" data-page="features">Features</a>
   <a class="item" href="formats.html" data-page="formats">Formats</a>
   <a class="item" href="trust.html" data-page="trust">Trust</a>
-  <a class="item" href="changelog.html" data-page="changelog">Changelog</a>
+  <a class="item" href="download.html" data-page="download">Download</a>
+  <a class="item hide" href="changelog.html" data-page="changelog">Changelog</a>
 
   <span class="spacer"></span>
   <a class="item hide" href="https://github.com/PewPewBiches/Suffix">GitHub</a>
+  <!-- System 7 shipped a menu-bar clock as a desk accessory and everyone
+       installed it. Click it for the date, exactly as it behaved then. -->
+  <button class="clock" id="clock" type="button" title="Show the date"></button>
 </div>
 
 <div class="desk">
@@ -59,7 +75,7 @@
             match. No upload, no website, no app to open.
           </p>
           <div class="btns">
-            <a class="btn default" href="https://github.com/PewPewBiches/Suffix/releases/latest"><span class="applemark" aria-hidden="true"></span>Download for Mac</a>
+            <a class="btn default" href="download.html"><svg class="applelogo" viewBox="0 0 100 122" aria-hidden="true"><defs><clipPath id="ap"><path d="M74.6 64.9c-.1-11.5 9.4-17 9.8-17.3-5.3-7.8-13.6-8.9-16.6-9-7-.7-13.8 4.1-17.3 4.1-3.6 0-9.1-4-14.9-3.9-7.7.1-14.7 4.5-18.6 11.3-8 13.8-2 34.2 5.7 45.4 3.8 5.5 8.4 11.6 14.3 11.4 5.7-.2 7.9-3.7 14.8-3.7s8.9 3.7 14.9 3.6c6.2-.1 10-5.5 13.8-11.1 4.3-6.4 6.1-12.5 6.2-12.8-.1-.1-11.9-4.6-12.1-18z"/><path d="M63.3 30.9c3.1-3.8 5.2-9.2 4.6-14.5-4.5.2-10 3-13.2 6.8-2.9 3.4-5.4 8.8-4.7 13.9 5 .4 10.2-2.5 13.3-6.2z"/></clipPath></defs><g clip-path="url(#ap)"><rect y="0"    width="100" height="21" fill="#61BB46"/><rect y="21"   width="100" height="20" fill="#FDB827"/><rect y="41"   width="100" height="20" fill="#F5821F"/><rect y="61"   width="100" height="20" fill="#E03A3E"/><rect y="81"   width="100" height="20" fill="#963D97"/><rect y="101"  width="100" height="21" fill="#009DDC"/></g></svg>Download for Mac</a>
             <a class="btn" href="features.html">What it does</a>
           </div>
           <p class="small" style="margin-top:16px">macOS 14 or later · free · nothing leaves your Mac</p>
@@ -130,6 +146,52 @@
               <tr><td class="f">rename <span class="sel">.pdf</span></td><td style="text-align:right"><strong>1</strong></td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="win">
+    <div class="titlebar">
+      <span class="box"></span>
+      <span class="name">Practice folder</span>
+      <span class="box zoom"></span>
+    </div>
+    <div class="wbody">
+      <div class="cols" style="align-items:start">
+        <div>
+          <h2>have a go</h2>
+          <div class="rule"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <p>
+            These files are not real, but the rules are. Click a name, change
+            what comes after the dot, press Return. The same answers the app
+            would give — including the times it says no.
+          </p>
+          <p class="small dim">
+            Worth trying: <span class="mono">receipt.png</span> → .txt,
+            <span class="mono">clip.mov</span> → .mp3,
+            <span class="mono">manual.pdf</span> → .docx.
+          </p>
+
+          <div class="s7alert" id="s7">
+            <span class="ico" id="s7ico">!</span>
+            <span><span class="msg" id="s7msg"></span><span class="why" id="s7why"></span></span>
+          </div>
+        </div>
+
+        <div class="win finder play" style="margin:0;background:var(--white)">
+          <div class="titlebar">
+            <span class="box"></span>
+            <span class="name">Practice</span>
+            <span class="box zoom"></span>
+          </div>
+          <div class="head-row"><span>Name</span><span>Size</span><span>Kind</span></div>
+          <div class="list" id="playlist"></div>
+          <div class="playbar">
+            <span id="tally">nothing converted yet</span>
+            <span class="score" id="hint">click a name to rename it</span>
+          </div>
         </div>
       </div>
     </div>
@@ -236,40 +298,364 @@ cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
   }, { threshold: .2 }).observe(row);
 })();
 </script>
-<div class="desk" style="padding-top:0">
-  <div class="trashline">
-    <footer>
-      suffix · mit licensed · built for macOS ·
-      <a href="https://github.com/PewPewBiches/Suffix">source</a> ·
-      <a href="https://github.com/PewPewBiches/Suffix/releases/latest">download</a> ·
-      <a href="https://github.com/PewPewBiches/Suffix/issues">report a problem</a>
-    </footer>
-    <span class="bin" aria-hidden="true"><i></i><i></i></span>
+
+<script>
+/* ── the practice folder ──────────────────────────────────────────────
+   A playable copy of the app's decision: look at what the file is,
+   look at what it was renamed to, and answer. The answers below are
+   the real ones, including the refusals — a demo that only ever says
+   yes teaches the wrong thing. */
+(function () {
+  const list = document.getElementById('playlist');
+  if (!list) return;
+
+  const FAM = {
+    png:'image', jpg:'image', jpeg:'image', heic:'image', tiff:'image',
+    gif:'image', bmp:'image', webp:'image',
+    pdf:'pdf',
+    mov:'video', mp4:'video', m4v:'video',
+    m4a:'audio', mp3:'audio', wav:'audio', aiff:'audio',
+    docx:'doc', pages:'doc', key:'doc', numbers:'doc', rtf:'doc',
+    txt:'text', zip:'zip',
+  };
+  const KIND = { image:'picture', pdf:'document', video:'movie', audio:'sound',
+                 doc:'document', text:'plain text', zip:'archive' };
+
+  const files = [
+    { name:'receipt',  ext:'png',  size:'1.4 MB',  fam:'image' },
+    { name:'manual',   ext:'pdf',  size:'3.1 MB',  fam:'pdf'   },
+    { name:'clip',     ext:'mov',  size:'18.2 MB', fam:'video' },
+    { name:'deck',     ext:'key',  size:'6.7 MB',  fam:'doc'   },
+    { name:'notes',    ext:'docx', size:'88 KB',   fam:'doc'   },
+  ];
+
+  let picked = -1, editing = false, wins = 0;
+  const seen = new Set();
+
+  /* what the app would actually do */
+  function decide(from, to) {
+    const a = FAM[from], b = FAM[to];
+    if (from === to) return { ok:false, icon:'?', msg:'It is already a <b>.' + to + '</b>.',
+      why:'suffix reads the file, not the name, so renaming it to what it already is does nothing at all.' };
+    if (['exe','dll','msi'].includes(to)) return { ok:false, icon:'☹', msg:'This is a Mac.',
+      why:'And suffix converts files, not operating systems. <a href="windows.html">Windows waitlist →</a>' };
+    if (['app','dmg'].includes(to)) return { ok:false, icon:'☹', msg:'A picture cannot become an application.',
+      why:'Tempting, though. That is roughly how the nineties went.' };
+    if (!b) return { ok:false, icon:'?', msg:'<b>.' + to + '</b> is not a format suffix writes.',
+      why:'<a href="formats.html">Here is everything it does write →</a>' };
+
+    if (to === 'mp3') return { ok:false, icon:'!', msg:'macOS cannot write MP3.',
+      why:'Nothing in the system encodes it. Install ffmpeg (<span class="mono">brew install ffmpeg</span>) and this starts working — the app says so too, rather than failing quietly.' };
+
+    if (a === 'image' && b === 'image') return { ok:true, out:to, icon:'✓',
+      msg:'Re-encoded as <b>.' + to + '</b>.', why:'Same picture, different container.' };
+    if (a === 'image' && b === 'pdf')   return { ok:true, out:'pdf', icon:'✓',
+      msg:'A one-page PDF, the size of the image.', why:'No margins invented, no page it did not have.' };
+    if ((a === 'image' || a === 'pdf') && b === 'text') return { ok:true, out:'txt', icon:'✓',
+      msg:'The words inside it, read out and saved as text.',
+      why:a === 'pdf' ? 'Uses the text layer if the PDF has one, and reads the pixels if it does not.'
+                      : 'Vision does the reading, on your Mac. It is good, not perfect — check names and numbers.' };
+    if (a === 'pdf' && b === 'image')  return { ok:true, out:'zip', icon:'✓',
+      msg:'Every page as a <b>.' + to + '</b>, collected in a .zip.',
+      why:'A 40-page PDF is 40 images, so it does not scatter them across your folder.' };
+    if (a === 'pdf' && b === 'doc')    return { ok:false, icon:'!',
+      msg:'suffix will not pretend to rebuild a document.',
+      why:'A PDF has no paragraphs or styles left in it. Reconstructing them is guesswork, and the guesses look fine until you edit one. Rename it to <b>.txt</b> for the words.' };
+    if (a === 'video' && b === 'video') return { ok:true, out:to, icon:'✓',
+      msg:'Same video, in the container everything accepts.', why:'Passed through where it can be; re-encoded only when it must.' };
+    if (a === 'video' && b === 'audio') return { ok:true, out:to, icon:'✓',
+      msg:'Just the audio, as <b>.' + to + '</b>.', why:'The video track is dropped, not re-encoded into anything.' };
+    if (a === 'audio' && b === 'audio') return { ok:true, out:to, icon:'✓',
+      msg:'Re-encoded as <b>.' + to + '</b>.', why:'Everything but MP3, which macOS cannot write.' };
+    if (a === 'audio' && b === 'video') return { ok:false, icon:'?',
+      msg:'There is no picture in a sound file.', why:'Nothing to put on the screen, so suffix leaves it alone.' };
+    if (a === 'doc' && b === 'pdf')    return { ok:true, out:'pdf', icon:'✓',
+      msg:'Exported to PDF by the app that owns it.',
+      why:'Pages, Keynote and Numbers do their own export in the background, so the result is exactly theirs.' };
+    if (a === 'doc' && b === 'text')   return { ok:true, out:'txt', icon:'✓',
+      msg:'The text, without the formatting.', why:'Via PDF, so page order survives and layout does not.' };
+    if (a === 'doc' && b === 'image')  return { ok:true, out:'zip', icon:'✓',
+      msg:'Each page as a <b>.' + to + '</b>, in a .zip.', why:'Exported to PDF first, then rendered page by page.' };
+
+    return { ok:false, icon:'?', msg:'<b>.' + from + '</b> to <b>.' + to + '</b> is not a conversion suffix makes.',
+      why:'<a href="formats.html">The full matrix is here →</a>' };
+  }
+
+  function say(r) {
+    const box = document.getElementById('s7');
+    document.getElementById('s7ico').textContent = r.icon;
+    document.getElementById('s7msg').innerHTML = r.msg;
+    document.getElementById('s7why').innerHTML = r.why || '';
+    box.classList.remove('on'); void box.offsetWidth; box.classList.add('on');
+  }
+
+  function tally() {
+    const t = document.getElementById('tally');
+    const h = document.getElementById('hint');
+    t.textContent = wins === 0 ? 'nothing converted yet'
+      : wins + (wins === 1 ? ' file converted' : ' files converted') + ' · none of them left this page';
+    if (wins >= 7) h.textContent = 'you are better at this than most file converters';
+    else if (seen.size >= 3) h.textContent = 'the real one does this while you are elsewhere';
+    else h.textContent = 'click a name to rename it';
+  }
+
+  function draw() {
+    list.innerHTML = '';
+    files.forEach((f, i) => {
+      const row = document.createElement('div');
+      row.className = 'row' + (i === picked ? ' on' : '');
+      row.innerHTML =
+        '<span class="nm"><span class="doc" data-k="' + f.ext.toUpperCase() + '"></span>' +
+        '<span class="fname">' + f.name + '<span class="x">.' + f.ext + '</span></span></span>' +
+        '<span class="sz">' + f.size + '</span>' +
+        '<span class="kd">' + (KIND[f.fam] || 'file') + '</span>';
+      row.tabIndex = 0;
+      row.addEventListener('click', e => {
+        // A click inside the field is a click in the field, not on the row.
+        if (e.target.classList.contains('edit')) return;
+        if (picked === i && !editing) edit(i); else { picked = i; editing = false; draw(); }
+      });
+      // Return renames, the way it does in Finder.
+      row.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !editing) { e.preventDefault(); picked = i; edit(i); }
+      });
+      list.appendChild(row);
+    });
+    tally();
+  }
+
+  function edit(i) {
+    editing = true;
+    const row = list.children[i];
+    const slot = row.querySelector('.x');
+    const input = document.createElement('input');
+    input.className = 'edit'; input.value = files[i].ext;
+    input.setAttribute('aria-label', 'new extension for ' + files[i].name);
+    slot.replaceWith(input);
+    input.focus(); input.select();
+
+    const cancel = () => { editing = false; draw(); };
+    input.addEventListener('keydown', e => {
+      if (e.key !== 'Escape' && e.key !== 'Enter') return;
+      // Stop it here. The row listens for Return too, and letting it bubble
+      // reopens the editor the instant you close it.
+      e.preventDefault(); e.stopPropagation();
+      if (e.key === 'Escape') cancel(); else commit(i, input.value);
+    });
+    input.addEventListener('blur', cancel);
+  }
+
+  function commit(i, raw) {
+    editing = false;
+    const to = raw.trim().toLowerCase().replace(/^\.+/, '');
+    if (!to) return draw();
+    const f = files[i];
+    const r = decide(f.ext, to);
+    if (r.ok) {
+      f.ext = r.out; f.fam = FAM[r.out] || 'file';
+      if (r.out === 'zip') { f.size = '2.4 MB'; }
+      wins++; seen.add(to);
+      draw();
+      list.children[i].classList.add('done');
+    } else {
+      draw();
+    }
+    say(r);
+  }
+
+  draw();
+})();
+</script>
+<div class="pagefoot">
+  <footer>
+    <span>
+      suffix &middot; mit licensed &middot; built for macOS &middot;
+      <a href="https://github.com/PewPewBiches/Suffix">source</a> &middot;
+      <a href="download.html">download</a> &middot;
+      <a href="https://github.com/PewPewBiches/Suffix/issues/new">report a problem</a>
+    </span>
+    <span style="display:flex;align-items:center;gap:18px">
+      <button class="themeswitch" id="themeswitch" type="button" aria-pressed="false">
+        <span class="lamp"></span><span id="themelabel">Night</span>
+      </button>
+      <button class="bin" id="bin" type="button" aria-label="Trash" title="Trash">
+        <span class="lid"></span><span class="can"></span>
+      </button>
+    </span>
+  </footer>
+</div>
+
+<div class="modal" id="about-modal" role="dialog" aria-modal="true" aria-label="About suffix">
+  <div class="dialog">
+    <div class="titlebar"><span class="box" data-close></span><span class="name">About This Mac</span></div>
+    <div class="dbody">
+      <h2>suffix 0.4</h2>
+      <p class="small" style="margin-bottom:14px">Converts files when you rename them.<br>Built for macOS 14 and later. Free, MIT licensed.</p>
+      <div style="font-family:var(--data);font-size:12px">
+        <div>Total Memory &nbsp;&nbsp;8,192K</div>
+        <div style="margin-top:9px">suffix</div>
+        <div class="meter"><i style="width:3%"></i></div>
+        <div class="small">about 240K — it is a very small app</div>
+        <div style="margin-top:9px">Your files, uploaded anywhere</div>
+        <div class="meter"><i style="width:0"></i></div>
+        <div class="small">0K</div>
+      </div>
+      <div class="btns"><button class="btn default" data-close type="button">OK</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="bin-modal" role="dialog" aria-modal="true" aria-label="Trash">
+  <div class="dialog">
+    <div class="titlebar"><span class="box" data-close></span><span class="name">Trash</span></div>
+    <div class="dbody">
+      <p id="bintext">The Trash contains 1 item: <span class="mono">nine-step-png-to-pdf-workflow.txt</span></p>
+      <ul class="binlist" id="binlist"></ul>
+      <p class="small" id="binnote">Close a window with its top-left box and it lands here. Unlike the other thing in there, it can come back out.</p>
+      <div class="btns"><button class="btn default" data-close type="button">OK</button></div>
+    </div>
   </div>
 </div>
 
 <script>
 (function () {
-  // The Apple menu drops down; every other item is a plain link.
+  /* ── Apple menu ── */
   const apple = document.querySelector('.menubar .item[data-menu]');
   if (apple) {
     const menu = apple.querySelector('.menu');
-    const close = () => { apple.setAttribute('aria-expanded', 'false'); menu.classList.remove('open'); };
-    const toggle = e => {
+    const close = () => { apple.setAttribute('aria-expanded','false'); menu.classList.remove('open'); };
+    apple.addEventListener('click', e => {
+      if (e.target.closest('a')) return;               // let menu links work
       e.preventDefault(); e.stopPropagation();
       const open = apple.getAttribute('aria-expanded') === 'true';
       apple.setAttribute('aria-expanded', String(!open));
       menu.classList.toggle('open', !open);
-    };
-    apple.addEventListener('click', toggle);
-    apple.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') toggle(e); });
+    });
     document.addEventListener('click', close);
     document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
   }
-  // Mark the page you are on.
+
+  /* ── current page ── */
   const here = document.body.dataset.page;
   document.querySelectorAll('.menubar a[data-page]').forEach(a => {
-    if (a.dataset.page === here) a.setAttribute('aria-current', 'page');
+    if (a.dataset.page === here) a.setAttribute('aria-current','page');
+  });
+
+  /* ── dialogs ── */
+  const show = id => document.getElementById(id)?.classList.add('open');
+  const hideAll = () => document.querySelectorAll('.modal').forEach(m => m.classList.remove('open'));
+  document.querySelector('[data-about]')?.addEventListener('click', e => { e.preventDefault(); hideAll(); show('about-modal'); });
+  document.getElementById('bin')?.addEventListener('click', () => { hideAll(); paintBin(); show('bin-modal'); });
+  document.addEventListener('click', e => {
+    if (e.target.matches('[data-close]') || e.target.classList.contains('modal')) hideAll();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') hideAll(); });
+
+  /* ── copy buttons on every command box ── */
+  document.querySelectorAll('pre').forEach(pre => {
+    const wrap = document.createElement('div');
+    wrap.className = 'cmd';
+    pre.parentNode.insertBefore(wrap, pre);
+    wrap.appendChild(pre);
+    const btn = document.createElement('button');
+    btn.className = 'copy'; btn.type = 'button'; btn.textContent = 'Copy';
+    btn.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(pre.innerText.trim()); }
+      catch (e) {
+        // Clipboard API needs permission in some browsers; select it instead
+        // so the reader can still copy with the keyboard.
+        const r = document.createRange(); r.selectNodeContents(pre);
+        const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        btn.textContent = 'Press ⌘C'; setTimeout(() => (btn.textContent = 'Copy'), 1800);
+        return;
+      }
+      btn.textContent = 'Copied'; btn.dataset.done = '1';
+      setTimeout(() => { btn.textContent = 'Copy'; delete btn.dataset.done; }, 1500);
+    });
+    wrap.appendChild(btn);
+  });
+
+  /* ── close and zoom boxes actually work ── */
+  document.querySelectorAll('.win > .titlebar').forEach(bar => {
+    const win = bar.parentElement;
+    if (win.closest('.dialog')) return;
+    bar.querySelector('.box:not(.zoom)')?.addEventListener('click', () => {
+      win.style.transition = 'transform .16s ease, opacity .16s ease';
+      win.style.transform = 'scale(.94)'; win.style.opacity = '0';
+      setTimeout(() => {
+        win.style.display = 'none';
+        // Closing something should not be a dead end. It goes in the Trash,
+        // and the Trash can put it back — which is also how the app treats
+        // the file it converted.
+        trashed.push({ el: win, name: bar.querySelector('.name')?.textContent || 'Untitled' });
+        paintBin();
+      }, 160);
+    });
+    bar.querySelector('.box.zoom')?.addEventListener('click', () => {
+      win.classList.toggle('zoomed');
+      win.style.maxWidth = win.classList.contains('zoomed') ? '640px' : '';
+    });
+  });
+
+  /* ── the Trash, which actually holds things ── */
+  const trashed = [];
+  function paintBin() {
+    const ul = document.getElementById('binlist');
+    const txt = document.getElementById('bintext');
+    if (!ul || !txt) return;
+    const n = trashed.length + 1;
+    txt.innerHTML = 'The Trash contains ' + n + (n === 1 ? ' item' : ' items') + ':';
+    ul.innerHTML = '';
+    trashed.forEach((t, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = '<span>' + t.name + ' (window)</span>';
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = 'Put Back';
+      b.addEventListener('click', () => {
+        t.el.style.display = ''; t.el.style.opacity = '1'; t.el.style.transform = 'none';
+        trashed.splice(i, 1); paintBin();
+      });
+      li.appendChild(b);
+      ul.appendChild(li);
+    });
+    const li = document.createElement('li');
+    li.innerHTML = '<span class="mono">nine-step-png-to-pdf-workflow.txt</span><span class="small">not recoverable, and that is fine</span>';
+    ul.appendChild(li);
+    document.getElementById('bin')?.classList.toggle('full', trashed.length > 0);
+  }
+
+  /* ── the menu bar clock ── */
+  const clock = document.getElementById('clock');
+  if (clock) {
+    let showDate = false;
+    const tick = () => {
+      const d = new Date();
+      clock.textContent = showDate
+        ? d.toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' })
+        : d.toLocaleTimeString(undefined, { hour:'numeric', minute:'2-digit' });
+    };
+    clock.addEventListener('click', () => {
+      showDate = !showDate; tick();
+      if (showDate) setTimeout(() => { showDate = false; tick(); }, 3000);
+    });
+    tick(); setInterval(tick, 10000);
+  }
+
+  /* ── night ── */
+  const sw = document.getElementById('themeswitch');
+  const label = document.getElementById('themelabel');
+  const paint = () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (label) label.textContent = dark ? 'Day' : 'Night';
+    sw?.setAttribute('aria-pressed', String(dark));
+  };
+  paint();
+  sw?.addEventListener('click', () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (dark) { document.documentElement.removeAttribute('data-theme'); }
+    else { document.documentElement.setAttribute('data-theme','dark'); }
+    try { localStorage.setItem('suffix-theme', dark ? 'light' : 'dark'); } catch (e) {}
+    paint();
   });
 })();
 </script>

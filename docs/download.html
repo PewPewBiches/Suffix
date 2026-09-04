@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>trust — suffix</title>
-<meta name="description" content="What suffix can reach, what it never touches, why macOS blocks it, and how to check any of it yourself.">
-<meta property="og:title" content="trust — suffix">
-<meta property="og:description" content="What suffix can reach, what it never touches, why macOS blocks it, and how to check any of it yourself.">
+<title>download — suffix</title>
+<meta name="description" content="Download suffix for macOS. Free, open source, and it never uploads your files.">
+<meta property="og:title" content="download — suffix">
+<meta property="og:description" content="Download suffix for macOS. Free, open source, and it never uploads your files.">
 <meta property="og:image" content="images/icon-256.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,7 +25,7 @@
   } catch (e) {}
 </script>
 </head>
-<body data-page="trust">
+<body data-page="download">
 <div class="menubar">
   <!-- The Apple menu opens a menu. It does not navigate — that was the whole
        point of it being a menu, and two things going to the same page is just
@@ -59,76 +59,71 @@
 
 <div class="desk">
   <div class="win">
-    <div class="titlebar"><span class="box"></span><span class="name">Trust</span><span class="box zoom"></span></div>
+    <div class="titlebar"><span class="box"></span><span class="name">Download</span><span class="box zoom"></span></div>
     <div class="wbody">
-      <h1>what it can<br>and cannot reach</h1>
-      <div class="rule"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      <p class="lede">This app rewrites your files. That deserves a page rather than a sentence.</p>
+      <div class="cols" style="align-items:start">
+        <div>
+          <h1>get suffix</h1>
+          <div class="rule"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <p class="lede">Free, open source, and it never uploads anything. Renaming a file is the whole app.</p>
+          <div class="btns">
+            <a class="btn default" href="https://github.com/PewPewBiches/Suffix/releases/latest"><svg class="applelogo" viewBox="0 0 100 122" aria-hidden="true"><defs><clipPath id="ap2"><path d="M74.6 64.9c-.1-11.5 9.4-17 9.8-17.3-5.3-7.8-13.6-8.9-16.6-9-7-.7-13.8 4.1-17.3 4.1-3.6 0-9.1-4-14.9-3.9-7.7.1-14.7 4.5-18.6 11.3-8 13.8-2 34.2 5.7 45.4 3.8 5.5 8.4 11.6 14.3 11.4 5.7-.2 7.9-3.7 14.8-3.7s8.9 3.7 14.9 3.6c6.2-.1 10-5.5 13.8-11.1 4.3-6.4 6.1-12.5 6.2-12.8-.1-.1-11.9-4.6-12.1-18z"/><path d="M63.3 30.9c3.1-3.8 5.2-9.2 4.6-14.5-4.5.2-10 3-13.2 6.8-2.9 3.4-5.4 8.8-4.7 13.9 5 .4 10.2-2.5 13.3-6.2z"/></clipPath></defs><g clip-path="url(#ap2)"><rect y="0" width="100" height="21" fill="#61BB46"/><rect y="21" width="100" height="20" fill="#FDB827"/><rect y="41" width="100" height="20" fill="#F5821F"/><rect y="61" width="100" height="20" fill="#E03A3E"/><rect y="81" width="100" height="20" fill="#963D97"/><rect y="101" width="100" height="21" fill="#009DDC"/></g></svg>Download for Mac</a>
+          </div>
+          <p class="small" style="margin-top:14px">macOS 14 or later &middot; Apple silicon &amp; Intel &middot; about 800 KB</p>
+        </div>
+        <div>
+          <div class="tw" style="margin:0">
+            <table>
+              <thead><tr><th><span>What you get</span></th><th style="text-align:right"><span>How much</span></th></tr></thead>
+              <tbody>
+                <tr><td>Price</td><td style="text-align:right">nothing</td></tr>
+                <tr><td>Account</td><td style="text-align:right">none</td></tr>
+                <tr><td>Network access</td><td style="text-align:right">none</td></tr>
+                <tr><td>Licence</td><td style="text-align:right">MIT</td></tr>
+                <tr><td>Undo window</td><td style="text-align:right">7 days</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="win">
-    <div class="titlebar"><span class="box"></span><span class="name">Your files never leave your Mac</span><span class="box zoom"></span></div>
+    <div class="titlebar"><span class="box"></span><span class="name">First launch</span><span class="box zoom"></span></div>
     <div class="wbody">
-      <div class="cols">
+      <div class="cols3">
         <div>
-          <p class="lede">Suffix contains no network code at all. Conversion uses only what ships with macOS — ImageIO, PDFKit, AVFoundation and Vision.</p>
-          <p>There is no account, no service, and nothing to sign in to. Do not take that on faith:</p>
+          <h3>1 &middot; Open the disk image</h3>
+          <p>Drag suffix into Applications, the way you have done a hundred times.</p>
+        </div>
+        <div>
+          <h3>2 &middot; macOS will block it</h3>
+          <p>The app is unsigned, so Gatekeeper stops it once. Open <strong>System Settings → Privacy &amp; Security</strong>, scroll to the line about suffix, click <strong>Open Anyway</strong>.</p>
+        </div>
+        <div>
+          <h3>3 &middot; Run the test</h3>
+          <p>Setup asks for Full Disk Access, then converts a real file to prove the whole chain works. <a href="trust.html">Why that matters →</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span class="box"></span><span class="name">Build it yourself</span><span class="box zoom"></span></div>
+    <div class="wbody">
+      <p>Would rather not run a stranger's binary? Reasonable. The whole thing is one command, and it takes about ten seconds.</p>
 <pre><code>git clone https://github.com/PewPewBiches/Suffix.git
-cd Suffix &amp;&amp; ./Scripts/build-app.sh</code></pre>
-        </div>
-        <div class="tw" style="margin:0">
-          <table>
-            <thead><tr><th><span>Item</span></th><th style="text-align:right"><span>Count</span></th></tr></thead>
-            <tbody>
-              <tr><td>Network requests</td><td style="text-align:right">none</td></tr>
-              <tr><td>Telemetry, analytics</td><td style="text-align:right">none</td></tr>
-              <tr><td>Accounts</td><td style="text-align:right">none</td></tr>
-              <tr><td>Bundled binaries</td><td style="text-align:right">none</td></tr>
-              <tr><td>Source published</td><td style="text-align:right">all of it, MIT</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
+      <p class="small">Needs Xcode. Nothing else — no package manager, no dependencies to fetch.</p>
     </div>
   </div>
 
   <div class="win">
-    <div class="titlebar"><span class="box"></span><span class="name">It only acts on a deliberate rename</span><span class="box zoom"></span></div>
+    <div class="titlebar"><span class="box"></span><span class="name">On Windows?</span><span class="box zoom"></span></div>
     <div class="wbody">
-      <p class="lede">Not on files you copy, download or move. Only when you change a file's extension yourself, to something suffix can produce, and the contents do not already match.</p>
-      <div class="cols">
-        <div>
-          <h2>Skipped entirely</h2>
-          <p>Photos libraries, Photo Booth, Music, iMovie and Final Cut libraries, application bundles, caches, <code>node_modules</code>, <code>.git</code>, and the Trash. A Photos library is a database, not loose files — rewriting anything inside would corrupt it.</p>
-        </div>
-        <div>
-          <h2>Nothing is destroyed</h2>
-          <p>Before anything is overwritten the original is copied aside and kept for seven days, so any conversion can be undone from the menu bar. Stored originals expire on their own rather than growing forever.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="win">
-    <div class="titlebar"><span class="box"></span><span class="name">Why macOS says it is unidentified</span><span class="box zoom"></span></div>
-    <div class="wbody">
-      <p class="lede">Because it is unsigned.</p>
-      <p>Gatekeeper blocks the first launch and says the app “cannot be verified”. That is a statement about the missing signature, not about what the app does. Open <strong>System Settings → Privacy &amp; Security</strong> and click <strong>Open Anyway</strong>; you do it once.</p>
-      <p>The same gap means suffix cannot use Notification Center — macOS refuses authorization without a signing identity — so it draws its own notice instead.</p>
-    </div>
-  </div>
-
-  <div class="win">
-    <div class="titlebar"><span class="box"></span><span class="name">The permission it asks for</span><span class="box zoom"></span></div>
-    <div class="wbody">
-      <p class="lede">Full Disk Access, so it can reach Desktop, Documents and Downloads.</p>
-      <p>Without it suffix keeps running and silently does nothing in exactly the folders you use most — which is worse than failing, because it looks like it is working.</p>
-      <div class="note">
-        <span class="tag">Do run the test</span>
-        <p>A silent, healthy-looking failure is this app's characteristic way of going wrong. Setup ends in a <strong>test it</strong> button that converts a real file and shows you the result — it catches the problem while you are still paying attention, instead of three days later.</p>
-      </div>
-      <p class="small">The keyboard shortcut additionally asks Finder what you have selected, which macOS prompts for separately. Declining costs you the shortcut and nothing else — right-click still works.</p>
+      <p class="lede">suffix is macOS only, because it is built out of things only macOS has.</p>
+      <p>Its whole engine is Apple's — ImageIO, PDFKit, AVFoundation, Vision. A Windows version is not a port, it is a rewrite. <a href="windows.html">Put your name down →</a> and if enough people want it, it becomes worth doing.</p>
     </div>
   </div>
 </div>

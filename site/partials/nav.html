@@ -1,23 +1,30 @@
 <div class="menubar">
+  <!-- The Apple menu opens a menu. It does not navigate — that was the whole
+       point of it being a menu, and two things going to the same page is just
+       a broken link with extra steps. -->
   <div class="item" data-menu="apple" aria-expanded="false" role="button" tabindex="0" aria-label="Apple menu">
     <span class="rainbow"><i></i><i></i><i></i><i></i><i></i><i></i></span>
     <div class="menu" id="m-apple">
-      <a href="index.html">About suffix…</a>
+      <a href="#" data-about>About suffix…</a>
       <hr>
-      <a href="https://github.com/PewPewBiches/Suffix/releases/latest">Download suffix</a>
+      <a href="download.html">Get suffix…</a>
+      <a href="windows.html">Windows waitlist…</a>
+      <hr>
       <a href="https://github.com/PewPewBiches/Suffix">Source on GitHub</a>
-      <a href="https://github.com/PewPewBiches/Suffix/issues">Report a problem…</a>
+      <a href="https://github.com/PewPewBiches/Suffix/issues/new">Report a problem…</a>
     </div>
   </div>
 
-  <!-- The pages themselves, not a File/Edit/Special costume. Each one goes
-       somewhere; a menu bar whose items do nothing is worse than no menu bar. -->
   <a class="item" href="index.html" data-page="index">Overview</a>
   <a class="item" href="features.html" data-page="features">Features</a>
   <a class="item" href="formats.html" data-page="formats">Formats</a>
   <a class="item" href="trust.html" data-page="trust">Trust</a>
-  <a class="item" href="changelog.html" data-page="changelog">Changelog</a>
+  <a class="item" href="download.html" data-page="download">Download</a>
+  <a class="item hide" href="changelog.html" data-page="changelog">Changelog</a>
 
   <span class="spacer"></span>
   <a class="item hide" href="https://github.com/PewPewBiches/Suffix">GitHub</a>
+  <!-- System 7 shipped a menu-bar clock as a desk accessory and everyone
+       installed it. Click it for the date, exactly as it behaved then. -->
+  <button class="clock" id="clock" type="button" title="Show the date"></button>
 </div>

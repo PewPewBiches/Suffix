@@ -11,6 +11,7 @@
 
 :root{
   --black:#000; --white:#FFF;
+  --ink:#000; --field:#FFF;
   --paper:#DEDEDE;          /* window and dialog fill */
   --dim:#555;               /* secondary text */
   --faint:#7A7A7A;
@@ -24,10 +25,14 @@
   --data:'IBM Plex Mono',ui-monospace,Menlo,monospace;
 
   /* The 1984 pointer, drawn pixel by pixel. */
+  --deskA:#8E8E8E; --deskB:#9A9A9A;
   --arrow:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAZUlEQVR42uXWMQ4AIAgDwP7/07rohi4CbSNJV7iEAQBgrNBKBkCDaAB2MSBaAAZEE9AJ0QZ0QDwAlRAvQAXEE5AJ8QZkQLwAwQNzijmg80xrAYIB5RANwKXhPwDa80oHvK7MGzABFbjkRhmWL8IAAAAASUVORK5CYII=");
 }
 
 *{box-sizing:border-box}
+/* System 7 inverted a selection. Nothing here should ever be browser-blue. */
+::selection{background:var(--black);color:var(--white)}
+::-moz-selection{background:var(--black);color:var(--white)}
 html{scroll-behavior:smooth}
 
 body{
@@ -167,17 +172,7 @@ pre{
   margin:4px 6px;
 }
 .btns{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin:18px 0 0}
-/* The six-colour apple, drawn rather than typed — U+F8FF only renders on
-   Apple platforms, and this button is the one thing everyone must be able
-   to read. */
-.applemark{
-  display:inline-flex;flex-direction:column;gap:1px;
-  width:9px;height:11px;vertical-align:-1px;margin-right:8px;
-}
-.applemark::before,.applemark::after{content:"";display:block;flex:1;border-radius:1px}
-.applemark::before{background:linear-gradient(var(--g) 0 33%, var(--y) 33% 66%, var(--o) 66% 100%)}
-.applemark::after{background:linear-gradient(var(--r) 0 33%, var(--p) 33% 66%, var(--b) 66% 100%)}
-.btn.default:active .applemark{filter:brightness(1.6)}
+
 
 /* ── layout helpers ───────────────────────────────────── */
 .cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px}
@@ -268,10 +263,6 @@ td.f{font-family:var(--data);font-size:12.5px;white-space:nowrap}
 }
 footer{font-family:var(--chrome);font-size:11px;color:#3A3A3A}
 footer a{color:#3A3A3A}
-.bin{width:34px;height:38px;position:relative;flex:none}
-.bin i{position:absolute;left:0;right:0;background:var(--white);border:1px solid var(--black)}
-.bin i:nth-child(1){top:0;height:4px;left:6px;right:6px}
-.bin i:nth-child(2){top:5px;bottom:0;border-radius:0 0 4px 4px}
 
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -329,3 +320,210 @@ tbody tr:hover code{background:transparent;color:var(--white)}
 @media(prefers-reduced-motion:reduce){
   .win,.rule i{transform:none;animation:none}
 }
+
+
+/* ── night ────────────────────────────────────────────────
+   System 7 had no dark mode. This is the compromise: the
+   desktop dims, windows keep their frames, and the six
+   colours stay exactly as bright as they were. */
+[data-theme="dark"]{
+  --black:#E8E8E6; --white:#1A1A1C;
+  --paper:#232326; --dim:#A6A6A2; --faint:#7E7E7A;
+  --shadow:rgba(0,0,0,.6);
+  --deskA:#242427; --deskB:#2B2B2F;
+}
+[data-theme="dark"] body{background-color:var(--deskB)}
+[data-theme="dark"] .titlebar{
+  background:repeating-linear-gradient(var(--black) 0 1px, var(--white) 1px 3px);
+}
+[data-theme="dark"] th{
+  background:repeating-linear-gradient(var(--black) 0 1px, var(--white) 1px 3px);
+}
+[data-theme="dark"] .doc{background:var(--white);border-color:var(--black)}
+[data-theme="dark"] pre,[data-theme="dark"] .note,[data-theme="dark"] .tw,
+[data-theme="dark"] .alert,[data-theme="dark"] .menu,[data-theme="dark"] .menubar,
+[data-theme="dark"] .finder .list,[data-theme="dark"] .finder .head-row{background:var(--white)}
+[data-theme="dark"] td{border-bottom-color:#3A3A3E}
+body{
+  background-image:
+    linear-gradient(45deg,var(--deskA) 25%,transparent 25%,transparent 75%,var(--deskA) 75%),
+    linear-gradient(45deg,var(--deskA) 25%,transparent 25%,transparent 75%,var(--deskA) 75%);
+}
+
+/* ── 2. the footer sits at the bottom, not wherever content ended ── */
+html,body{height:100%}
+body{display:flex;flex-direction:column;min-height:100vh}
+.pagefoot{margin-top:auto}
+footer{
+  border-top:1px solid var(--black);
+  background:var(--white);
+  padding:10px 16px;
+  display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+}
+
+/* ── 1. every command box can be copied ── */
+.cmd{position:relative}
+.cmd pre{margin:0;padding-right:78px}
+.copy{
+  position:absolute;top:7px;right:7px;
+  font-family:var(--chrome);font-size:10px;
+  background:var(--white);color:var(--black);
+  border:1px solid var(--black);border-radius:5px;
+  padding:3px 9px;box-shadow:1px 1px 0 var(--shadow);
+}
+.copy:hover{background:var(--black);color:var(--white)}
+.copy:active{transform:translate(1px,1px)}
+.copy[data-done="1"]{background:var(--g);color:var(--black)}
+
+/* ── 3. the apple, in its own shape ── */
+.applelogo{width:17px;height:21px;vertical-align:-4px;margin-right:9px;flex:none}
+/* 13px was the honest historical size and far too small to read as a rainbow.
+   17px is where the six stripes become six stripes again. */
+.btn{display:inline-flex;align-items:center}
+
+/* ── the trash, drawn properly, and it does something ── */
+.bin{width:30px;height:34px;position:relative;flex:none;background:none;border:0;padding:0}
+.bin .lid,.bin .can{position:absolute;border:1.5px solid var(--black);background:var(--white)}
+.bin .lid{top:0;left:4px;right:4px;height:5px;border-radius:2px 2px 0 0}
+.bin .can{top:6px;left:1px;right:1px;bottom:0;border-radius:0 0 5px 5px}
+.bin .can::after{
+  content:"";position:absolute;inset:4px 6px 4px 6px;
+  background:repeating-linear-gradient(90deg,var(--black) 0 1.5px,transparent 1.5px 6px);
+  opacity:.55;
+}
+.bin:hover{animation:wiggle .4s ease-in-out}
+@keyframes wiggle{25%{transform:rotate(-7deg)}75%{transform:rotate(7deg)}}
+
+/* ── dialogs: About, and the trash joke ── */
+.modal{
+  position:fixed;inset:0;z-index:200;display:none;
+  align-items:center;justify-content:center;padding:20px;
+  background:rgba(0,0,0,.28);
+}
+.modal.open{display:flex}
+.dialog{
+  background:var(--paper);border:2px solid var(--black);
+  box-shadow:4px 4px 0 var(--shadow);max-width:430px;width:100%;
+}
+.dialog .dbody{padding:20px 22px}
+.dialog h2{margin-bottom:8px}
+.meter{border:1px solid var(--black);height:13px;background:var(--white);margin:5px 0 3px;position:relative}
+.meter i{position:absolute;inset:0 auto 0 0;background:repeating-linear-gradient(90deg,var(--b) 0 3px,var(--white) 3px 5px)}
+
+/* ── the waitlist form ── */
+.field{margin-bottom:20px;max-width:560px}
+.field label{display:block;font-family:var(--chrome);font-size:13px;margin-bottom:5px}
+.field .hint{font-size:13px;color:var(--dim);margin-bottom:7px}
+.field input,.field textarea{
+  width:100%;font-family:var(--read);font-size:15px;
+  background:var(--white);color:var(--black);
+  border:1px solid var(--black);border-radius:0;padding:8px 10px;
+  box-shadow:inset 1px 1px 0 rgba(0,0,0,.14);
+}
+.field textarea{min-height:96px;resize:vertical}
+.field input:focus,.field textarea:focus{outline:2px solid var(--b);outline-offset:1px}
+
+/* ── theme switch, dressed as a System 7 control ── */
+.themeswitch{
+  font-family:var(--chrome);font-size:11px;display:inline-flex;align-items:center;gap:6px;
+  background:none;border:0;color:var(--black);padding:0;
+}
+.themeswitch .lamp{
+  width:11px;height:11px;border:1px solid var(--black);background:var(--white);
+  display:inline-block;position:relative;
+}
+[data-theme="dark"] .themeswitch .lamp::after{
+  content:"";position:absolute;inset:2px;background:var(--y);
+}
+
+/* ── the menu bar clock ─────────────────────────────────
+   System 7 shipped one as a desk accessory, and everyone
+   installed it. Click it and it shows the date, same as
+   it did then. */
+.clock{
+  font-family:var(--chrome);font-size:11px;
+  padding:0 10px;height:22px;display:flex;align-items:center;
+  background:none;border:0;color:var(--black);
+}
+.clock:hover{background:var(--black);color:var(--white)}
+
+/* ── the practice folder ────────────────────────────────
+   The demo you can drive yourself. Same rules as the app:
+   it reads what the file is, not what it is called. */
+.play .row{cursor:default;user-select:none}
+.play .row.on{background:var(--black);color:var(--white)}
+.play .row.on .sz,.play .row.on .kd{color:var(--white)}
+.play .row.on .doc{background:var(--white)}
+.play .row:hover:not(.on){background:rgba(0,0,0,.05)}
+[data-theme="dark"] .play .row:hover:not(.on){background:rgba(255,255,255,.07)}
+.play .fname .edit{
+  font-family:var(--data);font-size:12px;line-height:1;
+  background:var(--white);color:var(--black);
+  border:1px solid var(--black);border-radius:0;
+  padding:1px 2px;width:8.5ch;
+}
+.play .fname .edit:focus{outline:0}
+.play .row.done{animation:flick .5s steps(1) 2}
+@keyframes flick{50%{background:var(--black);color:var(--white)}}
+
+.playbar{
+  display:flex;justify-content:space-between;align-items:center;gap:14px;
+  flex-wrap:wrap;font-family:var(--chrome);font-size:11px;color:var(--dim);
+  border-top:1px solid var(--black);padding:7px 10px;background:var(--paper);
+}
+.score{font-family:var(--data);font-size:11px;color:var(--black)}
+
+/* the System 7 alert: an icon, a sentence, one button */
+.s7alert{
+  display:none;gap:14px;align-items:flex-start;
+  border:1px solid var(--black);background:var(--white);
+  padding:14px 16px;margin-top:16px;box-shadow:2px 2px 0 var(--shadow);
+}
+.s7alert.on{display:flex;animation:nudge .22s ease}
+@keyframes nudge{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.s7alert .ico{
+  width:32px;height:32px;flex:none;border:2px solid var(--black);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--chrome);font-size:19px;
+}
+.s7alert .msg{display:block;font-size:14px;line-height:1.45}
+.s7alert .msg b{font-family:var(--data);font-weight:400}
+.s7alert .why{display:block;color:var(--dim);font-size:13px;margin-top:5px}
+
+/* more document colours, one per family */
+.doc[data-k="PNG"]::after,.doc[data-k="HEIC"]::after{background:var(--b)}
+.doc[data-k="DOCX"]::after,.doc[data-k="PAGES"]::after{background:var(--o)}
+.doc[data-k="KEY"]::after{background:var(--p)}
+.doc[data-k="M4A"]::after,.doc[data-k="MP3"]::after{background:var(--y)}
+.doc[data-k="ZIP"]::after{background:var(--dim)}
+
+/* closed windows go to the Trash, and can come back out */
+.binlist{font-family:var(--data);font-size:12px;margin:10px 0 4px}
+.binlist li{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:5px 0;border-bottom:1px solid var(--line,#D8D6D0)}
+.binlist button{
+  font-family:var(--chrome);font-size:10px;background:var(--white);color:var(--black);
+  border:1px solid var(--black);border-radius:5px;padding:2px 8px;
+}
+.binlist button:hover{background:var(--black);color:var(--white)}
+.bin.full .lid{transform:translate(3px,-3px) rotate(-14deg)}
+.bin .lid{transition:transform .18s ease}
+
+/* ── the DOS box on the windows page ────────────────────
+   The one place this site is allowed to stop being a Mac. */
+.dos{
+  background:#000;color:#C8C8C8;border:1px solid var(--black);
+  font-family:var(--data);font-size:12.5px;line-height:1.5;
+  padding:14px 16px;min-height:150px;white-space:pre-wrap;
+}
+.dos .caret{display:inline-block;width:8px;height:14px;background:#C8C8C8;vertical-align:-2px;
+  animation:blink 1.06s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.dos .err{color:#E8E8E8}
+[data-theme="dark"] .dos{border-color:var(--black)}
+
+.spec{font-family:var(--data);font-size:12px;margin-top:4px}
+.spec li{display:grid;grid-template-columns:1fr auto;gap:10px;padding:6px 0;
+  border-bottom:1px solid rgba(128,128,128,.35)}
+.spec li:last-child{border-bottom:0}
+.spec .no{color:var(--r);font-family:var(--chrome);font-size:11px}

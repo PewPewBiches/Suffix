@@ -13,32 +13,48 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/chicagoflf">
-<link rel="stylesheet" href="style.css?v=8d81f24428">
+<link rel="stylesheet" href="style.css?v=5aadb9b701">
 <link rel="icon" href="images/icon-256.png">
+<script>
+  // Before first paint, so the page never flashes the wrong theme.
+  // A stored choice always wins; otherwise follow the Mac's own setting.
+  try {
+    var t = localStorage.getItem('suffix-theme');
+    if (!t && matchMedia('(prefers-color-scheme: dark)').matches) t = 'dark';
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  } catch (e) {}
+</script>
 </head>
 <body data-page="features">
 <div class="menubar">
+  <!-- The Apple menu opens a menu. It does not navigate — that was the whole
+       point of it being a menu, and two things going to the same page is just
+       a broken link with extra steps. -->
   <div class="item" data-menu="apple" aria-expanded="false" role="button" tabindex="0" aria-label="Apple menu">
     <span class="rainbow"><i></i><i></i><i></i><i></i><i></i><i></i></span>
     <div class="menu" id="m-apple">
-      <a href="index.html">About suffix…</a>
+      <a href="#" data-about>About suffix…</a>
       <hr>
-      <a href="https://github.com/PewPewBiches/Suffix/releases/latest">Download suffix</a>
+      <a href="download.html">Get suffix…</a>
+      <a href="windows.html">Windows waitlist…</a>
+      <hr>
       <a href="https://github.com/PewPewBiches/Suffix">Source on GitHub</a>
-      <a href="https://github.com/PewPewBiches/Suffix/issues">Report a problem…</a>
+      <a href="https://github.com/PewPewBiches/Suffix/issues/new">Report a problem…</a>
     </div>
   </div>
 
-  <!-- The pages themselves, not a File/Edit/Special costume. Each one goes
-       somewhere; a menu bar whose items do nothing is worse than no menu bar. -->
   <a class="item" href="index.html" data-page="index">Overview</a>
   <a class="item" href="features.html" data-page="features">Features</a>
   <a class="item" href="formats.html" data-page="formats">Formats</a>
   <a class="item" href="trust.html" data-page="trust">Trust</a>
-  <a class="item" href="changelog.html" data-page="changelog">Changelog</a>
+  <a class="item" href="download.html" data-page="download">Download</a>
+  <a class="item hide" href="changelog.html" data-page="changelog">Changelog</a>
 
   <span class="spacer"></span>
   <a class="item hide" href="https://github.com/PewPewBiches/Suffix">GitHub</a>
+  <!-- System 7 shipped a menu-bar clock as a desk accessory and everyone
+       installed it. Click it for the date, exactly as it behaved then. -->
+  <button class="clock" id="clock" type="button" title="Show the date"></button>
 </div>
 
 <div class="desk">
@@ -105,40 +121,196 @@ Payment terms: net 30 days</code></pre>
     </div>
   </div>
 </div>
-<div class="desk" style="padding-top:0">
-  <div class="trashline">
-    <footer>
-      suffix · mit licensed · built for macOS ·
-      <a href="https://github.com/PewPewBiches/Suffix">source</a> ·
-      <a href="https://github.com/PewPewBiches/Suffix/releases/latest">download</a> ·
-      <a href="https://github.com/PewPewBiches/Suffix/issues">report a problem</a>
-    </footer>
-    <span class="bin" aria-hidden="true"><i></i><i></i></span>
+<div class="pagefoot">
+  <footer>
+    <span>
+      suffix &middot; mit licensed &middot; built for macOS &middot;
+      <a href="https://github.com/PewPewBiches/Suffix">source</a> &middot;
+      <a href="download.html">download</a> &middot;
+      <a href="https://github.com/PewPewBiches/Suffix/issues/new">report a problem</a>
+    </span>
+    <span style="display:flex;align-items:center;gap:18px">
+      <button class="themeswitch" id="themeswitch" type="button" aria-pressed="false">
+        <span class="lamp"></span><span id="themelabel">Night</span>
+      </button>
+      <button class="bin" id="bin" type="button" aria-label="Trash" title="Trash">
+        <span class="lid"></span><span class="can"></span>
+      </button>
+    </span>
+  </footer>
+</div>
+
+<div class="modal" id="about-modal" role="dialog" aria-modal="true" aria-label="About suffix">
+  <div class="dialog">
+    <div class="titlebar"><span class="box" data-close></span><span class="name">About This Mac</span></div>
+    <div class="dbody">
+      <h2>suffix 0.4</h2>
+      <p class="small" style="margin-bottom:14px">Converts files when you rename them.<br>Built for macOS 14 and later. Free, MIT licensed.</p>
+      <div style="font-family:var(--data);font-size:12px">
+        <div>Total Memory &nbsp;&nbsp;8,192K</div>
+        <div style="margin-top:9px">suffix</div>
+        <div class="meter"><i style="width:3%"></i></div>
+        <div class="small">about 240K — it is a very small app</div>
+        <div style="margin-top:9px">Your files, uploaded anywhere</div>
+        <div class="meter"><i style="width:0"></i></div>
+        <div class="small">0K</div>
+      </div>
+      <div class="btns"><button class="btn default" data-close type="button">OK</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="bin-modal" role="dialog" aria-modal="true" aria-label="Trash">
+  <div class="dialog">
+    <div class="titlebar"><span class="box" data-close></span><span class="name">Trash</span></div>
+    <div class="dbody">
+      <p id="bintext">The Trash contains 1 item: <span class="mono">nine-step-png-to-pdf-workflow.txt</span></p>
+      <ul class="binlist" id="binlist"></ul>
+      <p class="small" id="binnote">Close a window with its top-left box and it lands here. Unlike the other thing in there, it can come back out.</p>
+      <div class="btns"><button class="btn default" data-close type="button">OK</button></div>
+    </div>
   </div>
 </div>
 
 <script>
 (function () {
-  // The Apple menu drops down; every other item is a plain link.
+  /* ── Apple menu ── */
   const apple = document.querySelector('.menubar .item[data-menu]');
   if (apple) {
     const menu = apple.querySelector('.menu');
-    const close = () => { apple.setAttribute('aria-expanded', 'false'); menu.classList.remove('open'); };
-    const toggle = e => {
+    const close = () => { apple.setAttribute('aria-expanded','false'); menu.classList.remove('open'); };
+    apple.addEventListener('click', e => {
+      if (e.target.closest('a')) return;               // let menu links work
       e.preventDefault(); e.stopPropagation();
       const open = apple.getAttribute('aria-expanded') === 'true';
       apple.setAttribute('aria-expanded', String(!open));
       menu.classList.toggle('open', !open);
-    };
-    apple.addEventListener('click', toggle);
-    apple.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') toggle(e); });
+    });
     document.addEventListener('click', close);
     document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
   }
-  // Mark the page you are on.
+
+  /* ── current page ── */
   const here = document.body.dataset.page;
   document.querySelectorAll('.menubar a[data-page]').forEach(a => {
-    if (a.dataset.page === here) a.setAttribute('aria-current', 'page');
+    if (a.dataset.page === here) a.setAttribute('aria-current','page');
+  });
+
+  /* ── dialogs ── */
+  const show = id => document.getElementById(id)?.classList.add('open');
+  const hideAll = () => document.querySelectorAll('.modal').forEach(m => m.classList.remove('open'));
+  document.querySelector('[data-about]')?.addEventListener('click', e => { e.preventDefault(); hideAll(); show('about-modal'); });
+  document.getElementById('bin')?.addEventListener('click', () => { hideAll(); paintBin(); show('bin-modal'); });
+  document.addEventListener('click', e => {
+    if (e.target.matches('[data-close]') || e.target.classList.contains('modal')) hideAll();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') hideAll(); });
+
+  /* ── copy buttons on every command box ── */
+  document.querySelectorAll('pre').forEach(pre => {
+    const wrap = document.createElement('div');
+    wrap.className = 'cmd';
+    pre.parentNode.insertBefore(wrap, pre);
+    wrap.appendChild(pre);
+    const btn = document.createElement('button');
+    btn.className = 'copy'; btn.type = 'button'; btn.textContent = 'Copy';
+    btn.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(pre.innerText.trim()); }
+      catch (e) {
+        // Clipboard API needs permission in some browsers; select it instead
+        // so the reader can still copy with the keyboard.
+        const r = document.createRange(); r.selectNodeContents(pre);
+        const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        btn.textContent = 'Press ⌘C'; setTimeout(() => (btn.textContent = 'Copy'), 1800);
+        return;
+      }
+      btn.textContent = 'Copied'; btn.dataset.done = '1';
+      setTimeout(() => { btn.textContent = 'Copy'; delete btn.dataset.done; }, 1500);
+    });
+    wrap.appendChild(btn);
+  });
+
+  /* ── close and zoom boxes actually work ── */
+  document.querySelectorAll('.win > .titlebar').forEach(bar => {
+    const win = bar.parentElement;
+    if (win.closest('.dialog')) return;
+    bar.querySelector('.box:not(.zoom)')?.addEventListener('click', () => {
+      win.style.transition = 'transform .16s ease, opacity .16s ease';
+      win.style.transform = 'scale(.94)'; win.style.opacity = '0';
+      setTimeout(() => {
+        win.style.display = 'none';
+        // Closing something should not be a dead end. It goes in the Trash,
+        // and the Trash can put it back — which is also how the app treats
+        // the file it converted.
+        trashed.push({ el: win, name: bar.querySelector('.name')?.textContent || 'Untitled' });
+        paintBin();
+      }, 160);
+    });
+    bar.querySelector('.box.zoom')?.addEventListener('click', () => {
+      win.classList.toggle('zoomed');
+      win.style.maxWidth = win.classList.contains('zoomed') ? '640px' : '';
+    });
+  });
+
+  /* ── the Trash, which actually holds things ── */
+  const trashed = [];
+  function paintBin() {
+    const ul = document.getElementById('binlist');
+    const txt = document.getElementById('bintext');
+    if (!ul || !txt) return;
+    const n = trashed.length + 1;
+    txt.innerHTML = 'The Trash contains ' + n + (n === 1 ? ' item' : ' items') + ':';
+    ul.innerHTML = '';
+    trashed.forEach((t, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = '<span>' + t.name + ' (window)</span>';
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = 'Put Back';
+      b.addEventListener('click', () => {
+        t.el.style.display = ''; t.el.style.opacity = '1'; t.el.style.transform = 'none';
+        trashed.splice(i, 1); paintBin();
+      });
+      li.appendChild(b);
+      ul.appendChild(li);
+    });
+    const li = document.createElement('li');
+    li.innerHTML = '<span class="mono">nine-step-png-to-pdf-workflow.txt</span><span class="small">not recoverable, and that is fine</span>';
+    ul.appendChild(li);
+    document.getElementById('bin')?.classList.toggle('full', trashed.length > 0);
+  }
+
+  /* ── the menu bar clock ── */
+  const clock = document.getElementById('clock');
+  if (clock) {
+    let showDate = false;
+    const tick = () => {
+      const d = new Date();
+      clock.textContent = showDate
+        ? d.toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' })
+        : d.toLocaleTimeString(undefined, { hour:'numeric', minute:'2-digit' });
+    };
+    clock.addEventListener('click', () => {
+      showDate = !showDate; tick();
+      if (showDate) setTimeout(() => { showDate = false; tick(); }, 3000);
+    });
+    tick(); setInterval(tick, 10000);
+  }
+
+  /* ── night ── */
+  const sw = document.getElementById('themeswitch');
+  const label = document.getElementById('themelabel');
+  const paint = () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (label) label.textContent = dark ? 'Day' : 'Night';
+    sw?.setAttribute('aria-pressed', String(dark));
+  };
+  paint();
+  sw?.addEventListener('click', () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (dark) { document.documentElement.removeAttribute('data-theme'); }
+    else { document.documentElement.setAttribute('data-theme','dark'); }
+    try { localStorage.setItem('suffix-theme', dark ? 'light' : 'dark'); } catch (e) {}
+    paint();
   });
 })();
 </script>

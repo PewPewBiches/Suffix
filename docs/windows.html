@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>trust — suffix</title>
-<meta name="description" content="What suffix can reach, what it never touches, why macOS blocks it, and how to check any of it yourself.">
-<meta property="og:title" content="trust — suffix">
-<meta property="og:description" content="What suffix can reach, what it never touches, why macOS blocks it, and how to check any of it yourself.">
+<title>windows waitlist — suffix</title>
+<meta name="description" content="suffix is macOS only for now. Tell us you want a Windows version and why.">
+<meta property="og:title" content="windows waitlist — suffix">
+<meta property="og:description" content="suffix is macOS only for now. Tell us you want a Windows version and why.">
 <meta property="og:image" content="images/icon-256.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,7 +25,7 @@
   } catch (e) {}
 </script>
 </head>
-<body data-page="trust">
+<body data-page="windows">
 <div class="menubar">
   <!-- The Apple menu opens a menu. It does not navigate — that was the whole
        point of it being a menu, and two things going to the same page is just
@@ -59,79 +59,148 @@
 
 <div class="desk">
   <div class="win">
-    <div class="titlebar"><span class="box"></span><span class="name">Trust</span><span class="box zoom"></span></div>
+    <div class="titlebar"><span class="box"></span><span class="name">suffix for windows</span><span class="box zoom"></span></div>
     <div class="wbody">
-      <h1>what it can<br>and cannot reach</h1>
-      <div class="rule"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      <p class="lede">This app rewrites your files. That deserves a page rather than a sentence.</p>
+      <div class="cols" style="align-items:center">
+        <div>
+          <h1>suffix for windows</h1>
+          <div class="rule"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <p class="lede">it doesn't exist yet. that's what this page is for.</p>
+          <p>
+            the mac version is built almost entirely out of apple's own frameworks —
+            imageio, pdfkit, avfoundation, vision. windows has none of them, so it
+            isn't a port, it's a rewrite. worth doing if enough people actually want it.
+          </p>
+          <p class="small dim">no launch date, no email list you can't leave, no "exciting news soon".</p>
+        </div>
+        <div class="dos" id="dos" aria-hidden="true"></div>
+      </div>
     </div>
   </div>
 
   <div class="win">
-    <div class="titlebar"><span class="box"></span><span class="name">Your files never leave your Mac</span><span class="box zoom"></span></div>
+    <div class="titlebar"><span class="box"></span><span class="name">Put your name down</span><span class="box zoom"></span></div>
+    <div class="wbody">
+      <div class="cols" style="align-items:start">
+        <form id="waitlist">
+          <div class="field">
+            <label for="email">what's your email?</label>
+            <div class="hint">plz make sure it's right, there's no password reset for a waitlist.</div>
+            <input id="email" name="email" type="email" required placeholder="you@wherever.com">
+          </div>
+
+          <div class="field">
+            <label for="use">what would you use it for?</label>
+            <div class="hint">honestly, "heic photos my windows laptop refuses to open" is a complete answer.</div>
+            <textarea id="use" name="use" required placeholder="the thing you keep googling a converter for…"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="help">(optional) do you write windows code? want to help?</label>
+            <div class="hint">the mac version is MIT and the whole engine is documented. it would go faster with someone who knows the platform.</div>
+            <textarea id="help" name="help" placeholder="tell me about yourself"></textarea>
+          </div>
+
+          <div class="btns">
+            <button class="btn default" type="submit">Submit →</button>
+          </div>
+          <p class="small dim" id="formnote" style="margin-top:10px">
+            there's no server behind this page, so Submit writes your answers into a
+            GitHub issue and shows it to you before anything is posted. you can read
+            it, edit it, or close the tab.
+          </p>
+        </form>
+
+        <div>
+          <h3>what a windows version would have to replace</h3>
+          <ul class="spec">
+            <li><span>ImageIO — reads and writes 20 image formats</span><span class="no">no</span></li>
+            <li><span>PDFKit — pages, text layers, rendering</span><span class="no">no</span></li>
+            <li><span>AVFoundation — video and audio, hardware encoders</span><span class="no">no</span></li>
+            <li><span>Vision — on-device OCR, no model to download</span><span class="no">no</span></li>
+            <li><span>FSEvents — knowing a file was renamed</span><span class="no">no</span></li>
+          </ul>
+          <p class="small" style="margin-top:14px">
+            windows has answers for all five, they're just other people's libraries with
+            other people's licences. that's the work, and it's why this is a page with a
+            form on it rather than a download.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span class="box"></span><span class="name">In the meantime</span><span class="box zoom"></span></div>
     <div class="wbody">
       <div class="cols">
         <div>
-          <p class="lede">Suffix contains no network code at all. Conversion uses only what ships with macOS — ImageIO, PDFKit, AVFoundation and Vision.</p>
-          <p>There is no account, no service, and nothing to sign in to. Do not take that on faith:</p>
-<pre><code>git clone https://github.com/PewPewBiches/Suffix.git
-cd Suffix &amp;&amp; ./Scripts/build-app.sh</code></pre>
-        </div>
-        <div class="tw" style="margin:0">
-          <table>
-            <thead><tr><th><span>Item</span></th><th style="text-align:right"><span>Count</span></th></tr></thead>
-            <tbody>
-              <tr><td>Network requests</td><td style="text-align:right">none</td></tr>
-              <tr><td>Telemetry, analytics</td><td style="text-align:right">none</td></tr>
-              <tr><td>Accounts</td><td style="text-align:right">none</td></tr>
-              <tr><td>Bundled binaries</td><td style="text-align:right">none</td></tr>
-              <tr><td>Source published</td><td style="text-align:right">all of it, MIT</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="win">
-    <div class="titlebar"><span class="box"></span><span class="name">It only acts on a deliberate rename</span><span class="box zoom"></span></div>
-    <div class="wbody">
-      <p class="lede">Not on files you copy, download or move. Only when you change a file's extension yourself, to something suffix can produce, and the contents do not already match.</p>
-      <div class="cols">
-        <div>
-          <h2>Skipped entirely</h2>
-          <p>Photos libraries, Photo Booth, Music, iMovie and Final Cut libraries, application bundles, caches, <code>node_modules</code>, <code>.git</code>, and the Trash. A Photos library is a database, not loose files — rewriting anything inside would corrupt it.</p>
+          <h3>the honest answer</h3>
+          <p>if you need this today and you're on windows, use one of those converter sites. they work. they're just tedious, and they see your files.</p>
         </div>
         <div>
-          <h2>Nothing is destroyed</h2>
-          <p>Before anything is overwritten the original is copied aside and kept for seven days, so any conversion can be undone from the menu bar. Stored originals expire on their own rather than growing forever.</p>
+          <h3>if you have a mac too</h3>
+          <p><a href="download.html">the mac version is here</a>, free, and takes about a minute to set up.</p>
         </div>
       </div>
-    </div>
-  </div>
-
-  <div class="win">
-    <div class="titlebar"><span class="box"></span><span class="name">Why macOS says it is unidentified</span><span class="box zoom"></span></div>
-    <div class="wbody">
-      <p class="lede">Because it is unsigned.</p>
-      <p>Gatekeeper blocks the first launch and says the app “cannot be verified”. That is a statement about the missing signature, not about what the app does. Open <strong>System Settings → Privacy &amp; Security</strong> and click <strong>Open Anyway</strong>; you do it once.</p>
-      <p>The same gap means suffix cannot use Notification Center — macOS refuses authorization without a signing identity — so it draws its own notice instead.</p>
-    </div>
-  </div>
-
-  <div class="win">
-    <div class="titlebar"><span class="box"></span><span class="name">The permission it asks for</span><span class="box zoom"></span></div>
-    <div class="wbody">
-      <p class="lede">Full Disk Access, so it can reach Desktop, Documents and Downloads.</p>
-      <p>Without it suffix keeps running and silently does nothing in exactly the folders you use most — which is worse than failing, because it looks like it is working.</p>
-      <div class="note">
-        <span class="tag">Do run the test</span>
-        <p>A silent, healthy-looking failure is this app's characteristic way of going wrong. Setup ends in a <strong>test it</strong> button that converts a real file and shows you the result — it catches the problem while you are still paying attention, instead of three days later.</p>
-      </div>
-      <p class="small">The keyboard shortcut additionally asks Finder what you have selected, which macOS prompts for separately. Declining costs you the shortcut and nothing else — right-click still works.</p>
     </div>
   </div>
 </div>
+
+<script>
+/* The one moment this site leaves the Mac. It types, it fails, it shrugs. */
+(function () {
+  const el = document.getElementById('dos');
+  if (!el) return;
+  const script = [
+    { t: 'C:\\Users\\you> ', d: 0 },
+    { t: 'suffix.exe', d: 70 },
+    { t: '\n\'suffix\' is not recognized as an internal or external command,\noperable program or batch file.\n\n', d: 6 },
+    { t: 'C:\\Users\\you> ', d: 0 },
+    { t: 'please', d: 110 },
+    { t: '\nno.\n\n', d: 6 },
+    { t: 'C:\\Users\\you> ', d: 0 },
+  ];
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.textContent = script.map(s => s.t).join('');
+    return;
+  }
+  let i = 0, j = 0;
+  const caret = '<span class="caret"></span>';
+  // Wait until it is actually on screen — background tabs throttle timers,
+  // and a joke that has already finished is not a joke.
+  new IntersectionObserver((entries, obs) => {
+    if (!entries[0].isIntersecting) return;
+    obs.disconnect(); step();
+  }, { threshold: .4 }).observe(el);
+  function step() {
+    if (i >= script.length) { el.innerHTML = el.textContent + caret; return; }
+    const part = script[i];
+    if (j >= part.t.length) { i++; j = 0; return step(); }
+    el.textContent += part.t[j++];
+    el.innerHTML = el.textContent + caret;
+    setTimeout(step, part.d || 8);
+  }
+})();
+
+/* No backend, so the form composes a GitHub issue you can read before posting. */
+document.getElementById('waitlist')?.addEventListener('submit', e => {
+  e.preventDefault();
+  const v = id => (document.getElementById(id).value || '').trim();
+  const body = [
+    '**email:** ' + v('email'),
+    '', '**would use it for:**', v('use'),
+    '', '**can help build it:**', v('help') || '—',
+  ].join('\n');
+  const url = 'https://github.com/PewPewBiches/Suffix/issues/new'
+            + '?title=' + encodeURIComponent('windows waitlist: ' + v('email'))
+            + '&body='  + encodeURIComponent(body)
+            + '&labels=' + encodeURIComponent('windows');
+  window.open(url, '_blank', 'noopener');
+  document.getElementById('formnote').textContent =
+    'opened in a new tab — read it over, then press "Submit new issue" there to finish.';
+});
+</script>
 <div class="pagefoot">
   <footer>
     <span>

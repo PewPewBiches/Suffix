@@ -1,0 +1,147 @@
+<!--title:windows waitlist — suffix-->
+<!--desc:suffix is macOS only for now. Tell us you want a Windows version and why.-->
+
+<div class="desk">
+  <div class="win">
+    <div class="titlebar"><span class="box"></span><span class="name">suffix for windows</span><span class="box zoom"></span></div>
+    <div class="wbody">
+      <div class="cols" style="align-items:center">
+        <div>
+          <h1>suffix for windows</h1>
+          <div class="rule"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <p class="lede">it doesn't exist yet. that's what this page is for.</p>
+          <p>
+            the mac version is built almost entirely out of apple's own frameworks —
+            imageio, pdfkit, avfoundation, vision. windows has none of them, so it
+            isn't a port, it's a rewrite. worth doing if enough people actually want it.
+          </p>
+          <p class="small dim">no launch date, no email list you can't leave, no "exciting news soon".</p>
+        </div>
+        <div class="dos" id="dos" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span class="box"></span><span class="name">Put your name down</span><span class="box zoom"></span></div>
+    <div class="wbody">
+      <div class="cols" style="align-items:start">
+        <form id="waitlist">
+          <div class="field">
+            <label for="email">what's your email?</label>
+            <div class="hint">plz make sure it's right, there's no password reset for a waitlist.</div>
+            <input id="email" name="email" type="email" required placeholder="you@wherever.com">
+          </div>
+
+          <div class="field">
+            <label for="use">what would you use it for?</label>
+            <div class="hint">honestly, "heic photos my windows laptop refuses to open" is a complete answer.</div>
+            <textarea id="use" name="use" required placeholder="the thing you keep googling a converter for…"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="help">(optional) do you write windows code? want to help?</label>
+            <div class="hint">the mac version is MIT and the whole engine is documented. it would go faster with someone who knows the platform.</div>
+            <textarea id="help" name="help" placeholder="tell me about yourself"></textarea>
+          </div>
+
+          <div class="btns">
+            <button class="btn default" type="submit">Submit →</button>
+          </div>
+          <p class="small dim" id="formnote" style="margin-top:10px">
+            there's no server behind this page, so Submit writes your answers into a
+            GitHub issue and shows it to you before anything is posted. you can read
+            it, edit it, or close the tab.
+          </p>
+        </form>
+
+        <div>
+          <h3>what a windows version would have to replace</h3>
+          <ul class="spec">
+            <li><span>ImageIO — reads and writes 20 image formats</span><span class="no">no</span></li>
+            <li><span>PDFKit — pages, text layers, rendering</span><span class="no">no</span></li>
+            <li><span>AVFoundation — video and audio, hardware encoders</span><span class="no">no</span></li>
+            <li><span>Vision — on-device OCR, no model to download</span><span class="no">no</span></li>
+            <li><span>FSEvents — knowing a file was renamed</span><span class="no">no</span></li>
+          </ul>
+          <p class="small" style="margin-top:14px">
+            windows has answers for all five, they're just other people's libraries with
+            other people's licences. that's the work, and it's why this is a page with a
+            form on it rather than a download.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span class="box"></span><span class="name">In the meantime</span><span class="box zoom"></span></div>
+    <div class="wbody">
+      <div class="cols">
+        <div>
+          <h3>the honest answer</h3>
+          <p>if you need this today and you're on windows, use one of those converter sites. they work. they're just tedious, and they see your files.</p>
+        </div>
+        <div>
+          <h3>if you have a mac too</h3>
+          <p><a href="download.html">the mac version is here</a>, free, and takes about a minute to set up.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* The one moment this site leaves the Mac. It types, it fails, it shrugs. */
+(function () {
+  const el = document.getElementById('dos');
+  if (!el) return;
+  const script = [
+    { t: 'C:\\Users\\you> ', d: 0 },
+    { t: 'suffix.exe', d: 70 },
+    { t: '\n\'suffix\' is not recognized as an internal or external command,\noperable program or batch file.\n\n', d: 6 },
+    { t: 'C:\\Users\\you> ', d: 0 },
+    { t: 'please', d: 110 },
+    { t: '\nno.\n\n', d: 6 },
+    { t: 'C:\\Users\\you> ', d: 0 },
+  ];
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.textContent = script.map(s => s.t).join('');
+    return;
+  }
+  let i = 0, j = 0;
+  const caret = '<span class="caret"></span>';
+  // Wait until it is actually on screen — background tabs throttle timers,
+  // and a joke that has already finished is not a joke.
+  new IntersectionObserver((entries, obs) => {
+    if (!entries[0].isIntersecting) return;
+    obs.disconnect(); step();
+  }, { threshold: .4 }).observe(el);
+  function step() {
+    if (i >= script.length) { el.innerHTML = el.textContent + caret; return; }
+    const part = script[i];
+    if (j >= part.t.length) { i++; j = 0; return step(); }
+    el.textContent += part.t[j++];
+    el.innerHTML = el.textContent + caret;
+    setTimeout(step, part.d || 8);
+  }
+})();
+
+/* No backend, so the form composes a GitHub issue you can read before posting. */
+document.getElementById('waitlist')?.addEventListener('submit', e => {
+  e.preventDefault();
+  const v = id => (document.getElementById(id).value || '').trim();
+  const body = [
+    '**email:** ' + v('email'),
+    '', '**would use it for:**', v('use'),
+    '', '**can help build it:**', v('help') || '—',
+  ].join('\n');
+  const url = 'https://github.com/PewPewBiches/Suffix/issues/new'
+            + '?title=' + encodeURIComponent('windows waitlist: ' + v('email'))
+            + '&body='  + encodeURIComponent(body)
+            + '&labels=' + encodeURIComponent('windows');
+  window.open(url, '_blank', 'noopener');
+  document.getElementById('formnote').textContent =
+    'opened in a new tab — read it over, then press "Submit new issue" there to finish.';
+});
+</script>
