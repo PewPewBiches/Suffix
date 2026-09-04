@@ -6,6 +6,9 @@ import ServiceManagement
 /// Everything the menu bar shows and controls.
 @MainActor
 final class AppModel: ObservableObject {
+    /// One instance, so the app delegate and the scenes share state.
+    static let shared = AppModel()
+
     @Published private(set) var isWatching = false
     @Published private(set) var history: [HistoryEntry] = []
     @Published private(set) var lastError: String?
@@ -17,6 +20,9 @@ final class AppModel: ObservableObject {
     @AppStorage("confirmLarge")   var confirmLarge = true  { didSet { pushOptions() } }
     /// Watch external drives as well as the home folder.
     @AppStorage("includeVolumes") var includeVolumes = true { didSet { restartWatching() } }
+    /// Replace the renamed file, or leave the original beside the result.
+    @AppStorage("outputMode")     var outputMode = OutputMode.replace { didSet { pushOptions() } }
+    @AppStorage("hasOnboarded")   var hasOnboarded = false
 
     /// Registered with the system rather than stored by us, so the toggle
     /// reflects reality even if the user changes it in System Settings.
@@ -101,17 +107,33 @@ final class AppModel: ObservableObject {
                 await MainActor.run {
                     self.history = service.history
                     self.lastError = nil
-                    Notifier.converted(name: result.finalURL.lastPathComponent,
-                                       summary: plan.summary,
-                                       at: result.finalURL)
+                    self.announce(result, originalName: originalName)
                 }
             } catch {
                 await MainActor.run {
                     self.lastError = error.localizedDescription
-                    Notifier.failed(name: originalName, reason: error.localizedDescription)
+                    NoticeCenter.shared.show(Notice(
+                        title: "Couldn't convert \(originalName)",
+                        detail: error.localizedDescription,
+                        isError: true))
                 }
             }
         }
+    }
+
+    private func announce(_ result: ConversionResult, originalName: String) {
+        let entry = service.history.first
+        NoticeCenter.shared.show(Notice(
+            title: "Converted",
+            from: originalName,
+            to: result.finalURL.lastPathComponent,
+            detail: result.keptAlongside.map { "\($0.lastPathComponent) kept alongside" },
+            thumbnail: Thumbnail.image(for: result.finalURL),
+            undo: entry.flatMap { e in e.canUndo ? { [weak self] in self?.undo(e) } : nil },
+            reveal: { [weak self] in
+                _ = self
+                NSWorkspace.shared.activateFileViewerSelecting([result.finalURL])
+            }))
     }
 
     // MARK: - Actions the menu offers
@@ -143,7 +165,8 @@ final class AppModel: ObservableObject {
     private func pushOptions() {
         service.options = ConversionOptions(quality: quality,
                                             rasterScale: rasterScale,
-                                            keepOriginal: keepOriginals)
+                                            keepOriginal: keepOriginals,
+                                            outputMode: outputMode)
         service.confirmLargeJobs = confirmLarge
     }
 }

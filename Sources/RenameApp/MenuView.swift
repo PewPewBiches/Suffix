@@ -13,20 +13,15 @@ struct MenuView: View {
 
         if model.history.isEmpty {
             Text("No conversions yet")
-                .foregroundStyle(.secondary)
             Text("Rename a file's extension in Finder to convert it.")
-                .font(.caption)
-                .foregroundStyle(.tertiary)
         } else {
             Section("Recent") {
                 ForEach(model.history.prefix(8)) { entry in
-                    Menu(entry.finalURL.lastPathComponent) {
+                    Menu("\(entry.originalName)  →  \(entry.finalURL.lastPathComponent)") {
                         Text(entry.summary)
                         Button("Show in Finder") { model.reveal(entry) }
                         if entry.canUndo {
-                            Button("Undo — put \(entry.originalName) back") {
-                                model.undo(entry)
-                            }
+                            Button("Undo — put \(entry.originalName) back") { model.undo(entry) }
                         }
                     }
                 }
@@ -35,7 +30,7 @@ struct MenuView: View {
 
         if let error = model.lastError {
             Divider()
-            Text(error).foregroundStyle(.red)
+            Text(error)
         }
 
         Divider()
@@ -46,7 +41,11 @@ struct MenuView: View {
         }
         .keyboardShortcut(",", modifiers: .command)
 
-        Button("Quit Rename") { NSApp.terminate(nil) }
+        Button("How to use REname…") {
+            SetupWindow.shared.show(model: model)
+        }
+
+        Button("Quit REname") { NSApp.terminate(nil) }
             .keyboardShortcut("q", modifiers: .command)
     }
 }
@@ -56,51 +55,71 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            Section {
+                ForEach(OutputMode.allCases) { mode in
+                    ChoiceCard(title: mode.title,
+                               systemImage: mode == .replace
+                                   ? "arrow.triangle.2.circlepath" : "doc.on.doc",
+                               isSelected: model.outputMode == mode,
+                               action: { model.outputMode = mode }) {
+                        Text(mode.explanation())
+                            .font(.system(size: 12))
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            } header: {
+                Text("When a file converts")
+            }
+
             Section("Watching") {
                 Toggle("Launch at login", isOn: Binding(
                     get: { model.launchAtLogin },
                     set: { model.launchAtLogin = $0 }))
                 Toggle("Include external drives", isOn: $model.includeVolumes)
-                Text(model.isWatching
-                     ? "Watching \(model.watchRoots.map(\.lastPathComponent).joined(separator: ", "))"
-                     : "Not watching")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                LabeledContent("Status") {
+                    Label(model.isWatching ? "Watching your files" : "Paused",
+                          systemImage: model.isWatching ? "checkmark.circle.fill" : "pause.circle.fill")
+                        .foregroundStyle(model.isWatching ? Style.accent : .secondary)
+                        .font(.system(size: 12, weight: .medium))
+                }
             }
 
-            Section("Conversion") {
+            Section("Quality") {
                 Slider(value: $model.quality, in: 0.3...1.0) {
                     Text("JPEG quality")
                 } minimumValueLabel: {
-                    Text("Small").font(.caption)
+                    Text("Smaller").font(.caption)
                 } maximumValueLabel: {
-                    Text("Best").font(.caption)
+                    Text("Better").font(.caption)
                 }
 
-                Picker("PDF page resolution", selection: $model.rasterScale) {
-                    Text("Screen (72 dpi)").tag(1.0)
-                    Text("Retina (144 dpi)").tag(2.0)
-                    Text("Print (216 dpi)").tag(3.0)
+                Picker("PDF pages render at", selection: $model.rasterScale) {
+                    Text("Screen — 72 dpi").tag(1.0)
+                    Text("Retina — 144 dpi").tag(2.0)
+                    Text("Print — 216 dpi").tag(3.0)
                 }
 
                 Toggle("Ask before converting long PDFs", isOn: $model.confirmLarge)
             }
 
-            Section("Originals") {
-                Toggle("Keep originals so conversions can be undone",
-                       isOn: $model.keepOriginals)
-                LabeledContent("Currently stored", value: model.originalsSize)
+            Section {
+                Toggle("Keep originals for seven days", isOn: $model.keepOriginals)
+                LabeledContent("Using", value: model.originalsSize)
                 HStack {
                     Button("Show in Finder") { model.openOriginalsFolder() }
-                    Button("Delete all") { model.emptyOriginals() }
+                    Button("Delete all now") { model.emptyOriginals() }
                 }
-                Text("Originals are deleted automatically after a week.")
+            } header: {
+                Text("Undo history")
+            } footer: {
+                Text("Originals are stored outside the folder so they don't clutter it, and are deleted automatically after a week.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
-        .frame(width: 420)
+        .frame(width: 460)
         .fixedSize(horizontal: false, vertical: true)
     }
 }

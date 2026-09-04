@@ -184,3 +184,56 @@ func serviceConfirmsLargeJobs() {
     #expect(plan.needsConfirmation)
     #expect(service.confirmLargeJobs)
 }
+
+// MARK: - Keeping both files
+
+@Test("keepBoth leaves the original beside the result, under its true name")
+func keepBothProducesTwoFiles() throws {
+    let url = try makeImage(.png, named: "invoice.pdf")   // PNG bytes, .pdf name
+    let p = try plan(source: .png, ext: "pdf").get()
+    let result = try Converter(options: .init(keepOriginal: false, outputMode: .keepBoth))
+        .run(p, on: url)
+
+    let kept = try #require(result.keptAlongside)
+    #expect(kept.lastPathComponent == "invoice.png")
+    #expect(FileFormat.detect(at: kept) == .png)      // original, untouched
+    #expect(FileFormat.detect(at: url) == .pdf)       // converted, as renamed
+    #expect(kept.deletingLastPathComponent() == url.deletingLastPathComponent())
+}
+
+@Test("replace leaves exactly one file")
+func replaceProducesOneFile() throws {
+    let url = try makeImage(.png, named: "invoice.pdf")
+    let p = try plan(source: .png, ext: "pdf").get()
+    let result = try Converter(options: .init(keepOriginal: false, outputMode: .replace))
+        .run(p, on: url)
+
+    #expect(result.keptAlongside == nil)
+    let siblings = try FileManager.default.contentsOfDirectory(
+        atPath: url.deletingLastPathComponent().path)
+    #expect(siblings == ["invoice.pdf"])
+}
+
+@Test("keeping both never overwrites a file that is already there")
+func keepBothAvoidsCollisions() throws {
+    let url = try makeImage(.png, named: "shot.jpg")
+    // Something already occupies the name the original would take.
+    let occupied = url.deletingLastPathComponent().appendingPathComponent("shot.png")
+    try "not an image".write(to: occupied, atomically: true, encoding: .utf8)
+
+    let p = try plan(source: .png, ext: "jpg").get()
+    let result = try Converter(options: .init(keepOriginal: false, outputMode: .keepBoth))
+        .run(p, on: url)
+
+    let kept = try #require(result.keptAlongside)
+    #expect(kept.lastPathComponent == "shot 2.png")
+    // The pre-existing file is still intact.
+    #expect(try String(contentsOf: occupied, encoding: .utf8) == "not an image")
+}
+
+@Test("both modes explain themselves with a concrete example")
+func modesExplainThemselves() {
+    #expect(OutputMode.keepBoth.explanation().contains("photo.png"))
+    #expect(OutputMode.replace.explanation().contains("becomes"))
+    #expect(OutputMode.allCases.count == 2)
+}
