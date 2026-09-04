@@ -59,7 +59,6 @@ nav.top .inner{
   display:flex;align-items:center;gap:9px;text-decoration:none;
   font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:-.04em;
 }
-.brand img{width:22px;height:22px;border-radius:6px}
 nav.top .links{display:flex;gap:22px;margin-left:auto;font-size:14.5px}
 nav.top .links a{text-decoration:none;color:var(--muted);padding:4px 0;border-bottom:1.5px solid transparent}
 nav.top .links a:hover{color:var(--ink)}
@@ -69,7 +68,7 @@ nav.top .links a.ext::after{content:" ↗";font-size:.85em;opacity:.6}
 @media(max-width:520px){nav.top .links a.hide{display:none}}
 
 /* ---- page head ---- */
-.head{padding:74px 0 40px;border-bottom:1px solid var(--line)}
+.head{padding:74px 0 40px}
 .eyebrow{
   font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;
   text-transform:uppercase;color:var(--faint);margin:0 0 16px;
@@ -89,8 +88,7 @@ h2{
 h3{font-size:16.5px;font-weight:700;margin:26px 0 7px;letter-spacing:-.01em}
 p{margin:0 0 15px;max-width:70ch}
 .lede{font-size:18px}
-section{padding:56px 0;border-bottom:1px solid var(--line)}
-section:last-of-type{border-bottom:0}
+section{padding:56px 0}
 
 code{font-family:var(--mono);font-size:.87em;background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 5px}
 pre{

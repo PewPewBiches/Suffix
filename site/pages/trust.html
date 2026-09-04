@@ -53,7 +53,7 @@ cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
 <section><div class="shell">
   <h2>why macOS says it is unidentified</h2>
   <p class="lede">
-    Because it is. Signing costs $99 a year and this is free.
+    Because it is unsigned.
   </p>
   <p>
     Gatekeeper blocks the first launch and says the app “cannot be verified”.
@@ -63,8 +63,8 @@ cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
   </p>
   <p>
     The same gap means suffix cannot use Notification Center — macOS refuses
-    authorization outright without a Team Identifier — so it draws its own
-    notice instead.
+    authorization without a signing identity — so it draws its own notice
+    instead.
   </p>
 </div></section>
 
@@ -87,7 +87,7 @@ cd Suffix &amp;&amp; ./Scripts/build-app.sh &amp;&amp; open build</code></pre>
     </p>
   </div>
   <p>
-    The ⌥⌘S shortcut additionally asks Finder what you have selected, which macOS
+    The keyboard shortcut additionally asks Finder what you have selected, which macOS
     prompts for separately the first time. Declining it costs you the shortcut
     and nothing else — right-click still works.
   </p>
