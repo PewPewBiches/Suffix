@@ -148,3 +148,39 @@ func pruning() throws {
     #expect(!fm.fileExists(atPath: old.path))
     #expect(fm.fileExists(atPath: new.path))
 }
+
+// MARK: - Watcher filtering
+
+@Test("system and churn directories are ignored")
+func watcherExcludesNoise() {
+    #expect(!RenameWatcher.isEligible(path: "/System/Library/thing.png"))
+    #expect(!RenameWatcher.isEligible(path: NSHomeDirectory() + "/Library/Caches/x.png"))
+    #expect(!RenameWatcher.isEligible(path: "/Users/me/proj/node_modules/a/logo.png"))
+    #expect(!RenameWatcher.isEligible(path: "/Users/me/.Trash/old.png"))
+    #expect(!RenameWatcher.isEligible(path: "/Users/me/proj/.git/x.png"))
+}
+
+@Test("only files we could actually convert are considered")
+func watcherExtensionGate() {
+    #expect(RenameWatcher.isEligible(path: "/Users/me/Desktop/photo.jpg"))
+    #expect(RenameWatcher.isEligible(path: "/Users/me/Desktop/scan.pdf"))
+    #expect(!RenameWatcher.isEligible(path: "/Users/me/Desktop/notes.txt"))
+    #expect(!RenameWatcher.isEligible(path: "/Users/me/Desktop/archive.zip"))
+    #expect(!RenameWatcher.isEligible(path: "/Users/me/Desktop/.hidden.png"))
+}
+
+@Test("a rename that changes nothing is not treated as work")
+func serviceIgnoresNonConversions() throws {
+    let url = try makeImage(.jpeg, named: "already.jpg")
+    if case .ignore = ConversionService().decide(url) {} else {
+        Issue.record("a correctly-named JPEG should be ignored")
+    }
+}
+
+@Test("a large PDF job asks before running")
+func serviceConfirmsLargeJobs() {
+    let service = ConversionService()
+    let plan = ConversionPlan.pdfToImageArchive(to: .jpeg, pages: 200)
+    #expect(plan.needsConfirmation)
+    #expect(service.confirmLargeJobs)
+}
