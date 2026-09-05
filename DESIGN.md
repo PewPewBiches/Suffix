@@ -106,6 +106,22 @@ Lowercase headlines. Plain sentences. Say what the thing does and what it costs.
 
 ## The icon
 
-A dark rounded square. A white monospace period, then a selection-blue block —
-the dot and the highlighted extension after it. Two shapes, so it still reads
-at 16px.
+A dark rounded square. A white square period, then an **S** in Krungthep with
+the six colours living inside the letter. Suffix is what comes after the dot,
+so the icon is a dot and what comes after it.
+
+Two shapes, and they have to *stay* two shapes. The first version of this made
+the dot part of the rainbow too; at 16px it dissolved into the letter and the
+mark became one coloured blob. White keeps them apart at every size, which is
+the entire job of an icon that small.
+
+It replaced a mark that spelled out `.pdf` in a selection block. That failed
+three ways: the type was unreadable below 64px, an app that handles 23 formats
+was badging itself as one of them, and in Spotlight it sat among real files
+looking like a PDF document rather than an app.
+
+**In the menu bar** the same mark is drawn as a template — one colour plus
+alpha, which macOS tints to match the bar. The six colours cannot come along,
+so the shape carries it alone. Solid when watching, ghosted when paused, and
+during a long conversion it fills from the baseline up, so a video export is
+visibly working rather than apparently hung.
