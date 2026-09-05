@@ -6,7 +6,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-VERSION="${1:-0.1.0}"
+VERSION="${1:-$(cat VERSION)}"
 STAGE="build/dmg"
 DMG="build/Suffix-$VERSION.dmg"
 
@@ -33,8 +33,13 @@ To open it:
 
 You only do this once.
 
-Suffix has no network access. It converts files using only what ships with
-macOS, and never sends anything anywhere.
+After that, Suffix opens a setup window and walks you through the rest. It asks
+for Full Disk Access, tells you what it is used for and what it does not allow,
+and then converts a real file in front of you so you can see the whole chain
+working rather than hope it is.
+
+Suffix has no networking in it. It converts files using only what ships with
+macOS, and there is nothing in the app capable of sending anything anywhere.
 NOTE
 
 hdiutil create -volname "Suffix" -srcfolder "$STAGE" -ov -format UDZO "$DMG" >/dev/null

@@ -167,7 +167,10 @@ final class NoticeCenter {
             $0.duration = 0.15
             panel.animator().alphaValue = 0
         } completionHandler: {
-            panel.orderOut(nil)
+            // The completion handler is nonisolated, and orderOut is main-actor
+            // work; hopping explicitly is the difference between a warning today
+            // and a crash under a stricter compiler.
+            Task { @MainActor in panel.orderOut(nil) }
         }
         layout(animated: true)
     }

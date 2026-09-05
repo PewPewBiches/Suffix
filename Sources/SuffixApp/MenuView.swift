@@ -13,6 +13,17 @@ struct MenuView: View {
             Text("Converting… \(Int(fraction * 100))%")
         }
 
+        // Without Full Disk Access the app runs perfectly and converts nothing
+        // in the folders anyone uses. Saying so here is the difference between
+        // a five-minute fix and assuming the app is broken.
+        if !Permission.fullDisk.measure().isSatisfied {
+            Divider()
+            Text("No access to your files — nothing will convert")
+            Button("Fix this…") {
+                SetupWindow.shared.show(model: model, startStep: 2)
+            }
+        }
+
         Divider()
 
         Button("File actions for Finder selection…") {
@@ -53,6 +64,8 @@ struct MenuView: View {
 
         Button("How to use Suffix…") { SetupWindow.shared.show(model: model) }
 
+        Button("Permissions…") { SetupWindow.shared.show(model: model, startStep: 2) }
+
         Button("Quit Suffix") { NSApp.terminate(nil) }
             .keyboardShortcut("q", modifiers: .command)
     }
@@ -74,6 +87,8 @@ struct SettingsView: View {
                 .tabItem { Label("Converting", systemImage: "arrow.triangle.2.circlepath") }
             ActionsPane(model: model)
                 .tabItem { Label("Finder", systemImage: "folder") }
+            PermissionsPane()
+                .tabItem { Label("Permissions", systemImage: "lock.shield") }
             UndoPane(model: model)
                 .tabItem { Label("Undo", systemImage: "clock.arrow.circlepath") }
         }
@@ -217,6 +232,33 @@ private struct ActionsPane: View {
         recording = false
         if let monitor { NSEvent.removeMonitor(monitor) }
         monitor = nil
+    }
+}
+
+/// The setup checklist, still reachable afterwards.
+///
+/// macOS lets people revoke any of these at any time, from another app, with
+/// no notification. A settings tab that shows the live answer is the only way
+/// the app can explain itself when it suddenly stops working.
+private struct PermissionsPane: View {
+    @StateObject private var monitor = PermissionMonitor()
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                PermissionList(monitor: monitor)
+
+                Text("Open a row for what it is used for and what it does not allow. macOS can revoke any of these at any time — this list is measured, not remembered.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Divider().opacity(0.4)
+                PermissionAssurance()
+            }
+            .padding(20)
+        }
+        .frame(minHeight: 380)
     }
 }
 

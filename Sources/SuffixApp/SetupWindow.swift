@@ -13,20 +13,29 @@ final class SetupWindow {
     static let shared = SetupWindow()
     private var window: NSWindow?
 
-    func show(model: AppModel) {
+    /// `startStep` lets the menu jump straight to the permission checklist,
+    /// which is where someone goes when the app has stopped working.
+    func show(model: AppModel, startStep: Int = 0) {
         if let window {
-            NSApp.activate(ignoringOtherApps: true)
-            window.makeKeyAndOrderFront(nil)
-            return
+            // Rebuild rather than reuse when a specific step was asked for:
+            // the old view is still sitting on whichever step it was left on.
+            if startStep != 0 {
+                window.close()
+                self.window = nil
+            } else {
+                NSApp.activate(ignoringOtherApps: true)
+                window.makeKeyAndOrderFront(nil)
+                return
+            }
         }
 
-        let view = OnboardingView(model: model) { [weak self] in
+        let view = OnboardingView(model: model, startStep: startStep) { [weak self] in
             model.hasOnboarded = true
             self?.close()
         }
 
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 520, height: 460),
+            contentRect: NSRect(x: 0, y: 0, width: 540, height: 520),
             styleMask: [.titled, .closable, .fullSizeContentView],
             backing: .buffered, defer: false)
         window.contentView = NSHostingView(rootView: view)

@@ -10,7 +10,9 @@ cd "$(dirname "$0")/.."
 CONFIG="${CONFIG:-release}"
 APP="${APP_DEST:-build/Suffix.app}"
 BUNDLE_ID="io.github.pewpewbiches.Suffix"
-VERSION="0.1.0"
+# One source of truth. This was a hand-edited string and it stayed at 0.1.0
+# through three releases, so every shipped build lied about its own version.
+VERSION="$(cat VERSION)"
 
 echo "Building ($CONFIG)…"
 swift build -c "$CONFIG" --product SuffixApp
@@ -46,6 +48,11 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <string>Suffix converts files in Downloads when you change their extension.</string>
   <key>NSRemovableVolumesUsageDescription</key>
   <string>Suffix converts files on external drives when you change their extension.</string>
+  <!-- Required to send Apple Events at all. Without it macOS denies them
+       outright and shows the user no prompt, so the keyboard shortcut and
+       every iWork export fail silently. -->
+  <key>NSAppleEventsUsageDescription</key>
+  <string>Suffix asks Finder which files you have selected, and asks Pages, Keynote or Numbers to export a document you renamed to .pdf. It does not change anything through either.</string>
   <!-- Finder right-click entries. NSSendFileTypes decides which selections
        they appear for, so they stay out of the menu for everything else. -->
   <!-- One entry, opening Suffix's own panel. Three separate ones sat two

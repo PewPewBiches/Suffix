@@ -14,7 +14,8 @@ struct OnboardingView: View {
     let finish: () -> Void
 
     @State private var step: Int
-    private let steps = ["Welcome", "How it works", "Permission", "Your choice"]
+    @StateObject private var permissions = PermissionMonitor()
+    private let steps = ["Welcome", "How it works", "Permissions", "Test", "Your choice"]
 
     init(model: AppModel, startStep: Int = 0, finish: @escaping () -> Void) {
         self.model = model
@@ -31,8 +32,9 @@ struct OnboardingView: View {
             Group {
                 switch step {
                 case 0: WelcomeStep()
-                case 1: HowItWorksStep()
-                case 2: PermissionStep(model: model)
+                case 1: HowItWorksStep(model: model)
+                case 2: PermissionStep(permissions: permissions)
+                case 3: TestStep(model: model, permissions: permissions)
                 default: ChoiceStep(model: model)
                 }
             }
@@ -42,7 +44,7 @@ struct OnboardingView: View {
             Divider().opacity(0.5)
             controls
         }
-        .frame(width: 520, height: 460)
+        .frame(width: 540, height: 520)
     }
 
     private var progress: some View {
@@ -66,14 +68,24 @@ struct OnboardingView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Button(step == steps.count - 1 ? "Start using Suffix" : "Continue") {
+            // On the permission step the button is a deliberate "carry on
+            // without it" rather than a plain Continue — leaving it grants
+            // nothing, and pretending otherwise is how apps end up silently
+            // broken.
+            Button(continueTitle) {
                 if step == steps.count - 1 { finish() } else { withAnimation { step += 1 } }
             }
             .buttonStyle(.borderedProminent)
-                        .keyboardShortcut(.defaultAction)
+            .keyboardShortcut(.defaultAction)
         }
         .padding(.horizontal, 26)
         .padding(.vertical, 15)
+    }
+
+    private var continueTitle: String {
+        if step == steps.count - 1 { return "Start using Suffix" }
+        if step == 2 && !permissions.allRequiredGranted { return "Continue without it" }
+        return "Continue"
     }
 }
 
@@ -107,6 +119,7 @@ private struct WelcomeStep: View {
 }
 
 private struct HowItWorksStep: View {
+    @ObservedObject var model: AppModel
     @State private var stage = 0
 
     // A loop of the real gesture, rather than a screenshot of it. Only the
@@ -159,7 +172,7 @@ private struct HowItWorksStep: View {
                 ForEach([("photo.on.rectangle.angled", "Images, PDFs, video, audio and documents"),
                          ("text.viewfinder", "Rename a screenshot to .txt to read the words in it"),
                          ("arrow.uturn.backward", "Anything can be undone for seven days"),
-                         ("square.grid.2x2", "Select several files and press ⌥⌘S to merge, compress or zip")],
+                         ("square.grid.2x2", "Select several files and press \(model.shortcut.display) to merge, compress or zip")],
                         id: \.1) { icon, text in
                     HStack(spacing: 9) {
                         // Fixed column so the labels line up rather than
@@ -188,49 +201,56 @@ private struct HowItWorksStep: View {
 }
 
 private struct PermissionStep: View {
+    @ObservedObject var permissions: PermissionMonitor
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 15) {
+                Text("What Suffix needs from macOS")
+                    .font(.title2).fontWeight(.semibold)
+
+                Text("""
+                     Three things, one of them required. Open a row to read what \
+                     each one is for and — the part usually left out — what it \
+                     does not allow.
+                     """)
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                PermissionList(monitor: permissions, startExpanded: .fullDisk)
+
+                Divider().opacity(0.4)
+                PermissionAssurance()
+            }
+            .padding(30)
+        }
+    }
+}
+
+/// Proving it works, which is the whole point of a setup screen for an app
+/// whose characteristic failure is looking healthy while doing nothing.
+private struct TestStep: View {
     @ObservedObject var model: AppModel
+    @ObservedObject var permissions: PermissionMonitor
     @State private var test: SelfTest.State = .idle
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 17) {
-            Text("Let Suffix reach your files")
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Prove it works")
                 .font(.title2).fontWeight(.semibold)
 
             Text("""
-                 macOS protects your Desktop, Documents and Downloads. Without \
-                 access, Suffix keeps running but silently does nothing in \
-                 exactly the folders you use most.
+                 This writes a small image to your Desktop, renames it, waits for \
+                 Suffix to convert it, and deletes both. If anything in the chain \
+                 is wrong you will find out here rather than next week.
                  """)
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Button {
-                NSWorkspace.shared.open(URL(string:
-                    "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")!)
-            } label: {
-                Label("Open Privacy & Security settings", systemImage: "arrow.up.forward.app")
-            }
-
-            Text("Turn on **Full Disk Access** for Suffix, then come back and test it.")
-                .font(.callout)
-                .foregroundStyle(.tertiary)
-
-            Divider().opacity(0.4)
-
-            Toggle("Skip Finder's extension warning", isOn: Binding(
-                get: { !model.finderWarningShown },
-                set: { model.finderWarningShown = !$0 }))
-            Text("Otherwise Finder asks you to confirm every rename, before Suffix ever sees the file. Changing this restarts Finder.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-
-            Divider().opacity(0.4)
-
-            // Proving it works is the whole point of this screen.
             HStack(spacing: 11) {
-                Button("Test it now") {
+                Button(test == .passed ? "Run it again" : "Run the test") {
                     test = .running
                     Task { test = await SelfTest.run() }
                 }
@@ -238,8 +258,7 @@ private struct PermissionStep: View {
 
                 switch test {
                 case .idle:
-                    Text("Converts a sample file on your Desktop")
-                        .font(.callout).foregroundStyle(.tertiary)
+                    EmptyView()
                 case .running:
                     HStack(spacing: 6) {
                         ProgressView().controlSize(.small)
@@ -252,10 +271,34 @@ private struct PermissionStep: View {
                 case .failed(let why):
                     Label(why, systemImage: "exclamationmark.triangle.fill")
                         .font(.callout)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(.orange)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
+
+            if case .failed = test, !permissions.allRequiredGranted {
+                Button("Back to Full Disk Access") {
+                    Permission.fullDisk.ask()
+                }
+                .font(.callout)
+            }
+
+            Divider().opacity(0.4)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Toggle("Skip Finder's extension warning", isOn: Binding(
+                    get: { !model.finderWarningShown },
+                    set: { model.finderWarningShown = !$0 }))
+                Text("""
+                     Finder asks you to confirm every extension change, before \
+                     Suffix ever sees the file. Turning this off restarts Finder, \
+                     which takes a moment and loses nothing.
+                     """)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
             Spacer()
         }
         .padding(30)

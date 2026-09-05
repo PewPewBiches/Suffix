@@ -76,7 +76,12 @@
           <tr><td class="f">changed</td><td>three Services entries became one panel that shows every action and greys out what does not apply, with the reason</td></tr>
           <tr><td class="f">changed</td><td>settings split into four tabs; the file actions are finally mentioned inside the app</td></tr>
           <tr><td class="f">changed</td><td>new icon and notice, both built from one idea: a selected extension</td></tr>
+          <tr><td class="f">added</td><td>setup asks for each permission separately and says, in the same breath, what it does <em>not</em> allow — then converts a real file so you can see the whole chain working</td></tr>
+          <tr><td class="f">added</td><td>a Permissions tab in Settings that measures what macOS is currently allowing rather than remembering what it once allowed</td></tr>
+          <tr><td class="f">added</td><td>the menu bar says <span class="sel">No access to your files</span> when Full Disk Access is missing, instead of running perfectly and converting nothing</td></tr>
           <tr><td class="f">removed</td><td>dead code — an unused faithfulness check, and an error describing a Pages preview that turned out not to exist</td></tr>
+          <tr><td class="f">fixed</td><td><code>NSAppleEventsUsageDescription</code> was missing, so macOS could deny the Finder shortcut and every iWork export with no prompt at all</td></tr>
+          <tr><td class="f">fixed</td><td>every build since 0.1.0 reported itself as 0.1.0 — the version was a hand-edited string in the build script and nobody edited it</td></tr>
           <tr><td class="f">fixed</td><td>a test that raced on shared state and failed about one run in five</td></tr>
         </tbody>
       </table></div>

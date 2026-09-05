@@ -102,10 +102,40 @@
           <p>The app is unsigned, so Gatekeeper stops it once. Open <strong>System Settings → Privacy &amp; Security</strong>, scroll to the line about suffix, click <strong>Open Anyway</strong>.</p>
         </div>
         <div>
-          <h3>3 &middot; Run the test</h3>
-          <p>Setup asks for Full Disk Access, then converts a real file to prove the whole chain works. <a href="trust.html">Why that matters →</a></p>
+          <h3>3 &middot; Let setup do the rest</h3>
+          <p>It asks for one permission, explains what that permission does <em>not</em> allow, and then converts a real file in front of you. About a minute.</p>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span class="box"></span><span class="name">What it asks for, and what it can't do with it</span><span class="box zoom"></span></div>
+    <div class="wbody">
+      <p>Three permissions. Only the first is required, and macOS asks for the other two itself, at the moment they are needed. The app shows this same list in Settings, measured live &mdash; so if something stops working you can see which permission went away.</p>
+      <div class="tw">
+        <table>
+          <thead><tr><th><span>macOS asks</span></th><th><span>Because</span></th><th><span>What it does not allow</span></th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="f">Full Disk Access</td>
+              <td>Desktop, Documents, Downloads and iCloud Drive are protected. Without it suffix runs perfectly and converts nothing in the four folders you use.</td>
+              <td>It reads a file only when you rename it to a different format, and only that file. There is no networking in the app at all.</td>
+            </tr>
+            <tr>
+              <td class="f">Control Finder</td>
+              <td>The keyboard shortcut arrives with no files attached, so it has to ask Finder what you selected. Only needed for the shortcut.</td>
+              <td>One question per press: which files are selected. It cannot move, open or delete anything through this.</td>
+            </tr>
+            <tr>
+              <td class="f">Control Pages, Keynote, Numbers</td>
+              <td>A <span class="mono">.pages</span> file is a sealed bundle only Apple's app can open, so suffix asks it to export the PDF.</td>
+              <td>Opens the document, exports, closes. It does not edit or save over your original.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small">You can revoke any of them at any time in System Settings. The app will tell you it has, rather than quietly stopping. <a href="trust.html">The longer version →</a></p>
     </div>
   </div>
 

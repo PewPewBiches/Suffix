@@ -87,13 +87,23 @@ app is here — clone it and run `./Scripts/build-app.sh` to build your own.
 
 ### Give it access to your files
 
-macOS protects Desktop, Documents and Downloads. Without access Suffix keeps
-running but silently does nothing in exactly the folders you use most, so the
-setup window asks for **Full Disk Access** and then offers a **Test it** button
-that converts a real file to prove the whole chain works.
+Setup walks through this. There are three permissions, each shown with what it
+is for and — the part usually left out — what it does not allow:
 
-Don't skip the test. A silent, healthy-looking failure is this app's
-characteristic way of going wrong.
+| macOS asks | Because | What it does not allow |
+|---|---|---|
+| **Full Disk Access** *(required)* | Desktop, Documents, Downloads and iCloud Drive are protected. Without it Suffix runs perfectly and converts nothing in the four folders you use. | Reads a file only when you rename it to a different format, and only that file. There is no networking in the app at all. |
+| **Control Finder** *(for the shortcut)* | The keyboard shortcut arrives with no files attached, so it asks Finder what you selected. | One question per press. It cannot move, open or delete anything through this. |
+| **Control Pages / Keynote / Numbers** *(for those formats)* | A `.pages` file is a sealed bundle only Apple's app can open, so Suffix asks it to export. | Opens, exports, closes. It does not edit or save over your original. |
+
+Only the first needs a trip to System Settings; macOS prompts for the other two
+itself, at the moment they are first needed. **Settings → Permissions** shows
+the same list afterwards, measured live rather than remembered — so when
+something stops working you can see which permission went away.
+
+The last setup step converts a real file to prove the whole chain works. Don't
+skip it. A silent, healthy-looking failure is this app's characteristic way of
+going wrong.
 
 ---
 

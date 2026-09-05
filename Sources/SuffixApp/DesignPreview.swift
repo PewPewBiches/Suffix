@@ -32,11 +32,23 @@ enum DesignPreview {
 
     private static func surfaces(model: AppModel) -> [(String, AnyView)] {
         var out: [(String, AnyView)] = []
-        for step in 0..<4 {
+        for step in 0..<5 {
             out.append(("setup-\(step)",
                         AnyView(OnboardingView(model: model, startStep: step, finish: {})
-                                    .frame(width: 520, height: 460))))
+                                    .frame(width: 540, height: 520))))
         }
+        // Rendered without its ScrollView: ImageRenderer cannot rasterise
+        // scrolling content, so the setup-2 sheet comes out blank and this is
+        // the only way to actually see the permission rows.
+        out.append(("permissions", AnyView(
+            VStack(alignment: .leading, spacing: 14) {
+                PermissionList(monitor: PermissionMonitor(), startExpanded: .fullDisk)
+                Divider().opacity(0.4)
+                PermissionAssurance()
+            }
+            .padding(24)
+            .frame(width: 540))))
+
         out.append(("settings", AnyView(SettingsView(model: model).frame(width: 460))))
         out.append(("notice", AnyView(
             NoticeView(notice: Notice(title: "Converted",
