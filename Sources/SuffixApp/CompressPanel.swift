@@ -22,16 +22,9 @@ final class CompressPanel {
             completion(results)
         }
 
-        let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 420, height: 300),
-            styleMask: [.titled, .closable, .fullSizeContentView],
-            backing: .buffered, defer: false)
-        window.title = "Compress"
-        window.titlebarAppearsTransparent = true
-        window.isMovableByWindowBackground = true
+        // Borderless: the panel draws its own System 7 title bar.
+        let window = S7WindowHost(size: NSSize(width: 452, height: 346))
         window.contentView = NSHostingView(rootView: view)
-        window.center()
-        window.isReleasedWhenClosed = false
         self.window = window
 
         NSApp.activate(ignoringOtherApps: true)
@@ -84,79 +77,109 @@ struct CompressView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text(files.count == 1
-                     ? files[0].lastPathComponent
-                     : "\(files.count) files")
-                    .font(.headline)
-                    .lineLimit(1).truncationMode(.middle)
-                Text(byteText(totalBefore))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
+        ZStack {
+            S7Desktop()
+            S7Window(title: "Compress", close: { finish([]) }) {
+                VStack(alignment: .leading, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(files.count == 1 ? files[0].lastPathComponent : "\(files.count) files")
+                            .font(S7.data(13))
+                            .foregroundStyle(S7.black)
+                            .lineLimit(1).truncationMode(.middle)
+                        Text(byteText(totalBefore))
+                            .font(S7.read(11.5))
+                            .foregroundStyle(S7.dim)
+                    }
 
-            Picker("", selection: Binding(
-                get: { level ?? .balanced },
-                set: { level = $0; quality = $0.settings.quality; scheduleEstimate() })) {
-                ForEach(CompressionLevel.allCases) { Text($0.title).tag($0) }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
+                    S7Rule()
 
-            VStack(alignment: .leading, spacing: 4) {
-                Slider(value: $quality, in: 0.2...0.95) {
-                    Text("Quality")
-                } minimumValueLabel: {
-                    Text("Smaller").font(.caption)
-                } maximumValueLabel: {
-                    Text("Better").font(.caption)
-                } onEditingChanged: { editing in
-                    if !editing { scheduleEstimate() }
+                    // The three presets, as one segmented row of System 7 tabs.
+                    HStack(spacing: 0) {
+                        ForEach(CompressionLevel.allCases) { option in
+                            Button {
+                                level = option
+                                quality = option.settings.quality
+                                scheduleEstimate()
+                            } label: {
+                                Text(option.title)
+                                    .font(S7.chrome(11))
+                                    .foregroundStyle(level == option ? S7.white : S7.black)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 6)
+                                    .background(level == option ? S7.black : S7.white)
+                                    .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            if option != CompressionLevel.allCases.last {
+                                Rectangle().fill(S7.black).frame(width: 1)
+                            }
+                        }
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    .overlay(Rectangle().strokeBorder(S7.black, lineWidth: 1))
+
+                    VStack(alignment: .leading, spacing: 5) {
+                        HStack {
+                            Text("Quality").font(S7.read(12.5)).foregroundStyle(S7.black)
+                            Spacer()
+                            Text("\(Int(quality * 100))%")
+                                .font(S7.data(12)).foregroundStyle(S7.black)
+                        }
+                        Slider(value: $quality, in: 0.2...0.95) { } onEditingChanged: { editing in
+                            if !editing { scheduleEstimate() }
+                        }
+                        .tint(S7.black)
+                        .onChange(of: quality) { _, new in
+                            // Moving the slider leaves the preset behind unless
+                            // it happens to land exactly on one.
+                            level = CompressionLevel.matching(quality: new)
+                        }
+                        HStack {
+                            Text("Smaller").font(S7.read(11)).foregroundStyle(S7.faint)
+                            Spacer()
+                            Text("Better").font(S7.read(11)).foregroundStyle(S7.faint)
+                        }
+                    }
+
+                    S7Note {
+                        if estimating {
+                            Text("Measuring…").font(S7.read(12)).foregroundStyle(S7.dim)
+                        } else if let estimate {
+                            let saved = max(0, totalBefore - estimate)
+                            let percent = totalBefore > 0
+                                ? Int(Double(saved) / Double(totalBefore) * 100) : 0
+                            HStack(spacing: 6) {
+                                Text("About").font(S7.read(12.5)).foregroundStyle(S7.black)
+                                S7Selection(text: byteText(estimate))
+                                Text("— saves \(percent)%")
+                                    .font(S7.read(12.5)).foregroundStyle(S7.black)
+                            }
+                        } else {
+                            Text("Estimating from the first file")
+                                .font(S7.read(12)).foregroundStyle(S7.faint)
+                        }
+                    }
+
+                    Spacer(minLength: 0)
+
+                    HStack {
+                        Button("Cancel") { finish([]) }
+                            .buttonStyle(.s7)
+                            .keyboardShortcut(.cancelAction)
+                        Spacer()
+                        Button(working ? "Compressing…" : "Compress") { run() }
+                            .buttonStyle(.s7Default)
+                            .keyboardShortcut(.defaultAction)
+                            .disabled(working)
+                    }
                 }
-                .onChange(of: quality) { _, new in
-                    // Moving the slider leaves the preset behind unless it
-                    // happens to land exactly on one.
-                    level = CompressionLevel.matching(quality: new)
-                }
-                Text("Quality \(Int(quality * 100))%")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                .padding(16)
+                .frame(width: 420, height: 290, alignment: .topLeading)
             }
-
-            Divider()
-
-            HStack(spacing: 8) {
-                if estimating {
-                    ProgressView().controlSize(.small)
-                    Text("Measuring…").font(.callout).foregroundStyle(.secondary)
-                } else if let estimate {
-                    let saved = max(0, totalBefore - estimate)
-                    let percent = totalBefore > 0 ? Int(Double(saved) / Double(totalBefore) * 100) : 0
-                    Text("About **\(byteText(estimate))** — saves \(percent)%")
-                        .font(.callout)
-                        .foregroundStyle(percent > 0 ? Color.primary : Color.secondary)
-                } else {
-                    Text("Estimating from the first file")
-                        .font(.callout).foregroundStyle(.tertiary)
-                }
-            }
-            .frame(height: 18)
-
-            Spacer(minLength: 0)
-
-            HStack {
-                Button("Cancel") { finish([]) }
-                    .keyboardShortcut(.cancelAction)
-                Spacer()
-                Button(working ? "Compressing…" : "Compress") { run() }
-                    .keyboardShortcut(.defaultAction)
-                    .buttonStyle(.borderedProminent)
-                    .disabled(working)
-            }
+            .padding(14)
         }
-        .padding(20)
-        .frame(width: 420, height: 300)
+        .frame(width: 452, height: 346)
+        .background(S7.paper)
         .task { scheduleEstimate() }
     }
 

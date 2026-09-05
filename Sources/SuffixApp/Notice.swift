@@ -31,81 +31,79 @@ struct NoticeView: View {
     @State private var hovering = false
 
     var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            icon
+        VStack(spacing: 0) {
+            S7TitleBar(title: notice.isError ? "Suffix" : "Converted", close: dismiss)
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text(notice.title)
-                    .font(.system(size: 11, weight: .semibold))
-                    .textCase(.uppercase)
-                    .kerning(0.6)
-                    .foregroundStyle(notice.isError ? Color.red : .secondary)
+            HStack(alignment: .top, spacing: 11) {
+                icon
 
-                if let from = notice.from, let to = notice.to {
-                    RenameChip(from: from, to: to, font: .system(size: 12.5))
-                }
-                if let detail = notice.detail {
-                    Text(detail)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                if notice.undo != nil || notice.reveal != nil {
-                    HStack(spacing: 8) {
-                        if let undo = notice.undo {
-                            Button("Undo") { undo(); dismiss() }
-                        }
-                        if let reveal = notice.reveal {
-                            Button("Show") { reveal(); dismiss() }
-                        }
+                VStack(alignment: .leading, spacing: 5) {
+                    if let from = notice.from, let to = notice.to {
+                        S7RenameChip(from: from, to: to, size: 12)
+                    } else {
+                        Text(notice.title)
+                            .font(S7.chrome(12))
+                            .foregroundStyle(S7.black)
                     }
-                    .controlSize(.small)
-                    .padding(.top, 4)
+
+                    if let detail = notice.detail {
+                        Text(detail)
+                            .font(S7.read(11.5))
+                            .foregroundStyle(S7.dim)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    if notice.undo != nil || notice.reveal != nil {
+                        HStack(spacing: 8) {
+                            if let undo = notice.undo {
+                                Button("Undo") { undo(); dismiss() }.buttonStyle(.s7)
+                            }
+                            if let reveal = notice.reveal {
+                                Button("Show") { reveal(); dismiss() }.buttonStyle(.s7)
+                            }
+                        }
+                        .padding(.top, 3)
+                    }
                 }
-            }
 
-            Spacer(minLength: 0)
-
-            Button(action: dismiss) {
-                Image(systemName: "xmark.circle.fill")
-                    .foregroundStyle(.secondary)
+                Spacer(minLength: 0)
             }
-            .buttonStyle(.plain)
-            .opacity(hovering ? 1 : 0)
+            .padding(.horizontal, 13)
+            .padding(.vertical, 12)
+            .frame(width: Style.noticeWidth, alignment: .leading)
+            .background(S7.paper)
         }
-        .padding(.horizontal, 13)
-        .padding(.vertical, 11)
-        .frame(width: Style.noticeWidth, alignment: .leading)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Style.noticeCorner))
-        .overlay(alignment: .leading) {
-            // A hairline in selection blue: the same "this is the thing that
-            // changed" signal the extension block carries.
-            Rectangle()
-                .fill(notice.isError ? Color.red : Style.selection)
-                .frame(width: 2.5)
-                .clipShape(RoundedRectangle(cornerRadius: 2))
-        }
-        .overlay(
-            RoundedRectangle(cornerRadius: Style.noticeCorner)
-                .strokeBorder(.separator, lineWidth: 0.5)
-        )
-        .shadow(color: .black.opacity(0.16), radius: 12, y: 4)
+        .overlay(Rectangle().strokeBorder(S7.black, lineWidth: 1))
+        .background(Rectangle().fill(S7.shadow).offset(x: 2, y: 2))
         .onHover { hovering = $0 }
     }
 
+    /// The file's own thumbnail if there is one; otherwise the System 7 alert
+    /// figure — a bordered square carrying the six-colour mark for a success
+    /// and an exclamation for a failure.
     @ViewBuilder private var icon: some View {
         if let thumb = notice.thumbnail {
             Image(nsImage: thumb)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: 36, height: 36)
-                .clipShape(RoundedRectangle(cornerRadius: 5))
-        } else {
-            Image(systemName: notice.isError ? "exclamationmark.triangle.fill" : "checkmark")
-                .font(.system(size: notice.isError ? 20 : 15, weight: .semibold))
-                .foregroundStyle(notice.isError ? Color.red : Color.secondary)
                 .frame(width: 34, height: 34)
+                .clipped()
+                .overlay(Rectangle().strokeBorder(S7.black, lineWidth: 1))
+        } else if notice.isError {
+            Text("!")
+                .font(S7.chrome(20))
+                .foregroundStyle(S7.black)
+                .frame(width: 34, height: 34)
+                .background(S7.orange)
+                .overlay(Rectangle().strokeBorder(S7.black, lineWidth: 1))
+        } else {
+            VStack(spacing: 0) {
+                ForEach(S7.rainbow.indices, id: \.self) { i in
+                    Rectangle().fill(S7.rainbow[i])
+                }
+            }
+            .frame(width: 34, height: 34)
+            .overlay(Rectangle().strokeBorder(S7.black, lineWidth: 1))
         }
     }
 }

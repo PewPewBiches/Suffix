@@ -29,21 +29,15 @@ final class SetupWindow {
             }
         }
 
-        let view = OnboardingView(model: model, startStep: startStep) { [weak self] in
+        let view = OnboardingView(model: model, startStep: startStep,
+                                  dismiss: { [weak self] in self?.close() }) { [weak self] in
             model.hasOnboarded = true
             self?.close()
         }
 
-        let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 540, height: 520),
-            styleMask: [.titled, .closable, .fullSizeContentView],
-            backing: .buffered, defer: false)
+        // Borderless: setup draws its own System 7 window, frame and all.
+        let window = S7WindowHost(size: NSSize(width: 560, height: 540))
         window.contentView = NSHostingView(rootView: view)
-        window.titlebarAppearsTransparent = true
-        window.titleVisibility = .hidden
-        window.isMovableByWindowBackground = true
-        window.center()
-        window.isReleasedWhenClosed = false
 
         self.window = window
         NSApp.activate(ignoringOtherApps: true)
@@ -52,5 +46,6 @@ final class SetupWindow {
 
     func close() {
         window?.close()
+        window = nil
     }
 }

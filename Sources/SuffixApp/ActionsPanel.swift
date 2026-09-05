@@ -29,16 +29,10 @@ final class ActionsPanel {
             self?.window = nil
         }
 
-        let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 380, height: 340),
-            styleMask: [.titled, .closable, .fullSizeContentView],
-            backing: .buffered, defer: false)
-        window.title = "Suffix"
-        window.titlebarAppearsTransparent = true
-        window.isMovableByWindowBackground = true
+        // Borderless: the panel draws its own System 7 title bar, so macOS
+        // must not draw one above it.
+        let window = S7WindowHost(size: NSSize(width: 412, height: 386))
         window.contentView = NSHostingView(rootView: view)
-        window.center()
-        window.isReleasedWhenClosed = false
         self.window = window
 
         NSApp.activate(ignoringOtherApps: true)
@@ -57,37 +51,52 @@ struct ActionsView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            VStack(alignment: .leading, spacing: 3) {
-                Text(files.count == 1 ? files[0].lastPathComponent : "\(files.count) files selected")
-                    .font(.headline).lineLimit(1).truncationMode(.middle)
-                Text(summary)
-                    .font(.subheadline).foregroundStyle(.secondary)
-                    .lineLimit(1).truncationMode(.middle)
-            }
+        ZStack {
+            S7Desktop()
+            S7Window(title: "File actions", close: dismiss) {
+                VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(files.count == 1 ? files[0].lastPathComponent
+                                              : "\(files.count) files selected")
+                            .font(S7.data(13))
+                            .foregroundStyle(S7.black)
+                            .lineLimit(1).truncationMode(.middle)
+                        Text(summary)
+                            .font(S7.read(11.5))
+                            .foregroundStyle(S7.dim)
+                            .lineLimit(1).truncationMode(.middle)
+                    }
 
-            Divider()
+                    S7Rule()
 
-            VStack(spacing: 8) {
-                ForEach(BatchOperation.allCases) { operation in
-                    ActionRow(operation: operation,
-                              problem: operation.accepts(formats) ? nil : operation.refusal) {
-                        run(operation)
+                    VStack(spacing: 8) {
+                        ForEach(BatchOperation.allCases) { operation in
+                            ActionRow(operation: operation,
+                                      problem: operation.accepts(formats) ? nil : operation.refusal) {
+                                run(operation)
+                            }
+                        }
+                    }
+
+                    Spacer(minLength: 0)
+
+                    HStack {
+                        Text("or just rename a file's extension")
+                            .font(S7.read(11))
+                            .foregroundStyle(S7.faint)
+                        Spacer()
+                        Button("Close") { dismiss() }
+                            .buttonStyle(.s7)
+                            .keyboardShortcut(.cancelAction)
                     }
                 }
+                .padding(16)
+                .frame(width: 380, height: 330, alignment: .topLeading)
             }
-
-            Spacer(minLength: 0)
-
-            HStack {
-                Text("or just rename a file's extension")
-                    .font(.caption).foregroundStyle(.tertiary)
-                Spacer()
-                Button("Close") { dismiss() }.keyboardShortcut(.cancelAction)
-            }
+            .padding(14)
         }
-        .padding(18)
-        .frame(width: 380, height: 340)
+        .frame(width: 412, height: 386)
+        .background(S7.paper)
     }
 
     private var summary: String {
@@ -113,12 +122,41 @@ private struct ActionRow: View {
     let run: () -> Void
     @State private var hovering = false
 
-    private var icon: String {
-        switch operation {
-        case .mergePDF: return "doc.on.doc"
-        case .compress: return "arrow.down.right.and.arrow.up.left"
-        case .zip:      return "doc.zipper"
+    /// A drawn mark rather than an SF Symbol — SF Symbols are the current
+    /// system's voice, and this window is not speaking it.
+    private var mark: some View {
+        Group {
+            switch operation {
+            case .mergePDF:
+                ZStack {
+                    Rectangle().fill(S7.white).frame(width: 13, height: 16)
+                        .overlay(Rectangle().strokeBorder(S7.black, lineWidth: 1))
+                        .offset(x: -3, y: -2)
+                    Rectangle().fill(S7.white).frame(width: 13, height: 16)
+                        .overlay(Rectangle().strokeBorder(S7.black, lineWidth: 1))
+                        .offset(x: 3, y: 2)
+                }
+            case .compress:
+                VStack(spacing: 2) {
+                    Text("▼").font(.system(size: 8))
+                    Rectangle().fill(S7.black).frame(width: 16, height: 1.5)
+                    Text("▲").font(.system(size: 8))
+                }
+                .foregroundStyle(S7.black)
+            case .zip:
+                Rectangle().fill(S7.white).frame(width: 15, height: 18)
+                    .overlay(Rectangle().strokeBorder(S7.black, lineWidth: 1))
+                    .overlay(
+                        VStack(spacing: 2) {
+                            ForEach(0..<4, id: \.self) { _ in
+                                Rectangle().fill(S7.black).frame(width: 4, height: 2)
+                            }
+                        }
+                    )
+            }
         }
+        .frame(width: 26, height: 22)
+        .opacity(problem == nil ? 1 : 0.35)
     }
 
     private var blurb: String {
@@ -131,27 +169,27 @@ private struct ActionRow: View {
 
     var body: some View {
         Button(action: run) {
-            HStack(spacing: 12) {
-                Image(systemName: icon)
-                    .font(.system(size: 17))
-                    .frame(width: 24)
-                    .foregroundStyle(problem == nil ? Color.accentColor : Color.secondary)
-                VStack(alignment: .leading, spacing: 1) {
+            HStack(spacing: 11) {
+                mark
+                VStack(alignment: .leading, spacing: 2) {
                     Text(operation.title.replacingOccurrences(of: "…", with: ""))
-                        .font(.body).fontWeight(.medium)
+                        .font(S7.chrome(12))
                     Text(problem ?? blurb)
-                        .font(.caption)
-                        .foregroundStyle(problem == nil ? .secondary : .tertiary)
+                        .font(S7.read(11.5))
+                        .foregroundStyle(problem == nil
+                                         ? (hovering ? S7.white : S7.dim)
+                                         : S7.faint)
                         .lineLimit(2).fixedSize(horizontal: false, vertical: true)
+                        .multilineTextAlignment(.leading)
                 }
                 Spacer(minLength: 0)
             }
+            // A row inverts under the pointer, the way a Finder row does.
+            .foregroundStyle(hovering && problem == nil ? S7.white : S7.black)
             .padding(.vertical, 9).padding(.horizontal, 11)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(hovering && problem == nil ? Color.accentColor.opacity(0.12)
-                                                     : Color.secondary.opacity(0.07)))
+            .background(hovering && problem == nil ? S7.black : S7.white)
+            .overlay(Rectangle().strokeBorder(S7.black, lineWidth: 1))
         }
         .buttonStyle(.plain)
         .disabled(problem != nil)

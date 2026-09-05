@@ -60,66 +60,81 @@ private struct PermissionRow: View {
         VStack(alignment: .leading, spacing: 0) {
             Button(action: toggle) {
                 HStack(spacing: 10) {
-                    StatusDot(state: state)
+                    StatusMark(state: state)
 
                     VStack(alignment: .leading, spacing: 1) {
                         Text(permission.title)
-                            .font(.body).fontWeight(.medium)
-                            .foregroundStyle(.primary)
+                            .font(S7.chrome(13))
+                            .foregroundStyle(S7.black)
                         Text(statusLine)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(S7.read(11.5))
+                            .foregroundStyle(S7.dim)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .multilineTextAlignment(.leading)
                     }
 
                     Spacer(minLength: 8)
 
-                    // `.notNeeded` counts as satisfied, so a machine without
-                    // Pages never sees an "Optional" badge it cannot act on.
+                    // `.notNeeded` counts as satisfied, so a Mac without Pages
+                    // never sees an "Optional" badge it cannot act on.
                     if !state.isSatisfied {
-                        Text(permission.isRequired ? "Needed" : "Optional")
-                            .font(.caption2).fontWeight(.medium)
-                            .padding(.horizontal, 6).padding(.vertical, 2)
-                            .background(permission.isRequired ? Color.orange.opacity(0.18)
-                                                              : Color.secondary.opacity(0.14),
-                                        in: Capsule())
-                            .foregroundStyle(permission.isRequired ? .orange : .secondary)
+                        Text(permission.isRequired ? "NEEDED" : "OPTIONAL")
+                            .font(S7.chrome(9))
+                            .foregroundStyle(permission.isRequired ? S7.white : S7.black)
+                            .padding(.horizontal, 5).padding(.vertical, 2)
+                            .background(permission.isRequired ? S7.black : S7.white)
+                            .overlay(Rectangle().strokeBorder(S7.black, lineWidth: 1))
                     }
 
-                    Image(systemName: "chevron.right")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.tertiary)
+                    // The disclosure triangle System 7 actually used.
+                    Triangle()
+                        .fill(S7.black)
+                        .frame(width: 7, height: 8)
                         .rotationEffect(.degrees(isExpanded ? 90 : 0))
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
+                .padding(.horizontal, 11)
+                .padding(.vertical, 9)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
 
             if isExpanded {
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 9) {
+                    Rectangle().fill(S7.black).frame(height: 1)
+
                     Text(permission.why)
+                        .font(S7.read(12.5))
+                        .foregroundStyle(S7.black)
                         .fixedSize(horizontal: false, vertical: true)
 
-                    Label {
+                    // The limit gets the selection block, because "what this
+                    // does not allow" is the thing being asserted.
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("WHAT IT DOES NOT ALLOW")
+                            .font(S7.chrome(9))
+                            .foregroundStyle(S7.white)
+                            .padding(.horizontal, 5).padding(.vertical, 2)
+                            .background(S7.black)
                         Text(permission.limit)
+                            .font(S7.read(12.5))
+                            .foregroundStyle(S7.black)
                             .fixedSize(horizontal: false, vertical: true)
-                    } icon: {
-                        Image(systemName: "lock.shield")
                     }
-                    .foregroundStyle(.secondary)
 
                     if !state.isSatisfied {
                         Button(permission.isAskable ? "Ask macOS now" : permission.settingsLabel,
                                action: act)
+                            .buttonStyle(.s7)
+                            .padding(.top, 2)
                     }
                 }
-                .font(.callout)
-                .padding(.horizontal, 12)
-                .padding(.bottom, 12)
+                .padding(.horizontal, 11)
+                .padding(.bottom, 11)
+                .padding(.top, 2)
             }
         }
-        .background(.quaternary.opacity(0.4), in: RoundedRectangle(cornerRadius: 8))
+        .background(S7.white)
+        .overlay(Rectangle().strokeBorder(S7.black, lineWidth: 1))
     }
 
     private var statusLine: String {
@@ -134,54 +149,70 @@ private struct PermissionRow: View {
     }
 }
 
-private struct StatusDot: View {
+/// A filled square in one of the six colours, rather than a traffic light.
+/// System 7 put colour on objects, not on text.
+private struct StatusMark: View {
     let state: Permission.State
 
     var body: some View {
-        Image(systemName: symbol)
-            .font(.system(size: 15))
-            .foregroundStyle(tint)
-            .frame(width: 18)
+        ZStack {
+            Rectangle().fill(fill).frame(width: 13, height: 13)
+                .overlay(Rectangle().strokeBorder(S7.black, lineWidth: 1))
+            if case .granted = state {
+                Path { path in
+                    path.move(to: CGPoint(x: 2.5, y: 6.5))
+                    path.addLine(to: CGPoint(x: 5.5, y: 9.5))
+                    path.addLine(to: CGPoint(x: 10.5, y: 3))
+                }
+                .stroke(S7.black, style: StrokeStyle(lineWidth: 2, lineCap: .square))
+                .frame(width: 13, height: 13)
+            }
+        }
+        .frame(width: 16)
     }
 
-    private var symbol: String {
+    private var fill: Color {
         switch state {
-        case .granted:   return "checkmark.circle.fill"
-        case .denied:    return "xmark.circle.fill"
-        case .notAsked:  return "circle.dashed"
-        case .notNeeded: return "minus.circle"
+        case .granted:   return S7.green
+        case .denied:    return S7.red
+        case .notAsked:  return S7.white
+        case .notNeeded: return S7.faint.opacity(0.4)
         }
     }
+}
 
-    private var tint: Color {
-        switch state {
-        case .granted:   return Style.accent
-        case .denied:    return .orange
-        default:         return .secondary
-        }
+private struct Triangle: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        p.move(to: CGPoint(x: rect.minX, y: rect.minY))
+        p.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+        p.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        p.closeSubpath()
+        return p
     }
 }
 
 /// The same list, plus the two facts that are true whatever macOS decides.
 struct PermissionAssurance: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 7) {
-            Row(icon: "wifi.slash",
-                text: "Suffix has no networking in it. Nothing is uploaded, and there is nothing to upload it with.")
-            Row(icon: "chevron.left.forwardslash.chevron.right",
-                text: "The source is public. Every one of these claims is checkable rather than promised.")
+        S7Note(tag: "Whatever you grant") {
+            VStack(alignment: .leading, spacing: 6) {
+                Row("Suffix has no networking in it. Nothing is uploaded, and there is nothing in the app capable of uploading it.")
+                Row("The source is public. Every one of these claims is checkable rather than promised.")
+            }
         }
-        .font(.caption)
-        .foregroundStyle(.secondary)
     }
 
     private struct Row: View {
-        let icon: String
         let text: String
+        init(_ text: String) { self.text = text }
         var body: some View {
-            HStack(alignment: .top, spacing: 7) {
-                Image(systemName: icon).frame(width: 15)
-                Text(text).fixedSize(horizontal: false, vertical: true)
+            HStack(alignment: .top, spacing: 8) {
+                Rectangle().fill(S7.black).frame(width: 4, height: 4).padding(.top, 6)
+                Text(text)
+                    .font(S7.read(12))
+                    .foregroundStyle(S7.black)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }

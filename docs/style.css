@@ -20,7 +20,9 @@
   /* The 1977 six-colour logo, used as this design's whole palette. */
   --g:#61BB46; --y:#FDB827; --o:#F5821F; --r:#E03A3E; --p:#963D97; --b:#009DDC;
 
-  --chrome:'ChicagoFLF','Silkscreen','Chicago',ui-monospace,monospace;
+  /* Krungthep ships with macOS and does Chicago's job; it is what the app
+     uses, and it keeps Mac visitors in the same face if the CDN is unreachable. */
+  --chrome:'ChicagoFLF','Chicago','Krungthep','Silkscreen',ui-monospace,monospace;
   --read:'Geneva','Verdana','DejaVu Sans',ui-sans-serif,system-ui,sans-serif;
   --data:'IBM Plex Mono',ui-monospace,Menlo,monospace;
 

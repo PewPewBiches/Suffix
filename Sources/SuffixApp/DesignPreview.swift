@@ -22,6 +22,7 @@ enum DesignPreview {
                 let tagged = AnyView(
                     view
                         .environment(\.colorScheme, scheme)
+                        .environment(\.isRenderingPreview, true)
                         .background(scheme == .dark ? Color(white: 0.11) : Color(white: 0.96))
                 )
                 write(tagged, to: dir.appendingPathComponent("\(name)-\(scheme == .dark ? "dark" : "light").png"))
@@ -49,7 +50,12 @@ enum DesignPreview {
             .padding(24)
             .frame(width: 540))))
 
-        out.append(("settings", AnyView(SettingsView(model: model).frame(width: 460))))
+        out.append(("settings", AnyView(SettingsView(model: model))))
+        out.append(("actions", AnyView(
+            ActionsView(files: [URL(fileURLWithPath: "/tmp/scan-01.pdf"),
+                                URL(fileURLWithPath: "/tmp/scan-02.pdf")],
+                        dismiss: {}))))
+
         out.append(("notice", AnyView(
             NoticeView(notice: Notice(title: "Converted",
                                       from: "invoice.png",

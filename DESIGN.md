@@ -26,6 +26,19 @@ System 7, done properly rather than gestured at. Chicago for chrome, Geneva for
 reading, pinstriped title bars, 1px black frames, the 50% dither desktop, and
 the 1984 pointer as the cursor.
 
+**In the app, Chicago is Krungthep.** Chicago left macOS with the Classic
+environment. Krungthep — a Thai face whose Latin set is squared, heavy and
+flat-terminalled — is still installed on every Mac and does Chicago's job, so
+the app matches the site without redistributing somebody else's font. Geneva
+and Monaco both still ship and carry reading and data unchanged. The site lists
+Krungthep after Chicago in its own stack, so a Mac visitor stays in the same
+face if the web font never arrives.
+
+None of these families has a bold. That is not a limitation to work around —
+asking SwiftUI for a weight a family does not have silently drops it back to
+the system font, and the selection block below is the only emphasis this design
+has anyway.
+
 It is not black and white: the six-colour Apple logo is the palette. Green,
 yellow, orange, red, purple, blue appear as the divider rule, the document
 icons, and the alert badge — the way System 7 itself used colour, sparingly and
@@ -56,8 +69,9 @@ acted on*. Using it anywhere else weakens every place it is used correctly.
 | Interface | **Schibsted Grotesk** | Body, labels, buttons. |
 | Data | **IBM Plex Mono** | Filenames, extensions, sizes, code. |
 
-In the app, Interface is the system font — a Mac utility should use the system
-face. Display and Data still apply to the wordmark and to filenames.
+The table above is the website. The app uses the System 7 faces described under
+**The world**, because an app that looks nothing like its own product page is
+two products.
 
 Headlines are lowercase. Sentence case everywhere else. Never all-caps except
 column labels, which are 10–11px with wide tracking.
