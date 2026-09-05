@@ -106,9 +106,21 @@ enum Permission: String, CaseIterable, Identifiable {
 
     var settingsLabel: String {
         switch self {
-        case .fullDisk:         return "Open Privacy & Security → Full Disk Access"
+        case .fullDisk:         return "Open Full Disk Access"
         default:                return "Open Privacy & Security → Automation"
         }
+    }
+
+    /// What to actually do once the settings pane is open. Opening it is not
+    /// the instruction — finding the app in a long alphabetical list and
+    /// flipping a switch is, and nothing on screen says so.
+    var settingsSteps: [String]? {
+        guard case .fullDisk = self else { return nil }
+        return [
+            "Find Suffix in the list — it sorts near Safari and Terminal, so scroll.",
+            "Switch it on. If it is not listed, click + and choose Suffix in Applications.",
+            "Come back here and run the test.",
+        ]
     }
 
     /// Automation is granted by a system prompt the first time it is needed,
@@ -133,15 +145,29 @@ enum Permission: String, CaseIterable, Identifiable {
 
     /// Trigger the system prompt by doing the smallest real thing.
     func ask() {
-        switch self {
-        case .fullDisk:
+        if case .fullDisk = self {
             if let settingsURL { NSWorkspace.shared.open(settingsURL) }
-        case .finderAutomation:
-            _ = FinderSelection.canReadSelection
-        case .iWorkAutomation:
-            guard let bundleID = Permission.installediWorkApp(),
-                  let desc = NSAppleEventDescriptor(bundleIdentifier: bundleID).aeDesc
-            else { return }
+            return
+        }
+
+        let target: String?
+        switch self {
+        case .finderAutomation: target = "com.apple.finder"
+        case .iWorkAutomation:  target = Permission.installediWorkApp()
+        case .fullDisk:         target = nil
+        }
+        guard let target else { return }
+
+        // Suffix has no windows of its own in the Dock, so the consent dialog
+        // can open behind whatever you were looking at. Come forward first.
+        Task { @MainActor in NSApp.activate(ignoringOtherApps: true) }
+
+        // And ask off the main thread. Both this call and an Apple Event that
+        // provokes consent block until the dialog is answered — on the main
+        // thread that freezes the app before it can draw anything, which is
+        // indistinguishable from the button doing nothing at all.
+        DispatchQueue.global(qos: .userInitiated).async {
+            guard let desc = NSAppleEventDescriptor(bundleIdentifier: target).aeDesc else { return }
             _ = AEDeterminePermissionToAutomateTarget(desc, typeWildCard, typeWildCard, true)
         }
     }

@@ -122,6 +122,23 @@ private struct PermissionRow: View {
                     }
 
                     if !state.isSatisfied {
+                        if let steps = permission.settingsSteps {
+                            VStack(alignment: .leading, spacing: 4) {
+                                ForEach(steps.indices, id: \.self) { i in
+                                    HStack(alignment: .top, spacing: 7) {
+                                        Text("\(i + 1).")
+                                            .font(S7.chrome(11))
+                                            .foregroundStyle(S7.black)
+                                            .frame(width: 15, alignment: .leading)
+                                        Text(steps[i])
+                                            .font(S7.read(12))
+                                            .foregroundStyle(S7.black)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                    }
+                                }
+                            }
+                            .padding(.top, 2)
+                        }
                         Button(permission.isAskable ? "Ask macOS now" : permission.settingsLabel,
                                action: act)
                             .buttonStyle(.s7)
