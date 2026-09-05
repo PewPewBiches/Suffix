@@ -76,7 +76,7 @@ Applications folder, and open it.
 
 Suffix isn't signed with a paid Apple Developer certificate, so macOS will
 refuse to open it and say it "cannot be verified". This is Gatekeeper reacting
-to the missing $99/year signature, not to anything the app does.
+to the app being unsigned, not to anything the app does.
 
 1. Try to open Suffix. Let macOS block it.
 2. Go to **System Settings → Privacy & Security**.

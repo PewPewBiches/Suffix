@@ -20,7 +20,7 @@ struct Notice: Identifiable {
 /// This app cannot use Notification Center: an ad-hoc signature has no Team
 /// Identifier, so macOS auto-denies authorization with "Notifications are not
 /// allowed for this application" and never even prompts. A stable identity
-/// costs $99/year.
+/// requires a paid Apple Developer account.
 ///
 /// So the banner is drawn here — but built from system parts (material, text
 /// styles, the user's accent) and to the system's own proportions, so it reads

@@ -18,6 +18,7 @@ cp site/style.css docs/style.css
 : > docs/.nojekyll          # serve the files as written, no Jekyll pass
 
 SITE="https://pewpewbiches.github.io/Suffix"
+ICONV=$(shasum docs/images/icon-32.png | cut -c1-10)
 
 for page in site/pages/*.html; do
   name=$(basename "$page" .html)
@@ -38,6 +39,9 @@ for page in site/pages/*.html; do
     printf '<link rel="canonical" href="%s/%s.html">\n' "$SITE" "$name"
     printf '<meta property="og:url" content="%s/%s.html">\n' "$SITE" "$name"
     printf '<meta property="og:type" content="website">\n<meta property="og:site_name" content="suffix">\n'
+    printf '<link rel="icon" type="image/png" sizes="32x32" href="images/icon-32.png?v=%s">\n' "$ICONV"
+    printf '<link rel="icon" type="image/png" sizes="16x16" href="images/icon-16.png?v=%s">\n' "$ICONV"
+    printf '<link rel="apple-touch-icon" sizes="180x180" href="images/icon-180.png?v=%s">\n' "$ICONV"
     printf '%s\n</head>\n<body data-page="%s">\n' "$HEAD" "$name"
     printf '%s\n' "$NAV"
     printf '%s\n' "$body"
