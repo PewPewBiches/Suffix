@@ -87,6 +87,8 @@ hdiutil detach "$MOUNT" >/dev/null
 trap - EXIT
 
 hdiutil convert "$RW" -format UDZO -imagekey zlib-level=9 -o "$DMG" >/dev/null
-rm -f "$RW"
+# Clean up after ourselves. The staging folder holds a second copy of the app,
+# and leaving it behind means Spotlight shows two Suffixes forever.
+rm -rf "$RW" "$STAGE"
 
 echo "Built $DMG ($(du -h "$DMG" | cut -f1))"
