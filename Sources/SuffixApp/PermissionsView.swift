@@ -142,9 +142,16 @@ private struct PermissionRow: View {
                         // The required one wears the default ring. Every
                         // button looking identical is why the important one
                         // read as nothing at a glance.
-                        Button(permission.actionLabel, action: act)
-                            .buttonStyle(permission.isRequired ? .s7Default : .s7)
-                            .padding(.top, permission.isRequired ? 6 : 2)
+                        HStack(spacing: 10) {
+                            Button(permission.actionLabel, action: act)
+                                .buttonStyle(permission.isRequired ? .s7Default : .s7)
+
+                            if permission.needsRelaunch {
+                                Button("Already on? Reopen Suffix") { Relauncher.restart() }
+                                    .buttonStyle(.s7)
+                            }
+                        }
+                        .padding(.top, permission.isRequired ? 6 : 2)
                     }
                 }
                 .padding(.horizontal, 11)

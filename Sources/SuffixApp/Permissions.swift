@@ -164,10 +164,17 @@ enum Permission: String, CaseIterable, Identifiable {
         guard case .fullDisk = self else { return nil }
         return [
             "Two windows open: the settings list, and Suffix in Finder.",
-            "Drag Suffix from the Finder window into the list.",
-            "Switch it on.",
+            "Drag Suffix from the Finder window into the list, and switch it on.",
+            "Reopen Suffix. macOS only applies this one when the app starts.",
         ]
     }
+
+    /// macOS grants Full Disk Access to a *process*, and only at launch. Flip
+    /// the switch while the app is running and it keeps the old answer — macOS
+    /// says so in its own dialog, which everyone dismisses. Without somewhere
+    /// to restart from, the row just reads "Not allowed" next to a switch that
+    /// is visibly on, and the app looks broken.
+    var needsRelaunch: Bool { self == .fullDisk }
 
     private var settingsURL: URL? {
         URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
@@ -245,5 +252,21 @@ final class PermissionMonitor: ObservableObject {
         Permission.allCases
             .filter(\.isRequired)
             .allSatisfy { states[$0]?.isSatisfied ?? false }
+    }
+}
+
+/// Quit and come back.
+enum Relauncher {
+    /// Waits for this process to actually exit before reopening, so macOS does
+    /// not treat it as a second instance of an app that is still running.
+    @MainActor static func restart() {
+        let pid = ProcessInfo.processInfo.processIdentifier
+        let path = Bundle.main.bundleURL.path
+        let wait = "while kill -0 \(pid) 2>/dev/null; do sleep 0.2; done; open \"\(path)\""
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/bin/sh")
+        task.arguments = ["-c", wait]
+        try? task.run()
+        NSApp.terminate(nil)
     }
 }
