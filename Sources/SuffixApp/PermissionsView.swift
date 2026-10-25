@@ -139,10 +139,12 @@ private struct PermissionRow: View {
                             }
                             .padding(.top, 2)
                         }
-                        Button(permission.isAskable ? "Ask macOS now" : permission.settingsLabel,
-                               action: act)
-                            .buttonStyle(.s7)
-                            .padding(.top, 2)
+                        // The required one wears the default ring. Every
+                        // button looking identical is why the important one
+                        // read as nothing at a glance.
+                        Button(permission.actionLabel, action: act)
+                            .buttonStyle(permission.isRequired ? .s7Default : .s7)
+                            .padding(.top, permission.isRequired ? 6 : 2)
                     }
                 }
                 .padding(.horizontal, 11)
@@ -158,10 +160,11 @@ private struct PermissionRow: View {
         switch state {
         case .granted:              return "Allowed"
         case .denied:               return permission.isRequired
-                                         ? "Not allowed — Suffix cannot see your files"
+                                         ? "Not allowed — nothing will convert"
                                          : "Not allowed"
-        case .notAsked:             return "macOS will ask the first time it is needed"
+        case .notAsked:             return "macOS will ask when it is needed"
         case .notNeeded(let why):   return why
+        case .partial(let which):   return "Partly allowed — " + which
         }
     }
 }
@@ -192,6 +195,7 @@ private struct StatusMark: View {
         switch state {
         case .granted:   return S7.green
         case .denied:    return S7.red
+        case .partial:   return S7.yellow
         case .notAsked:  return S7.white
         case .notNeeded: return S7.faint.opacity(0.4)
         }

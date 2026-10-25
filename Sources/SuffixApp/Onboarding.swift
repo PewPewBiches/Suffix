@@ -268,10 +268,12 @@ private struct PermissionStep: View {
     @ObservedObject var permissions: PermissionMonitor
 
     var body: some View {
-        Page(title: "what Suffix needs",
-             lede: "Three things, one of them required. Open a row for what each is for and — the part usually left out — what it does not allow.") {
-            PermissionList(monitor: permissions, startExpanded: .fullDisk)
-            PermissionAssurance()
+        Page(title: "one permission",
+             lede: "Press the button. macOS asks three times — Desktop, Documents, Downloads — and each one is a single click. The rest of this list is optional.") {
+            // No assurance block here. It is true and it is three more
+            // paragraphs on the one screen where somebody is trying to find
+            // a button. It lives in Settings → Permissions instead.
+            PermissionList(monitor: permissions, startExpanded: .folders)
         }
     }
 }
@@ -320,7 +322,7 @@ private struct TestStep: View {
                         .foregroundStyle(S7.black)
                         .fixedSize(horizontal: false, vertical: true)
                     if !permissions.allRequiredGranted {
-                        Button("Open Full Disk Access") { Permission.fullDisk.ask() }
+                        Button("Ask macOS for the folders") { Permission.folders.ask() }
                             .buttonStyle(.s7)
                     }
                 }
@@ -421,7 +423,7 @@ enum SelfTest {
             try? FileManager.default.removeItem(at: renamed)
             try data.write(to: source)
         } catch {
-            return .failed("Can't write to your Desktop — grant Full Disk Access and try again")
+            return .failed("Can't write to your Desktop. Go back a step and press Ask macOS.")
         }
 
         try? await Task.sleep(for: .milliseconds(400))
@@ -442,7 +444,7 @@ enum SelfTest {
             }
         }
         try? FileManager.default.removeItem(at: renamed)
-        return .failed("The file was renamed but nothing converted. That is almost always Full Disk Access.")
+        return .failed("The file was renamed but nothing converted. Go back one step and grant the folders.")
     }
 
     private static func sampleImage() -> Data? {

@@ -16,7 +16,7 @@ struct MenuView: View {
         // Without Full Disk Access the app runs perfectly and converts nothing
         // in the folders anyone uses. Saying so here is the difference between
         // a five-minute fix and assuming the app is broken.
-        if !Permission.fullDisk.measure().isSatisfied {
+        if !Permission.folders.measure().isSatisfied {
             Divider()
             Text("No access to your files — nothing will convert")
             Button("Fix this…") {

@@ -5,11 +5,18 @@ import ConvertKit
 /// What macOS is currently letting Suffix do, and how to ask for the rest.
 ///
 /// There is no API that reports a TCC decision, so every state here is
-/// measured by attempting the smallest possible version of the real thing:
-/// reading one byte of a protected file, asking Finder a question that has no
-/// side effect. Guessing from a stored flag would be worse than useless —
-/// the whole failure mode of this app is looking fine while doing nothing.
+/// measured by attempting the smallest possible version of the real thing.
+/// Guessing from a stored flag would be worse than useless — the whole
+/// failure mode of this app is looking fine while doing nothing.
+///
+/// **The order here is the order of the screen, and it matters.** This used to
+/// lead with Full Disk Access, which cannot be granted from inside an app: it
+/// means a trip to System Settings, a list the app is not in until it has been
+/// refused once, and a + button. People got stuck there and never reached the
+/// product. The three folders anyone actually renames files in are a one-click
+/// system prompt each, and the Info.plist has always declared them.
 enum Permission: String, CaseIterable, Identifiable {
+    case folders
     case fullDisk
     case finderAutomation
     case iWorkAutomation
@@ -20,12 +27,14 @@ enum Permission: String, CaseIterable, Identifiable {
         case granted
         case denied
         case notAsked
-        case notNeeded(String)      // e.g. no iWork app installed
+        case notNeeded(String)
+        case partial(String)        // some folders yes, some no
 
         var isSatisfied: Bool {
-            if case .granted = self { return true }
-            if case .notNeeded = self { return true }
-            return false
+            switch self {
+            case .granted, .notNeeded: return true
+            default: return false
+            }
         }
     }
 
@@ -33,104 +42,76 @@ enum Permission: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .fullDisk:         return "Full Disk Access"
+        case .folders:          return "Desktop, Documents and Downloads"
+        case .fullDisk:         return "Every other folder"
         case .finderAutomation: return "Control Finder"
         case .iWorkAutomation:  return "Control Pages, Keynote and Numbers"
         }
     }
 
-    /// Required to do the main job, or only to do one extra thing.
-    var isRequired: Bool { self == .fullDisk }
+    /// Only one thing is required, and it is the one macOS will just ask for.
+    var isRequired: Bool { self == .folders }
 
+    /// One sentence. The old version ran to four and nobody read any of them.
     var why: String {
         switch self {
+        case .folders:
+            return "The three folders you actually rename files in. macOS asks once per folder, and it is one click each."
         case .fullDisk:
-            return """
-            Renaming a file is something macOS reports to whoever is watching \
-            the folder. Desktop, Documents, Downloads and iCloud Drive are \
-            protected, so without this Suffix keeps running and silently does \
-            nothing in the four folders you actually use.
-            """
+            return "External drives, iCloud Drive, and anywhere outside your home folder. Only worth granting if you rename files out there."
         case .finderAutomation:
-            return """
-            The keyboard shortcut arrives with no files attached, so Suffix has \
-            to ask Finder what you have selected. Only needed for the shortcut — \
-            the right-click menu hands over the selection by itself.
-            """
+            return "Lets the keyboard shortcut ask Finder what you have selected. The right-click menu works without it."
         case .iWorkAutomation:
-            return """
-            A .pages or .key file is a sealed bundle that only Apple's own app \
-            can open. Suffix asks Pages or Keynote to export it, in the \
-            background, so the PDF is exactly the one they would have made.
-            """
+            return "Lets Suffix ask Pages or Keynote to export your document, so the PDF is exactly the one they would make."
         }
     }
 
-    /// The limit, stated in the same breath as the request. This is the part
-    /// people are owed and rarely given.
+    /// The limit, in the same breath as the request.
     var limit: String {
         switch self {
+        case .folders:
+            return "Suffix reads a file only when you rename it to a different format, and only that file. It has no networking in it."
         case .fullDisk:
-            return """
-            Suffix reads a file only when you rename it to a different format, \
-            and only that file. It never opens a network connection — leave it \
-            running and Activity Monitor's Network tab will read zero for as \
-            long as you care to watch. The source is public if you would rather \
-            check than take our word.
-            """
+            return "Same rule, wider area. Still no networking, still only the file you renamed."
         case .finderAutomation:
-            return """
-            One question, asked once per press: which files are selected. \
-            Suffix cannot move, open or delete anything through this, and it \
-            asks nothing when you are not pressing the shortcut.
-            """
+            return "One question per press: which files are selected. It cannot move, open or delete anything through this."
         case .iWorkAutomation:
-            return """
-            Suffix opens your document, exports a PDF, and closes it again — \
-            it does not edit or save over the original. If the app was not \
-            already running it is quit afterwards.
-            """
+            return "Opens the document, exports, closes. It does not edit or save over your original."
         }
     }
 
-    // MARK: where to grant it
-
-    var settingsURL: URL? {
+    /// What the button does, said plainly rather than named after a settings pane.
+    var actionLabel: String {
         switch self {
-        case .fullDisk:
-            return URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
-        case .finderAutomation, .iWorkAutomation:
-            return URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation")
+        case .folders:          return "Ask macOS →"
+        case .fullDisk:         return "Open Settings and show me the app"
+        case .finderAutomation,
+             .iWorkAutomation:  return "Ask macOS →"
         }
     }
-
-    var settingsLabel: String {
-        switch self {
-        case .fullDisk:         return "Open Full Disk Access"
-        default:                return "Open Privacy & Security → Automation"
-        }
-    }
-
-    /// What to actually do once the settings pane is open. Opening it is not
-    /// the instruction — finding the app in a long alphabetical list and
-    /// flipping a switch is, and nothing on screen says so.
-    var settingsSteps: [String]? {
-        guard case .fullDisk = self else { return nil }
-        return [
-            "Find Suffix in the list — it sorts near Safari and Terminal, so scroll.",
-            "Switch it on. If it is not listed, click + and choose Suffix in Applications.",
-            "Come back here and run the test.",
-        ]
-    }
-
-    /// Automation is granted by a system prompt the first time it is needed,
-    /// not by finding Suffix in a list it is not in yet.
-    var isAskable: Bool { self != .fullDisk }
 
     // MARK: measuring it
 
+    /// The three folders, and whether each can be read right now.
+    static let watched: [(name: String, url: URL)] = {
+        let fm = FileManager.default
+        return [("Desktop", FileManager.SearchPathDirectory.desktopDirectory),
+                ("Documents", .documentDirectory),
+                ("Downloads", .downloadsDirectory)]
+            .compactMap { label, dir in
+                fm.urls(for: dir, in: .userDomainMask).first.map { (label, $0) }
+            }
+    }()
+
+    /// Not main-thread safe to call: a first attempt on a protected folder
+    /// blocks until the person answers the system prompt.
     func measure() -> State {
         switch self {
+        case .folders:
+            let ok = Permission.watched.filter { Permission.canList($0.url) }.map(\.name)
+            if ok.count == Permission.watched.count { return .granted }
+            if ok.isEmpty { return .denied }
+            return .partial(ok.joined(separator: " and ") + " only")
         case .fullDisk:
             return Permission.canReadProtectedFile() ? .granted : .denied
         case .finderAutomation:
@@ -143,41 +124,64 @@ enum Permission: String, CaseIterable, Identifiable {
         }
     }
 
-    /// Trigger the system prompt by doing the smallest real thing.
     func ask() {
-        if case .fullDisk = self {
-            if let settingsURL { NSWorkspace.shared.open(settingsURL) }
-            return
-        }
-
-        let target: String?
         switch self {
-        case .finderAutomation: target = "com.apple.finder"
-        case .iWorkAutomation:  target = Permission.installediWorkApp()
-        case .fullDisk:         target = nil
-        }
-        guard let target else { return }
+        case .folders:
+            // Touching each folder is what makes macOS show its own one-click
+            // dialog. Off the main thread: each one blocks until answered.
+            DispatchQueue.global(qos: .userInitiated).async {
+                for folder in Permission.watched { _ = Permission.canList(folder.url) }
+            }
 
-        // Suffix has no windows of its own in the Dock, so the consent dialog
-        // can open behind whatever you were looking at. Come forward first.
-        Task { @MainActor in NSApp.activate(ignoringOtherApps: true) }
+        case .fullDisk:
+            // Full Disk Access cannot be granted from in here. The app is not
+            // in that list until macOS has refused it once, so opening the
+            // pane alone strands people. Reveal the app too — it can be
+            // dragged straight into the list.
+            if let url = settingsURL { NSWorkspace.shared.open(url) }
+            let app = Bundle.main.bundleURL
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                NSWorkspace.shared.activateFileViewerSelecting([app])
+            }
 
-        // And ask off the main thread. Both this call and an Apple Event that
-        // provokes consent block until the dialog is answered — on the main
-        // thread that freezes the app before it can draw anything, which is
-        // indistinguishable from the button doing nothing at all.
-        DispatchQueue.global(qos: .userInitiated).async {
-            guard let desc = NSAppleEventDescriptor(bundleIdentifier: target).aeDesc else { return }
-            _ = AEDeterminePermissionToAutomateTarget(desc, typeWildCard, typeWildCard, true)
+        case .finderAutomation, .iWorkAutomation:
+            let target = self == .finderAutomation
+                ? "com.apple.finder"
+                : Permission.installediWorkApp()
+            guard let target else { return }
+            // Suffix has no Dock presence, so the consent dialog can open
+            // behind whatever you were looking at. Come forward first.
+            Task { @MainActor in NSApp.activate(ignoringOtherApps: true) }
+            DispatchQueue.global(qos: .userInitiated).async {
+                guard let desc = NSAppleEventDescriptor(bundleIdentifier: target).aeDesc else { return }
+                _ = AEDeterminePermissionToAutomateTarget(desc, typeWildCard, typeWildCard, true)
+            }
         }
+    }
+
+    /// Steps only for the one permission a button cannot finish.
+    var settingsSteps: [String]? {
+        guard case .fullDisk = self else { return nil }
+        return [
+            "Two windows open: the settings list, and Suffix in Finder.",
+            "Drag Suffix from the Finder window into the list.",
+            "Switch it on.",
+        ]
+    }
+
+    private var settingsURL: URL? {
+        URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")
     }
 
     // MARK: - probes
 
-    /// One byte out of a file only Full Disk Access can open.
-    ///
-    /// `isReadableFile(atPath:)` answers from the POSIX bits and says yes even
-    /// when TCC will refuse, so the read has to actually happen.
+    private static func canList(_ url: URL) -> Bool {
+        (try? FileManager.default.contentsOfDirectory(atPath: url.path)) != nil
+    }
+
+    /// One byte out of a file only Full Disk Access can open. `isReadableFile`
+    /// answers from the POSIX bits and says yes even when TCC will refuse, so
+    /// the read has to actually happen.
     private static func canReadProtectedFile() -> Bool {
         let path = NSHomeDirectory() + "/Library/Application Support/com.apple.TCC/TCC.db"
         guard let handle = FileHandle(forReadingAtPath: path) else { return false }
@@ -194,8 +198,6 @@ enum Permission: String, CaseIterable, Identifiable {
         switch status {
         case noErr:                             return .granted
         case OSStatus(errAEEventNotPermitted):  return .denied
-        case OSStatus(errAEEventWouldRequireUserConsent): return .notAsked
-        case OSStatus(procNotFound):            return .notAsked   // app isn't running yet
         default:                                return .notAsked
         }
     }
@@ -209,9 +211,9 @@ enum Permission: String, CaseIterable, Identifiable {
 
 /// Live permission states, refreshed while a window that shows them is open.
 ///
-/// macOS grants these in System Settings, in another process, with no
-/// notification — so the only way for a checklist to be truthful is to keep
-/// measuring it.
+/// Measuring happens on a background queue. A first read of a protected folder
+/// blocks until the person answers the system prompt, and doing that on the
+/// main thread would freeze the window behind the dialog.
 @MainActor
 final class PermissionMonitor: ObservableObject {
     @Published private(set) var states: [Permission: Permission.State] = [:]
@@ -220,9 +222,11 @@ final class PermissionMonitor: ObservableObject {
     init() { refresh() }
 
     func refresh() {
-        var next: [Permission: Permission.State] = [:]
-        for permission in Permission.allCases { next[permission] = permission.measure() }
-        states = next
+        Task.detached(priority: .userInitiated) {
+            var next: [Permission: Permission.State] = [:]
+            for permission in Permission.allCases { next[permission] = permission.measure() }
+            await MainActor.run { [next] in self.states = next }
+        }
     }
 
     func startWatching() {
